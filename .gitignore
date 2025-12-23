@@ -11,7 +11,11 @@ meta-*/
 buildtools/
 !meta-skeleton
 !meta-selftest
-hob-image-*.bb
+!meta-intel-fpga
+!meta-openembedded
+!meta-mylayer
+!meta-intel-fpga-refdes
+hob-imabb
 *.swp
 *.orig
 *.rej
@@ -19,6 +23,7 @@ hob-image-*.bb
 !meta-poky
 !meta-yocto
 !meta-yocto-bsp
+!meta-ke
 !meta-yocto-imported
 /documentation/*/eclipse/
 /documentation/*/*.html
