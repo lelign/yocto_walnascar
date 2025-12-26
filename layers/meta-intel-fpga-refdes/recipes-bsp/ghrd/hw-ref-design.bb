@@ -82,11 +82,9 @@ SRC_URI:stratix10_htile ?= "\
 		"
 
 SRC_URI:arria10 ?= "\
-		${GHRD_REPO}/arria10_${IMAGE_TYPE}_hps.xml;name=arria10_${IMAGE_TYPE}_hps_xml \
-		${GHRD_REPO}/arria10_${IMAGE_TYPE}_${A10_GHRD_CORE_RBF};name=arria10_${IMAGE_TYPE}_core \
-		${GHRD_REPO}/arria10_${IMAGE_TYPE}_${A10_GHRD_PERIPH_RBF};name=arria10_${IMAGE_TYPE}_periph \
-		${@bb.utils.contains("IMAGE_TYPE", "pr", "${GHRD_REPO}/arria10_${IMAGE_TYPE}_persona0.rbf;name=arria10_pr_persona0", "", d)} \
-		${@bb.utils.contains("IMAGE_TYPE", "pr", "${GHRD_REPO}/arria10_${IMAGE_TYPE}_persona1.rbf;name=arria10_pr_persona1", "", d)} \
+		file://arria10_gsrd_hps.xml \
+		file://arria10_gsrd_ghrd_10as066n2.core.rbf \
+		file://arria10_gsrd_ghrd_10as066n2.periph.rbf \
 		"
 
 SRC_URI:agilex3 ?= "\
@@ -123,9 +121,9 @@ SRC_URI[stratix10_htile_pr_core.sha256sum] = "a4d776c05d39ddf5b580b010990eae547e
 SRC_URI[stratix10_htile_pr_persona0.sha256sum] = "b97b161b8b9cd9719d88144173716305c363819bc856abe7444b2c9c21e33448"
 SRC_URI[stratix10_htile_pr_persona1.sha256sum] = "246d159a9d334321d676c01425ce20810bd8e2b637a925bd58fd4986efc17582"
 
-SRC_URI[arria10_gsrd_core.sha256sum] = "cc51c7452ada2e6b4fea232bcc419f2b153bab24169596b1df96b5a166ccd81e"
-SRC_URI[arria10_gsrd_periph.sha256sum] = "b08eed769e48ac0f0d157dcaa0c6c6eb881294ae19365684bacec5df31eefcb5"
-SRC_URI[arria10_gsrd_hps_xml.sha256sum] = "831278d75c6cddac5d13e48e3328ece057d207914790e75ce3aa24674b6fcd11"
+SRC_URI[arria10_gsrd_core.sha256sum] = "26df6482c6eb23f15bf049b163ee8bfac740dfd4db4b66d1880f494297b9c73e"
+SRC_URI[arria10_gsrd_periph.sha256sum] = "8967317e697a4ecb961343a54088523f2f2da3af200a8ed4688b7df10e783741"
+SRC_URI[arria10_gsrd_hps_xml.sha256sum] = "2296a9dab224a98bdf544807eef4abb4a0a91ebabbd0745bd2fa31d8c2da9c65"
 SRC_URI[arria10_nand_core.sha256sum] = "28920894c365a9f01518430b3bb3ebb2b5345a5b5298e65b794c49645c054a1b"
 SRC_URI[arria10_nand_periph.sha256sum] = "b06f371cfa25aade8488e8dfbe12ad0873fd54228eec8b2f751c995d80411a28"
 SRC_URI[arria10_nand_hps_xml.sha256sum] = "ee55c79cba91fd9848e47e120d381961031b4e729b52472049ee76f31375b588"
@@ -262,9 +260,9 @@ do_deploy () {
 	fi
 
 	if ${@bb.utils.contains("MACHINE", "arria10", "true", "false", d)}; then
-		install -D -m 0644 ${WORKDIR}/sources/${MACHINE}_${IMAGE_TYPE}_hps.xml ${DEPLOYDIR}/${MACHINE}_${IMAGE_TYPE}_ghrd/hps.xml
-		install -D -m 0644 ${WORKDIR}/sources/${MACHINE}_${IMAGE_TYPE}_${A10_GHRD_CORE_RBF} ${DEPLOYDIR}/${MACHINE}_${IMAGE_TYPE}_ghrd/${A10_GHRD_CORE_RBF}
-		install -D -m 0644 ${WORKDIR}/sources/${MACHINE}_${IMAGE_TYPE}_${A10_GHRD_PERIPH_RBF} ${DEPLOYDIR}/${MACHINE}_${IMAGE_TYPE}_ghrd/${A10_GHRD_PERIPH_RBF}
+		install -D -m 0644 ${WORKDIR}/sources/${MACHINE}_${IMAGE_TYPE}_hps.xml ${DEPLOYDIR}/${MACHINE}__ghrd/hps.xml
+		install -D -m 0644 ${WORKDIR}/sources/${MACHINE}_${IMAGE_TYPE}_${A10_GHRD_CORE_RBF} ${DEPLOYDIR}/${MACHINE}__ghrd/${A10_GHRD_CORE_RBF}
+		install -D -m 0644 ${WORKDIR}/sources/${MACHINE}_${IMAGE_TYPE}_${A10_GHRD_PERIPH_RBF} ${DEPLOYDIR}/${MACHINE}__ghrd/${A10_GHRD_PERIPH_RBF}
 	fi
 
 	if ${@bb.utils.contains("MACHINE", "cyclone5", "true", "false", d)} ; then
