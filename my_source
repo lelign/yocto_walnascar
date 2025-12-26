@@ -1,0 +1,9 @@
+#!/bin/sh
+export local_conf=/home/iru/poky-socfpga/build/conf/local.conf
+echo -e "\tassigned local_conf for \t*/conf/local.conf"
+export bb_conf=/home/iru/poky-socfpga/build/conf/bblayers.conf
+echo -e "\tassigned bb_conf for \t*/conf/bblayers.conf"
+export deploy=/home/iru/poky-socfpga/walnascar_deploy/images/arria10
+echo -e "\tassigned deploy for \t*/walnascar_deploy/images/arria10"
+export bb_c=/home/iru/YOCTO/bitbake_commands
+echo -e "\tassigned bb_c for \t*/YOCTO/bitbake_commands"

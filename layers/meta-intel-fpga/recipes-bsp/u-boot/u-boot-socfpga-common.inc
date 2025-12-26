@@ -70,7 +70,9 @@ B = "${WORKDIR}/build"
 
 RPROVIDES:${PN} = "u-boot"
 
-SRC_URI = "${UBOOT_REPO};protocol=${UBOOT_PROT};branch=${UBOOT_BRANCH}"
+SRC_URI = "${UBOOT_REPO};protocol=${UBOOT_PROT};branch=${UBOOT_BRANCH} \
+           file://0001-change-in-makefile-14_02.patch \
+           "
 
 do_compile:prepend() {
 	if [ -n "${COMPILE_PREPEND_FILES}" ]; then
