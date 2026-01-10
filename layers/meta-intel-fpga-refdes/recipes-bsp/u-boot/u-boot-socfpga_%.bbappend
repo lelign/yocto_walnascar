@@ -59,7 +59,11 @@ do_deploy:append:arria10() {
 		install -m 744 ${B}/fit_uboot_${IMAGE_TYPE}.itb ${DEPLOYDIR}/fit_uboot_${IMAGE_TYPE}.itb
 		install -m 744 ${B}/fit_spl_fpga_${IMAGE_TYPE}.itb ${DEPLOYDIR}/fit_spl_fpga_${IMAGE_TYPE}.itb
 	else
-		install -m 744 ${B}/*.itb ${DEPLOYDIR}/
+		# Ignat changet this line for rename fit_spl_fpga_.itb to fit_spl_fpga.itb
+		install -m 744 ${B}/fit_spl_fpga_.itb ${DEPLOYDIR}/fit_spl_fpga.itb
+		# Ignat added 2 lines for monitoring extlinux.conf fit_uboot_.itb
+		install -m 744 ${B}/extlinux.conf ${DEPLOYDIR}/extlinux.conf
+		install -m 744 ${B}/fit_uboot_.itb ${DEPLOYDIR}/fit_uboot.itb
 		install -m 644 ${B}/${config}/spl/u-boot-splx4.sfp ${DEPLOYDIR}/u-boot-splx4.sfp
 	fi
 }

@@ -7,3 +7,5 @@ export deploy=/home/iru/poky-socfpga/walnascar_deploy/images/arria10
 echo -e "\tassigned deploy for \t*/walnascar_deploy/images/arria10"
 export bb_c=/home/iru/YOCTO/bitbake_commands
 echo -e "\tassigned bb_c for \t*/YOCTO/bitbake_commands"
+export steps=/home/iru/YOCTO/yocto_steps
+echo -e "\tassigned steps for \t*/home/iru/YOCTO/yocto_steps"

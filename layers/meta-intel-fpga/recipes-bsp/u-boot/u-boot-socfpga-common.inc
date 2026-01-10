@@ -72,6 +72,7 @@ RPROVIDES:${PN} = "u-boot"
 
 SRC_URI = "${UBOOT_REPO};protocol=${UBOOT_PROT};branch=${UBOOT_BRANCH} \
            file://0001-change-in-makefile-14_02.patch \
+           file://0001-edited-3-dts-dtsi-files-for-gmac2-only.patch \
            "
 
 do_compile:prepend() {
