@@ -1,0 +1,41 @@
+# prepare
+export ARCH=arm
+export CROSS_COMPILE=$HOME/a10_flow_u-boot_28_10/gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf/bin/arm-none-linux-gnueabihf-
+# check
+type -P ${CRO OKSS_COMPILE:?}gcc
+# answ
+/home/iru/a10_flow_u-boot_28_10/gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf/bin/arm-none-linux-gnueabihf-gcc
+# OK
+# проверил возможность сборки посредством ./scripts/dtc/dtc в два прохода, сначала gcc , т.к. есть #include
+${CROSS_COMPILE}gcc -E -nostdinc -I./arch/arm/boot/dts/intel/socfpga -I./include -undef -D__DTS__ \
+-x assembler-with-cpp -o arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk_sdmmc.dts.tmp arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk_sdmmc.dts
+
+file arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk_sdmmc.dts.tmp
+arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk_sdmmc.dts.tmp: Device Tree File (v1), ASCII tex
+# OK
+# затем 
+./scripts/dtc/dtc -O dtb -o arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk_sdmmc.dtb \
+-i arch/arm/boot/dts/intel/socfpga -@ arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk_sdmmc.dts.tmp
+# NG ! bash: ./scripts/dtc/dtc: No such file or directory
+dtc -O dtb -o arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk_sdmmc.dtb \
+-i arch/arm/boot/dts/intel/socfpga -@ arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk_sdmmc.dts.tmp
+# OK
+# check
+file arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk_sdmmc.dtb
+arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk_sdmmc.dtb: 
+Device Tree Blob version 17, size=25692, boot CPU=0, string block size=2288, DT structure block size=23348
+# OK , работает
+# удаление записей в arch/arm/boot/dts/intel/socfpga/Makefile по поводу nand qspi ник чему не приводит
+# по прежнему собирает соотв <nand.dtb> <qspi.dtb>
+# если спрятать в arch/arm/boot/dts/intel/socfpga/ <nand.dts> и <nand.dts>
+# ERROR: Task (/home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bb:do_kernel_configme) 
+# failed with exit code '1'
+# чтобы избавиться от ошибки
+bitbake linux-socfpga-lts -c cleansstate 
+# не помогло
+devtool reset linux-socfpga-lts
+bitbake linux-socfpga-lts
+# ОК
+# возможный вывод: 
+# конфигурация dtb задается через make menuconfig
+# соответсвующий ,config является общим для bitbake и devtool
