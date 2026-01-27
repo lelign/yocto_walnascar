@@ -679,14 +679,29 @@ bitbake -c menuconfig busybox
 
 #27_01_2026
 ссылки, используемые в YOCTO gsrd (core, periph.hps.xml) (Игнат подменял)
+<core>
 file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_ghrd_10as066n2.core.rbf
 symbolic link to 
 /home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/ghrd_10as066n2.core.rbf
+file
+/home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/ghrd_10as066n2.core.rbf
+symbolic link to 
+/home/iru/Quartus_Projects/AR_PROV4_VIC/output_files/18-December_23_02_13_ask.core.rbf
 
+<periph>
 file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_ghrd_10as066n2.periph.rbf
 symbolic link to 
 /home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/ghrd_10as066n2.periph.rbf
+file
+/home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/ghrd_10as066n2.periph.rbf
+symbolic link to 
+/home/iru/Quartus_Projects/AR_PROV4_VIC/output_files/18-December_23_02_13_ask.periph.rbf
 
+<hps.xml>
 file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_hps.xml
 symbolic link to 
 /home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/hps_xml_link
+file
+/home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/hps_xml_link
+symbolic link to 
+/home/iru/Quartus_Projects/AR_PROV4_VIC/hps_isw_handoff/hps.xml
