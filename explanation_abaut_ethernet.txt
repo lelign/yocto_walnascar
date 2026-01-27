@@ -1,0 +1,106 @@
+общее описание 
+процессор по определлным адресам обращается к контроллеру Ethernet  (находится внутри Arria10), 
+а уже этот контроллер через физическую шину 
+по протоколу rgmii/rmii общается с физическим устройством (Marwell)
+
+gmac <= gigabit media access controller
+
+наши оригинальные dts/dtsi находятся по пути
+/home/iru/poky-socfpga/build/tmp/work-shared/arria10/kernel-source/arch/arm/boot/dts/intel/socfpga
+
+code -n /home/iru/poky-socfpga/build/tmp/work-shared/arria10/kernel-source/arch/arm/boot/dts/intel/socfpga
+in file ****/socfpga_arria10_socdk.dtsi
+                aliases {
+                        ethernet0 = &gmac0;
+                        serial0 = &uart1;
+                    };
+
+                &gmac0 {
+                    phy-mode = "rgmii";
+                    phy-addr = <0xffffffff>; /* probe for phy addr */
+
+                    /*
+                    * These skews assume the user's FPGA design is adding 600ps of delay
+                    * for TX_CLK on Arria 10.
+                    *
+                    * All skews are offset since hardware skew values for the ksz9031
+                    * range from a negative skew to a positive skew.
+                    * See the micrel-ksz90x1.txt Documentation file for details.
+                    */
+                    txd0-skew-ps = <0>; /* -420ps */
+                    txd1-skew-ps = <0>; /* -420ps */
+                    txd2-skew-ps = <0>; /* -420ps */
+                    txd3-skew-ps = <0>; /* -420ps */
+                    rxd0-skew-ps = <420>; /* 0ps */
+                    rxd1-skew-ps = <420>; /* 0ps */
+                    rxd2-skew-ps = <420>; /* 0ps */
+                    rxd3-skew-ps = <420>; /* 0ps */
+                    txen-skew-ps = <0>; /* -420ps */
+                    txc-skew-ps = <1860>; /* 960ps */
+                    rxdv-skew-ps = <420>; /* 0ps */
+                    rxc-skew-ps = <1680>; /* 780ps */
+                    max-frame-size = <3800>;
+                    status = "okay";
+                };
+
+in file **********/socfpga_arria10.dtsi
+<deleted>
+        gmac0: ethernet@ff800000 {
+			compatible = "altr,socfpga-stmmac-a10-s10", "snps,dwmac-3.72a", "snps,dwmac";
+			altr,sysmgr-syscon = <&sysmgr 0x44 0>;
+			reg = <0xff800000 0x2000>;
+			interrupts = <0 92 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-names = "macirq";
+			/* Filled in by bootloader */
+			mac-address = [00 00 00 00 00 00];
+			snps,multicast-filter-bins = <256>;
+			snps,perfect-filter-entries = <128>;
+			tx-fifo-depth = <4096>;
+			rx-fifo-depth = <16384>;
+			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
+			clock-names = "stmmaceth", "ptp_ref";
+			resets = <&rst EMAC0_RESET>, <&rst EMAC0_OCP_RESET>;
+			reset-names = "stmmaceth", "stmmaceth-ocp";
+			snps,axi-config = <&socfpga_axi_setup>;
+			status = "disabled";
+		};
+<deleted>
+		gmac1: ethernet@ff802000 {
+			compatible = "altr,socfpga-stmmac-a10-s10", "snps,dwmac-3.72a", "snps,dwmac";
+			altr,sysmgr-syscon = <&sysmgr 0x48 8>;
+		        reg = <0xff802000 0x2000>;
+			interrupts = <0 93 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-names = "macirq";
+			/* Filled in by bootloader */
+			mac-address = [00 00 00 00 00 00];
+			snps,multicast-filter-bins = <256>;
+			snps,perfect-filter-entries = <128>;
+			tx-fifo-depth = <4096>;
+			rx-fifo-depth = <16384>;
+			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
+			clock-names = "stmmaceth", "ptp_ref";
+			resets = <&rst EMAC1_RESET>, <&rst EMAC1_OCP_RESET>;
+			reset-names = "stmmaceth", "stmmaceth-ocp";
+			snps,axi-config = <&socfpga_axi_setup>;
+			status = "disabled";
+		};
+
+		gmac2: ethernet@ff804000 {
+			compatible = "altr,socfpga-stmmac-a10-s10", "snps,dwmac-3.72a", "snps,dwmac";
+			altr,sysmgr-syscon = <&sysmgr 0x4C 16>;
+			reg = <0xff804000 0x2000>;
+			interrupts = <0 94 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-names = "macirq";
+			/* Filled in by bootloader */
+			mac-address = [00 00 00 00 00 00];
+			snps,multicast-filter-bins = <256>;
+			snps,perfect-filter-entries = <128>;
+			tx-fifo-depth = <4096>;
+			rx-fifo-depth = <16384>;
+			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
+			clock-names = "stmmaceth", "ptp_ref";
+			resets = <&rst EMAC2_RESET>, <&rst EMAC2_OCP_RESET>;
+			reset-names = "stmmaceth", "stmmaceth-ocp";
+			snps,axi-config = <&socfpga_axi_setup>;
+			status = "disabled";
+		};
