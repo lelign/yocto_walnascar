@@ -1,5 +1,7 @@
 require busybox.inc
 
+PR="r6"
+
 SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://0001-depmod-Ignore-.debug-directories.patch \
            file://find-touchscreen.sh \
