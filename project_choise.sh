@@ -50,7 +50,7 @@ echo -e "\tВыберите проект Quartus (ввести номер)\n"
     if  [[ "$pr_num" =~ ^[0-9]+$ && $pr_num -le $count ]]; then
         project="${possible_path[$pr_num]}"
         name_pr=$(echo $project | cut -d " " -f 1)
-        echo -e "\n\tвыбран $pr_num\t$project" | tee -a $home/log
+        echo -e "\n\tвыбран $pr_num\t$project"
         project=$(echo $project | cut -d " " -f 2)
     else
         echo -e "\n\tError : ошибка выбора проекта $pr_num <= ??? \n\texit..."
@@ -59,7 +59,7 @@ echo -e "\tВыберите проект Quartus (ввести номер)\n"
 #
  cd $home
 # qts-filter-a10.sh
-echo -e "\n\tproject: $project\n" | tee -a $home/log
+echo -e "\n\tproject: $project\n" 
 hps_isw_handoff_dir="$project/hps_isw_handoff"
 if [[ -d "$hps_isw_handoff_dir" && -f "$hps_isw_handoff_dir/hps.xml" ]]; then
     rm -f hps.xml
