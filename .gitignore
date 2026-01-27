@@ -52,3 +52,7 @@ downloads/
 sstate-cache/
 toaster.sqlite
 .vscode/
+log
+hps.xml
+core.rbf
+periph.rbf
