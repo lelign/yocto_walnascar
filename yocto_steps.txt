@@ -717,4 +717,4 @@ file poky/core.rbf symbolic link to choosed Quartus project (build via sof file)
 
 file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_hps.xml
 symbolic link to to poky/hps.xml
-file poky/hps.xml symbolic link to choosed Quartus project 
+file poky/hps.xml choosed Quartus project 
