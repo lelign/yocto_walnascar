@@ -1,0 +1,65 @@
+#on host mashine install tftp
+sudo apt install tftpd-hpa
+# look at configuration file
+cat /etc/default/tftpd-hpa
+    # /etc/default/tftpd-hpa
+
+    TFTP_USERNAME="tftp"
+    TFTP_DIRECTORY="/srv/tftp"  <= tftp server directory
+    TFTP_ADDRESS=":69"
+    TFTP_OPTIONS="--secure"
+# prepare arria10
+load into u-boot
+setenv serverip 192.168.0.100 <= notebook IP
+printenv serverip                                                                                          
+    serverip=192.168.0.100
+saveenv                                                                                                    
+    Saving Environment to MMC... Writing to MMC(0)... OK                                                          
+dhcp                                                                                                       
+    Speed: 100, full duplex                                                                                       
+    BOOTP broadcast 1                                                                                             
+    DHCP client bound to address 192.168.0.143 (278 ms)                                                           
+    *** Warning: no boot file name; using 'C0A8008F.img' <= filename
+
+# place file into tftp server directory
+C0A8008F.img <= name from u-boot with command <dhcp>
+# on ignat's notebook
+cp ~/IRU_deploy/zImage--6.12.33-lts+git-r15-arria10-20260206124820.bin /srv/tftp/C0A8008F.img
+(6930944) filesize
+
+# on arria10 load file into RAM
+dhcp
+    Speed: 100, full duplex                                                                                       
+    BOOTP broadcast 1                                                                                             
+    DHCP client bound to address 192.168.0.143 (301 ms)                                                           
+    *** Warning: no boot file name; using 'C0A8008F.img'                                                          
+    Using ethernet@ff804000 device                                                                                
+    TFTP from server 192.168.0.100; our IP address is 192.168.0.143                                               
+    Filename 'C0A8008F.img'.                                                                                      
+    Load address: 0x1000000                                                                                       
+    Loading: #################################################################                                    
+            #################################################################                                    
+            #################################################################                                    
+            #################################################################                                    
+            #################################################################                                    
+            #################################################################                                    
+            #################################################################                                    
+            ##################                                                                                   
+            3.2 MiB/s                                                                                            
+    done                                                                                                          
+    Bytes transferred = 6930944 (69c200 hex)   
+
+# file size the same!
+
+# OK  completely sure file can be loaded via eth0
+
+# write file fro RAM into boot part on sd card
+mmc part
+    Part    Start Sector    Num Sectors     UUID            Type                                                  
+    1     2048            1024000         076c4a2a-01     0b Boot           <= <1>                                    
+    2     1026048         3072000         076c4a2a-02     83                                                    
+    3     4098048         20480           076c4a2a-03     a2
+
+fatwrite mmc 0:1 0x1000000 example_zImage.bin 6930944
+
+# OK file  example_zImage.bin in boot part on sd card

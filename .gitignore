@@ -57,3 +57,5 @@ hps.xml
 core.rbf
 periph.rbf
 steps_temp.txt
+success_dtsi/
+dts_dtsi_network_ok/zImage--6.12.33-lts+git-r15-arria10-20260208194842.bin

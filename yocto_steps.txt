@@ -718,3 +718,101 @@ file poky/core.rbf symbolic link to choosed Quartus project (build via sof file)
 file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_hps.xml
 symbolic link to to poky/hps.xml
 file poky/hps.xml choosed Quartus project 
+
+# 01_02_2026
+проверяем как u-boot-socfpg использует наш patch:
+bitbake -c do_unpack_and_patch u-boot-socfpga -DDD | grep 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch -A 2
+DEBUG: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga_v2025.07.bb: Searching for 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch in paths:
+    /home/iru/poky-socfpga/build/workspace/sources/u-boot-socfpga/oe-local-files
+    /home/iru/poky-socfpga/build/workspace/appends/u-boot-socfpga/poky
+--
+DEBUG: /home/iru/poky-socfpga/poky/layers/
+/recipes-bsp/u-boot/u-boot-socfpga_v2025.07.bb: Using /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga/0001-edited-3-dts-dtsi-files-for-gmac2-only.patch for 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch
+DEBUG: /home/iru/poky-socfpga/poky/meta/recipes-core/busybox/busybox_1.37.0.bb: Searching for 0001-depmod-Ignore-.debug-directories.patch in paths:
+    /home/iru/poky-socfpga/build/workspace/sources/busybox/oe-local-files
+
+оказывается linux-socfpga-lts использует тот же самый patch:
+bitbake -c do_unpack_and_patch linux-socfpga-lts -DDD | grep 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch -A 2
+DEBUG: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga_v2025.07.bb: Searching for 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch in paths:
+    /home/iru/poky-socfpga/build/workspace/sources/u-boot-socfpga/oe-local-files
+    /home/iru/poky-socfpga/build/workspace/appends/u-boot-socfpga/poky
+--
+DEBUG: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga_v2025.07.bb: Using /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga/0001-edited-3-dts-dtsi-files-for-gmac2-only.patch for 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch
+DEBUG: /home/iru/poky-socfpga/poky/meta/recipes-core/busybox/busybox_1.37.0.bb: Searching for 0001-depmod-Ignore-.debug-directories.patch in paths:
+    /home/iru/poky-socfpga/build/workspace/sources/busybox/oe-local-files
+
+
+вывод: нужно норамально дописать через devtool патч для u-boot-socfpga 
+дальнейшие действия в /home/iru/poky-socfpga/poky/success_dtsi/info.txt
+
+
+Peripheral Region Address Map
+Slave Identifier        Description                     Base Address    Size
+EMAC0RXECC              Receive ECC,Ethernet MAC0       0xFF8C0800      1 KB    <= default
+EMAC0TXECC              Transmit ECC,Ethernet MAC0      0xFF8C0C00      1 KB    <= default
+EMAC1RXECC              Receive ECC,Ethernet MAC1       0xFF8C1000      1 KB
+EMAC1TXECC              Transmit ECC, Ethernet MAC1     0xFF8C1400      1 KB
+EMAC2RXECC              Receive ECC, Ethernet MAC2      0xFF8C1800      1 KB
+EMAC2TXECC              Transmit ECC, Ethernet MAC2     0xFF8C1C00      1 KB
+
+# 06_02 
+        проверил состояние eth0 
+        devtool mennucinfig linuxsocfpga  <= marvell is not set, added marvell
+        devtool build linux-socfpga-lts
+        cp zImage, .dtb to sd_card
+
+
+
+
+
+
+        Poky (Yocto Project Reference Distro) 5.2.4 arria10 ttyS0                                                                                 
+                                                                                                                                          
+        arria10 login: [   23.687389] socfpga-dwmac ff804000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx
+        ip addr add 192.168.2.201/24 dev eth0; ip route add default via 192.168.2.1; ip link set dev eth0 down; ip link set dev eth0 up                                                                                                                                     
+        [  142.793450] socfpga-dwmac ff804000.ethernet eth0: Link is Down                                                                         
+        [  142.817919] socfpga-dwmac ff804000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0                                                    
+        [  143.034603] socfpga-dwmac ff804000.ethernet eth0: PHY [stmmac-0:00] driver [Marvell 88E1510] (irq=POLL)                                
+        [  143.044460] dwmac1000: Master AXI performs any burst length                                                                            
+        [  143.050064] socfpga-dwmac ff804000.ethernet eth0: No Safety Features support found                                                     
+        [  143.057675] socfpga-dwmac ff804000.ethernet eth0: IEEE 1588-2008 Advanced Timestamp supported                                          
+        [  143.066623] socfpga-dwmac ff804000.ethernet eth0: registered PTP clock                                                                 
+        [  143.073200] socfpga-dwmac ff804000.ethernet eth0: configuring for phy/rgmii link mode                                                  
+        root@arria10:~# [  146.327398] socfpga-dwmac ff804000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx 
+
+
+# 07_02
+        1 Убедился, что  u-boot может полноценно работать через eth0, описание шагов в
+        toBeShureThatU-bootCanLoadFileFromTftpServer.txt
+        2 u-boot использует драйвер Marvell?
+                /home/iru/poky-socfpga/build/workspace/sources/u-boot-socfpga/drivers/net/phy/marvell.c
+        3 убедился, что Linux загружает при старте необходимый драйвер Marvell
+                dmesg | grep -i Marvell                                                                       
+                [    0.983611] Marvell 88E1510 stmmac-0:00: attached PHY driver (mii_bus:phy_addr=stmmac-0:00, irq=POLL)      
+                [   20.244247] socfpga-dwmac ff804000.ethernet eth0: PHY [stmmac-0:00] driver [Marvell 88E1510] (irq=POLL)
+        4 Путь к драйверу Marvell для linux-socfpga-lts
+                /home/iru/poky-socfpga/poky/build_workspace/sources/linux-socfpga-lts/drivers/net/phy/marvell.c
+        5 diff <= это очень разные драйверы
+        6 Итого имеем 
+                6.1     u-boot полностью  работоспособен с eth0 через Marvell
+                6.2     Linux грузится без ошибок по сетевому адресу поднимает сетевой интерфейс, 
+                        видит его состояние и может его конфигурировть, 
+                        работают ping и traceroute на собственный статичный адрес
+                6.3     вывод: с точки зрения аппаратной части все ОК
+        7 Последовательность действий
+                7.1     вероятные причины неправльные значения задержек для Tx/Rx
+                        https://forum.rocketboards.org/t/arria-10-w-marvell-88e1512-transmit-fine-but-no-receive-100-packet-loss/1119
+                        https://stackoverflow.com/questions/64432791/cant-ping-using-yocto
+                        socfpga_arria10_socdk.dtsi
+                        phy-mode = "rgmii" => phy-mode = "rgmii-id"
+                7.2     неправильные какие-то другие значения в dts/dtsi
+                                использовать драйвер Marvell + patch из проекта 508
+                                использовать драйвер Marvell из рецепта u-boot-socfpga
+        8 Попробовал 7.1 
+                получен адрес по DHCP, сетевое соедиение установлено!!!
+                wget 192.168.0.1                                                                              
+                Connecting to 192.168.0.1 (192.168.0.1:80)                                                                    
+                saving to 'index.html'                                                                                        
+                index.html           100% |**************************************************************|  2623  0:00:00 ETA 
+                'index.html' saved
+                УРА !!!

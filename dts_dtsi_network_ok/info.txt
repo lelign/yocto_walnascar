@@ -1,0 +1,7 @@
+cp files from
+~/poky-socfpga/build/workspace/sources/linux-socfpga-lts/arch/arm/boot/dts/intel/socfpga
+| grep arria10 
+into 
+~/poky-socfpga/poky/dts_dtsi_network_ok
+с этой конфигурацией dts\dtsi удалось собрать из devtool zImage и .dtb
+на которых arria10 благополучно подняла сеть на eth0
