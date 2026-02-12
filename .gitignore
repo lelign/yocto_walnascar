@@ -59,3 +59,5 @@ periph.rbf
 steps_temp.txt
 success_dtsi/
 dts_dtsi_network_ok/zImage--6.12.33-lts+git-r15-arria10-20260208194842.bin
+.0001-add_ethaddr_into_alias_into_socfpga_arria10_socdk-u-.patch
+.0001-edited_two_dts_files.patch

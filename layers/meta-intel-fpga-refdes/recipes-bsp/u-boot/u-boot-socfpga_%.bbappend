@@ -29,6 +29,11 @@ do_compile:prepend:arria10() {
 	${S}/arch/arm/mach-socfpga/qts-filter-a10.sh ${S}/hps.xml ${S}/arch/arm/dts/socfpga_arria10_socdk_sdmmc_handoff.h
 }
 
+
+do_compile:arria10() {
+	mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Arria10 Script" -d "${UNPACKDIR}/ethaddr-u-boot.txt" ${UNPACKDIR}/u-boot.scr
+}
+
 do_compile:append:arria10() {
 	cp ${DEPLOY_DIR_IMAGE}/Image ${S}/Image
 
@@ -65,6 +70,8 @@ do_deploy:append:arria10() {
 		install -m 744 ${B}/extlinux.conf ${DEPLOYDIR}/extlinux.conf
 		install -m 744 ${B}/fit_uboot_.itb ${DEPLOYDIR}/fit_uboot.itb
 		install -m 644 ${B}/${config}/spl/u-boot-splx4.sfp ${DEPLOYDIR}/u-boot-splx4.sfp
+		# Ignat added u-boot.scr to DEPLOYDIR
+		install -m 744 ${UNPACKDIR}/u-boot.scr ${DEPLOYDIR}/u-boot.scr
 	fi
 }
 

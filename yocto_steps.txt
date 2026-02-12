@@ -1,759 +1,741 @@
-from https://www.macnica.co.jp/en/business/semiconductor/articles/intel/136409/
+#  установка настройка  YOCTO
 
+        from https://www.macnica.co.jp/en/business/semiconductor/articles/intel/136409/
 
-sudo apt update
-sudo apt upgrade
+        sudo apt update
+        sudo apt upgrade
 
-sudo apt install gawk wget git diffstat unzip texinfo gcc build-essential chrpath \ 
-        socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libsdl1.2-dev \
-        python3-subunit mesa-common-dev zstd liblz4-tool file locales libacl1
+        sudo apt install gawk wget git diffstat unzip texinfo gcc build-essential chrpath \ 
+                socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libsdl1.2-dev \
+                python3-subunit mesa-common-dev zstd liblz4-tool file locales libacl1
 
-sudo locale-gen en_US.UTF-8
+        sudo locale-gen en_US.UTF-8
 
-sudo apt install make python3-pip inkscape texlive-latex-extra
-sudo apt install python3-sphinx
-sudo apt install python-sphinx_rtd_theme <= ??? => sudo apt install sphinx-rtd-theme-common
-sudo apt install python-pyyaml <= ???
-sudo apt install g++-multilib
+        sudo apt install make python3-pip inkscape texlive-latex-extra
+        sudo apt install python3-sphinx
+        sudo apt install python-sphinx_rtd_theme <= ??? => sudo apt install sphinx-rtd-theme-common
+        sudo apt install python-pyyaml <= ???
+        sudo apt install g++-multilib
 
+        export YOCTO_VER=styhead <= перевел на walnascar
+        rm -rf ~/poky-socfpga && mkdir ~/poky-socfpga && cd ~/poky-socfpga
+        git clone -b $YOCTO_VER https://git.yoctoproject.org/git/poky.git
+        mkdir layers && cd layers
+        ln -s ./../poky/meta meta
+        ln -s ./../poky/meta-poky meta-poky
+        ln -s ./../poky/meta-yocto-bsp meta-yocto-bsp
+        git clone -b $YOCTO_VER https://git.openembedded.org/meta-openembedded
+        git clone -b $YOCTO_VER https://git.yoctoproject.org/git/meta-intel-fpga
+        git clone -b $YOCTO_VER https://github.com/altera-opensource/meta-intel-fpga-refdes.git
+        cd ..
 
+        #check
+        pwd
+        /home/iru/poky-socfpga
 
+        source poky/oe-init-build-env
 
-
-
-export YOCTO_VER=styhead <= перевел на walnascar
-rm -rf ~/poky-socfpga && mkdir ~/poky-socfpga && cd ~/poky-socfpga
-git clone -b $YOCTO_VER https://git.yoctoproject.org/git/poky.git
-mkdir layers && cd layers
-ln -s ./../poky/meta meta
-ln -s ./../poky/meta-poky meta-poky
-ln -s ./../poky/meta-yocto-bsp meta-yocto-bsp
-git clone -b $YOCTO_VER https://git.openembedded.org/meta-openembedded
-git clone -b $YOCTO_VER https://git.yoctoproject.org/git/meta-intel-fpga
-git clone -b $YOCTO_VER https://github.com/altera-opensource/meta-intel-fpga-refdes.git
-cd ..
-
-#check
-pwd
-/home/iru/poky-socfpga
-
-source poky/oe-init-build-env
-
-#check
-pwd
-/home/iru/poky-socfpga/build
+        #check
+        pwd
+        /home/iru/poky-socfpga/build
 
 
 
-# Settings for bblayers.conf 
-echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-intel-fpga "' >> conf/bblayers.conf 
-echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-intel-fpga-refdes "' >> conf/bblayers.conf 
-echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-oe "' >> conf/bblayers.conf 
-echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-networking "' >> conf/bblayers.conf 
-echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-python "' >> conf/bblayers.conf 
-echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-gnome "' >> conf/bblayers.conf 
-echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-xfce "' >> conf/bblayers.conf 
-echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-initramfs "' >> conf/bblayers.conf 
-echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-multimedia "' >> conf/bblayers.conf 
-echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-webserver "' >> conf/bblayers.conf 
-echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-filesystems "' >> conf/bblayers.conf 
-echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-perl "' >> conf/bblayers.conf
+        # Settings for bblayers.conf 
+        echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-intel-fpga "' >> conf/bblayers.conf 
+        echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-intel-fpga-refdes "' >> conf/bblayers.conf 
+        echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-oe "' >> conf/bblayers.conf 
+        echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-networking "' >> conf/bblayers.conf 
+        echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-python "' >> conf/bblayers.conf 
+        echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-gnome "' >> conf/bblayers.conf 
+        echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-xfce "' >> conf/bblayers.conf 
+        echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-initramfs "' >> conf/bblayers.conf 
+        echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-multimedia "' >> conf/bblayers.conf 
+        echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-webserver "' >> conf/bblayers.conf 
+        echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-filesystems "' >> conf/bblayers.conf 
+        echo 'BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-perl "' >> conf/bblayers.conf
 
-# check
-cat conf/bblayers.conf
-# POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
-# changes incompatibly
-POKY_BBLAYERS_CONF_VERSION = "2"
+        # check
+        cat conf/bblayers.conf
+        # POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
+        # changes incompatibly
+        POKY_BBLAYERS_CONF_VERSION = "2"
 
-BBPATH = "${TOPDIR}"
-BBFILES ?= ""
+        BBPATH = "${TOPDIR}"
+        BBFILES ?= ""
 
-BBLAYERS ?= " \
-        /home/iru/poky-socfpga/poky/meta \
-        /home/iru/poky-socfpga/poky/meta-poky \
-        /home/iru/poky-socfpga/poky/meta-yocto-bsp \
-        "
-BBLAYERS += " ${TOPDIR}/../layers/meta-intel-fpga "
-BBLAYERS += " ${TOPDIR}/../layers/meta-intel-fpga-refdes "
-BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-oe "
-BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-networking "
-BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-python "
-BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-gnome "
-BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-xfce "
-BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-initramfs "
-BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-multimedia "
+        BBLAYERS ?= " \
+                /home/iru/poky-socfpga/poky/meta \
+                /home/iru/poky-socfpga/poky/meta-poky \
+                /home/iru/poky-socfpga/poky/meta-yocto-bsp \
+                "
+        BBLAYERS += " ${TOPDIR}/../layers/meta-intel-fpga "
+        BBLAYERS += " ${TOPDIR}/../layers/meta-intel-fpga-refdes "
+        BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-oe "
+        BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-networking "
+        BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-python "
+        BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-gnome "
+        BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-xfce "
+        BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-initramfs "
+        BBLAYERS += " ${TOPDIR}/../layers/meta-openembedded/meta-multimedia "
 
-# set a10
-sed -i 's/^MACHINE .*=.*$/MACHINE = "arria10"/g' conf/local.conf
-# check
-cat conf/local.conf | grep ^MACHINE
-MACHINE = "arria10"
+        # set a10
+        sed -i 's/^MACHINE .*=.*$/MACHINE = "arria10"/g' conf/local.conf
+        # check
+        cat conf/local.conf | grep ^MACHINE
+        MACHINE = "arria10"
 
-# set downloads
-sed -i 's/#DL_DIR ?= "${TOPDIR}\/downloads"/DL_DIR = "${TOPDIR}\/..\/downloads"/g' conf/local.conf
-#check
-cat conf/local.conf | grep ^DL_DIR
-DL_DIR = "${TOPDIR}/../downloads"
+        # set downloads
+        sed -i 's/#DL_DIR ?= "${TOPDIR}\/downloads"/DL_DIR = "${TOPDIR}\/..\/downloads"/g' conf/local.conf
+        #check
+        cat conf/local.conf | grep ^DL_DIR
+        DL_DIR = "${TOPDIR}/../downloads"
 
-# добавить строчки в conf/local.conf
-# Use the LTS kernel and set version 
-PREFERRED_PROVIDER_virtual/kernel = "linux-socfpga-lts"
-PREFERRED_VERSION_linux-socfpga-lts = "6.6.%"
-DISTRO_FEATURES:append = " systemd usrmerge"
-VIRTUAL-RUNTIME_init_manager = "systemd"
-# Ensure we build in all kernel-modules 
-MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += "kernel-modules"
-# Other settings 
-INHERIT += "rm_work"
-DEPLOY_DIR = "${TOPDIR}/../deploy"
-BB_GENERATE_MIRROR_TARBALLS = "1"
-BB_DANGLINGAPPENDS_WARNONLY = "1"
-DISTRO_FEATURES:remove = "ptest"
-IMAGE_FSTYPES:remove = "multiubi"
-INHERIT += "archiver"
-ARCHIVER_MODE[src] = "original"
-COPY_LIC_MANIFEST = "1"
-COPY_LIC_DIRS = "1"
-LICENSE_CREATE_PACKAGE = "1"
-# assign q-ty of cores
-BB_NUMBER_THREADS = "20"
-PARALLEL_MAKE = "-j 20"
-
-
-# запустить сборку
-bitbake core-image-minimal
+        # добавить строчки в conf/local.conf
+        # Use the LTS kernel and set version 
+        PREFERRED_PROVIDER_virtual/kernel = "linux-socfpga-lts"
+        PREFERRED_VERSION_linux-socfpga-lts = "6.6.%"
+        DISTRO_FEATURES:append = " systemd usrmerge"
+        VIRTUAL-RUNTIME_init_manager = "systemd"
+        # Ensure we build in all kernel-modules 
+        MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += "kernel-modules"
+        # Other settings 
+        INHERIT += "rm_work"
+        DEPLOY_DIR = "${TOPDIR}/../deploy"
+        BB_GENERATE_MIRROR_TARBALLS = "1"
+        BB_DANGLINGAPPENDS_WARNONLY = "1"
+        DISTRO_FEATURES:remove = "ptest"
+        IMAGE_FSTYPES:remove = "multiubi"
+        INHERIT += "archiver"
+        ARCHIVER_MODE[src] = "original"
+        COPY_LIC_MANIFEST = "1"
+        COPY_LIC_DIRS = "1"
+        LICENSE_CREATE_PACKAGE = "1"
+        # assign q-ty of cores
+        BB_NUMBER_THREADS = "20"
+        PARALLEL_MAKE = "-j 20"
 
 
-
-# известные ощибки :
-
-# error
-ERROR: User namespaces are not usable by BitBake, possibly due to AppArmor
-
-# issue (возможно придется повторять после reboot)
-echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
-
-# error
-ERROR: u-boot-socfpga-1_v2025.01+git-r0 do_compile: Execution of '/home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/u-boot-socfpga/v2025.01+git/temp/run.do_compile.1620969' failed with exit code 1
-ERROR: Logfile of failure stored in: /home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/u-boot-socfpga/v2025.01+git/temp/log.do_compile.1620969
-Log data follows:
-| DEBUG: Executing shell function do_compile
-| cp: cannot stat '/home/iru/poky-socfpga/build/../deploy/images/arria10/arria10__ghrd/hps.xml': No such file or directory
-
-# issue не актуально, смотри ниже, найдено другое решение
-#ln -s /home/iru/poky-socfpga/build/../deploy/images/arria10/arria10_gsrd_ghrd /home/iru/poky-socfpga/build/../deploy/images/arria10/arria10__ghrd
-
-# error
-ERROR: core-image-minimal-1.0-r0 do_image_wic: Execution of 
-'/home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/core-image-minimal/1.0/temp/run.do_image_wic.1643664' failed with exit code 1
-
-# issue не актуально, смотри ниже, найдено другое решение
-#mkdir -p /home/iru/poky-socfpga/build/../deploy/images/arria10/intel/socfpga
-#ln -s /home/iru/poky-socfpga/build/../deploy/images/arria10/socfpga_arria10_socdk_sdmmc.dtb /home/iru/poky-socfpga/build/../deploy/images/arria10/intel/socfpga/socfpga_arria10_socdk_sdmmc.dtb
-#ln -s /home/iru/poky-socfpga/build/../deploy/images/arria10/socfpga_arria10_socdk_qspi.dtb /home/iru/poky-socfpga/build/../deploy/images/arria10/intel/socfpga/socfpga_arria10_socdk_qspi.dtb
-#ln -s /home/iru/poky-socfpga/build/../deploy/images/arria10/socfpga_arria10_socdk_nand.dtb /home/iru/poky-socfpga/build/../deploy/images/arria10/intel/socfpga/socfpga_arria10_socdk_nand.dtb
+        # запустить сборку
+        bitbake core-image-minimal
 
 
 
+        # известные ощибки :
 
+        # error
+        ERROR: User namespaces are not usable by BitBake, possibly due to AppArmor
 
+        # issue (возможно придется повторять после reboot)
+        echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
 
+        # error
+        ERROR: u-boot-socfpga-1_v2025.01+git-r0 do_compile: Execution of '/home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/u-boot-socfpga/v2025.01+git/temp/run.do_compile.1620969' failed with exit code 1
+        ERROR: Logfile of failure stored in: /home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/u-boot-socfpga/v2025.01+git/temp/log.do_compile.1620969
+        Log data follows:
+        | DEBUG: Executing shell function do_compile
+        | cp: cannot stat '/home/iru/poky-socfpga/build/../deploy/images/arria10/arria10__ghrd/hps.xml': No such file or directory
+
+        # issue не актуально, смотри ниже, найдено другое решение
+        #ln -s /home/iru/poky-socfpga/build/../deploy/images/arria10/arria10_gsrd_ghrd /home/iru/poky-socfpga/build/../deploy/images/arria10/arria10__ghrd
+
+        # error
+        ERROR: core-image-minimal-1.0-r0 do_image_wic: Execution of 
+        '/home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/core-image-minimal/1.0/temp/run.do_image_wic.1643664' failed with exit code 1
+
+        # issue не актуально, смотри ниже, найдено другое решение
+        #mkdir -p /home/iru/poky-socfpga/build/../deploy/images/arria10/intel/socfpga
+        #ln -s /home/iru/poky-socfpga/build/../deploy/images/arria10/socfpga_arria10_socdk_sdmmc.dtb /home/iru/poky-socfpga/build/../deploy/images/arria10/intel/socfpga/socfpga_arria10_socdk_sdmmc.dtb
+        #ln -s /home/iru/poky-socfpga/build/../deploy/images/arria10/socfpga_arria10_socdk_qspi.dtb /home/iru/poky-socfpga/build/../deploy/images/arria10/intel/socfpga/socfpga_arria10_socdk_qspi.dtb
+        #ln -s /home/iru/poky-socfpga/build/../deploy/images/arria10/socfpga_arria10_socdk_nand.dtb /home/iru/poky-socfpga/build/../deploy/images/arria10/intel/socfpga/socfpga_arria10_socdk_nand.dtb
 
 #18_12 walnascar
-ERROR: Nothing PROVIDES 'core-image-minimal'
-core-image-minimal was skipped: 'debug-tweaks' in IMAGE_FEATURES (added via EXTRA_IMAGE_FEATURES) is not a valid image feature
-issue
-nano conf/local.conf
-EXTRA_IMAGE_FEATURES:append = " allow-empty-password allow-root-login post-install-logging ssh-server-dropbear"
-DEPLOY_DIR = "${TOPDIR}/../walnascar_deploy"
+        ERROR: Nothing PROVIDES 'core-image-minimal'
+        core-image-minimal was skipped: 'debug-tweaks' in IMAGE_FEATURES (added via EXTRA_IMAGE_FEATURES) is not a valid image feature
+        issue
+        nano conf/local.conf
+        EXTRA_IMAGE_FEATURES:append = " allow-empty-password allow-root-login post-install-logging ssh-server-dropbear"
+        DEPLOY_DIR = "${TOPDIR}/../walnascar_deploy"
 
-# don't forget
-echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
+        # don't forget
+        echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
 
-OK started
+        OK started
 
-ERROR: Task (/home/iru/poky-socfpga/poky/meta/recipes-core/images/core-image-minimal.bb:do_rootfs) failed with exit code '134' 
-Pseudo log:
-path mismatch [3 links]: ino 30934853 db '/home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/core-image-minimal/1.0/rootfs/usr/share/common-licenses/busybox/recipeinfo' req '/home/iru/poky-socfpga/walnascar_deploy/licenses/cortexa9t2hf-neon/busybox/recipeinfo'.
-Setup complete, sending SIGUSR1 to pid 2015637
+        ERROR: Task (/home/iru/poky-socfpga/poky/meta/recipes-core/images/core-image-minimal.bb:do_rootfs) failed with exit code '134' 
+        Pseudo log:
+        path mismatch [3 links]: ino 30934853 db '/home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/core-image-minimal/1.0/rootfs/usr/share/common-licenses/busybox/recipeinfo' req '/home/iru/poky-socfpga/walnascar_deploy/licenses/cortexa9t2hf-neon/busybox/recipeinfo'.
+        Setup complete, sending SIGUSR1 to pid 2015637
 
-issue
-add to local.conf
-PSEUDO_IGNORE_PATHS:append = ",/run/"
+        issue
+        add to local.conf
+        PSEUDO_IGNORE_PATHS:append = ",/run/"
 
-error with licenses
-edit in local.conf
-#COPY_LIC_MANIFEST = "1"
-#COPY_LIC_DIRS = "1"
-#LICENSE_CREATE_PACKAGE = "1"
-
-
-rm -rf /home/iru/poky-socfpga/walnascar_deploy/licenses/
-rm -rf /home/iru/poky-socfpga/walnascar_deploy/spdx
-rm -rf /home/iru/poky-socfpga/walnascar_deploy/rpm
-rm /home/iru/poky-socfpga/walnascar_deploy/images/arria10/arria10_gsrd_ghrd/ghrd_10as066n2.periph.rbf
-rm /home/iru/poky-socfpga/walnascar_deploy/images/arria10/arria10_gsrd_ghrd/ghrd_10as066n2.core.rbf 
-rm /home/iru/poky-socfpga/walnascar_deploy/images/arria10/arria10_gsrd_ghrd/hps.xml
-
-bitbake core-image-minimal
-OK !
-
-после загрузки устройства не могу залогиниться !!!
-добавилв в local.conf
-IMAGE_FEATURES:remove = "debug-tweaks"
-IMAGE_FEATURES += "empty-root-password"
+        error with licenses
+        edit in local.conf
+        #COPY_LIC_MANIFEST = "1"
+        #COPY_LIC_DIRS = "1"
+        #LICENSE_CREATE_PACKAGE = "1"
 
 
-# To set a real password (generate your own encrypted version)
-# EXTRA_USERS_PARAMS = "usermod -P your_encrypted_password root;"
+        rm -rf /home/iru/poky-socfpga/walnascar_deploy/licenses/
+        rm -rf /home/iru/poky-socfpga/walnascar_deploy/spdx
+        rm -rf /home/iru/poky-socfpga/walnascar_deploy/rpm
+        rm /home/iru/poky-socfpga/walnascar_deploy/images/arria10/arria10_gsrd_ghrd/ghrd_10as066n2.periph.rbf
+        rm /home/iru/poky-socfpga/walnascar_deploy/images/arria10/arria10_gsrd_ghrd/ghrd_10as066n2.core.rbf 
+        rm /home/iru/poky-socfpga/walnascar_deploy/images/arria10/arria10_gsrd_ghrd/hps.xml
 
-bitbake core-image-minimal
-OK !
-login OK!
+        bitbake core-image-minimal
+        OK !
 
-root@arria10:~# ls
-ar_prov4.sof                           hps.xml                                socfpga_arria10_socdk_sdmmc_handoff.h
-fit_spl_fpga.itb                       log                                    u-boot-splx4.sfp
-
-root@arria10:~# uname -a
-Linux arria10 6.12.33-altera-g3234b1ed8956 #1 SMP Thu Sep 25 06:05:32 UTC 2025 armv7l GNU/Linux
-
-работа с devtool
-devtool modify u-boot-socfpga
-devtool переносит все исходники соотвествующего рецепта  <u-boot-socfpgaв> в каталог  
-~/poky-socfpga/build/workspace/sources/u-boot-socfpgaв
-
-в этом каталоге правим исходники (Makefile dts/dtsi и проч)
-проверяем результат 
-devtool build u-boot-socfpga
-если все устраивает, то находясь в каталоге ~/poky-socfpga/build/workspace/sources/u-boot-socfpga
-git commit -a
-то, что будет записано в commit будет являться именем патча
-далее необходимо очистить ~/poky-socfpga/build/workspace/sources/u-boot-socfpgaв от 
-сгененированных файлов после devtool build u-boot-socfpga
-затем
-devtool finish u-boot-socfpga
-соответствующий патч будет добавлен к рецепту
-После добавления patch к рецепту редактируем его и вносим запись  
-Upstream-Status: Pending
+        после загрузки устройства не могу залогиниться !!!
+        добавилв в local.conf
+        IMAGE_FEATURES:remove = "debug-tweaks"
+        IMAGE_FEATURES += "empty-root-password"
 
 
-################# 27_12_2025 Игнат добавил следующие изменения
-# цель => устранить ошибки при генерации содержимого boot
-#	изменить имя fit_spl_fpga_.itb на fit_spl_fpga.itb
-#	fit_spl_fpga.itb должен находиться в boot
-#	socfpga_arria10_socdk_sdmmc.dtb должен находиться в  boot /intel/socfpga
-#	запись в  extlinux/extlinux.conf должна содержать путь ../intel/socfpga	 
+        # To set a real password (generate your own encrypted version)
+        # EXTRA_USERS_PARAMS = "usermod -P your_encrypted_password root;"
 
-# 1
-для правильной адресации к файлу socfpga_arria10_socdk_sdmmc.dtb через каталог extlinux/extlinux.conf 
-в boot-partition sdcard
+        bitbake core-image-minimal
+        OK !
+        login OK!
 
-в файле /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/conf/machine/arria10.conf
+        root@arria10:~# ls
+        ar_prov4.sof                           hps.xml                                socfpga_arria10_socdk_sdmmc_handoff.h
+        fit_spl_fpga.itb                       log                                    u-boot-splx4.sfp
 
-было  UBOOT_EXTLINUX_FDTDIR:default ?= ".."
+        root@arria10:~# uname -a
+        Linux arria10 6.12.33-altera-g3234b1ed8956 #1 SMP Thu Sep 25 06:05:32 UTC 2025 armv7l GNU/Linux
 
-стало UBOOT_EXTLINUX_FDTDIR:default ?= "../intel/socfpga"  
+        работа с devtool
+        devtool modify u-boot-socfpga
+        devtool переносит все исходники соотвествующего рецепта  <u-boot-socfpgaв> в каталог  
+        ~/poky-socfpga/build/workspace/sources/u-boot-socfpgaв
 
-# 2
-для установки правильного имени для файла fit_spl_fpga.itb в boot-partition sdcard
-в файле /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/u-boot/u-boot-socfpga_%.bbappend
+        в этом каталоге правим исходники (Makefile dts/dtsi и проч)
+        проверяем результат 
+        devtool build u-boot-socfpga
+        если все устраивает, то находясь в каталоге ~/poky-socfpga/build/workspace/sources/u-boot-socfpga
+        git commit -a
+        то, что будет записано в commit будет являться именем патча
+        далее необходимо очистить ~/poky-socfpga/build/workspace/sources/u-boot-socfpgaв от 
+        сгененированных файлов после devtool build u-boot-socfpga
+        затем
+        devtool finish u-boot-socfpga
+        соответствующий патч будет добавлен к рецепту
+        После добавления patch к рецепту редактируем его и вносим запись  
+        Upstream-Status: Pending
 
-было	install -m 744 ${B}/*.itb ${DEPLOYDIR}/
+#27_12_2025 Игнат добавил следующие изменения
+        # цель => устранить ошибки при генерации содержимого boot
+        #	изменить имя fit_spl_fpga_.itb на fit_spl_fpga.itb
+        #	fit_spl_fpga.itb должен находиться в boot
+        #	socfpga_arria10_socdk_sdmmc.dtb должен находиться в  boot /intel/socfpga
+        #	запись в  extlinux/extlinux.conf должна содержать путь ../intel/socfpga	 
 
-стало	install -m 744 ${B}/fit_spl_fpga_.itb ${DEPLOYDIR}/fit_spl_fpga.itb
-install -m 744 ${B}/extlinux.conf ${DEPLOYDIR}/extlinux.conf <= для мониторинга
-install -m 744 ${B}/fit_uboot_.itb ${DEPLOYDIR}/fit_uboot.itb <= для мониторинга
+        # 1
+        для правильной адресации к файлу socfpga_arria10_socdk_sdmmc.dtb через каталог extlinux/extlinux.conf 
+        в boot-partition sdcard
 
-# 3
-чтобы fit_spl_fpga.itb оказался включен в образ *.wic
-в файл /home/iru/poky-socfpga/build/conf/local.conf  (доступен так-же как $local_conf) добавил
-IMAGE_BOOT_FILES:append = " fit_spl_fpga.itb"
+        в файле /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/conf/machine/arria10.conf
 
-# 4
-по аналогии с измениями в исходниках dts/dtsi для u-boot-socfpga 
-пытался править соответсвующий Makefie в *arch/arm/boot/dts/intel/socfpga/Makefile
-безуспешно, подробности в commands_prepare_and_check_dts_dtsi_linnux_socfpga_lts
-для того, чтобы linux-socfpga-lts генерил только socfpga_arria10_socdk_sdmmc.dtb, без <nand.dtb> и <qspi.dtb>
-добавил следующие изменения
-файл /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/conf/machine/arria10.conf
+        было  UBOOT_EXTLINUX_FDTDIR:default ?= ".."
 
-было
-KERNEL_DEVICETREE ?= "\
-        intel/socfpga/socfpga_arria10_socdk_sdmmc.dtb \
-        intel/socfpga/socfpga_arria10_socdk_qspi.dtb \
-        intel/socfpga/socfpga_arria10_socdk_nand.dtb \
-        "
-стало
-KERNEL_DEVICETREE ?= "\
-        intel/socfpga/socfpga_arria10_socdk_sdmmc.dtb \
-        "
-после этого изменения пришлось подредактировать также и
-файл /home/iru/poky-socfpga/poky/meta/recipes-core/images/core-image-minimal.bb
+        стало UBOOT_EXTLINUX_FDTDIR:default ?= "../intel/socfpga"  
 
-было
-move_my_files() {
-# Create the directory in the final deployment location
-rm -rf ${DEPLOY_DIR_IMAGE}/intel/socfpga
-mkdir -p ${DEPLOY_DIR_IMAGE}/intel/socfpga
+        # 2
+        для установки правильного имени для файла fit_spl_fpga.itb в boot-partition sdcard
+        в файле /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/u-boot/u-boot-socfpga_%.bbappend
 
-# Example: Copy a file into the new directory
-install -m 0644 ${DEPLOY_DIR_IMAGE}/socfpga_arria10_socdk_sdmmc.dtb ${DEPLOY_DIR_IMAGE}/intel/socfpga
-install -m 0644 ${DEPLOY_DIR_IMAGE}/socfpga_arria10_socdk_qspi.dtb ${DEPLOY_DIR_IMAGE}/intel/socfpga
-install -m 0644 ${DEPLOY_DIR_IMAGE}/socfpga_arria10_socdk_nand.dtb ${DEPLOY_DIR_IMAGE}/intel/socfpga
-}
+        было	install -m 744 ${B}/*.itb ${DEPLOYDIR}/
 
-стало
-cp_dtb_file() {
-# Create the directory in the deploy/intel/socfpga
-rm -rf ${DEPLOY_DIR_IMAGE}/intel/socfpga
-mkdir -p ${DEPLOY_DIR_IMAGE}/intel/socfpga
+        стало	install -m 744 ${B}/fit_spl_fpga_.itb ${DEPLOYDIR}/fit_spl_fpga.itb
+        install -m 744 ${B}/extlinux.conf ${DEPLOYDIR}/extlinux.conf <= для мониторинга
+        install -m 744 ${B}/fit_uboot_.itb ${DEPLOYDIR}/fit_uboot.itb <= для мониторинга
 
-# Copy dtb file into the intel/socfpga
-install -m 0644 ${DEPLOY_DIR_IMAGE}/socfpga_arria10_socdk_sdmmc.dtb ${DEPLOY_DIR_IMAGE}/intel/socfpga
-# commented 2 lines after edited layers/meta-intel-fpga/conf/machine/arria10.conf
-# install -m 0644 ${DEPLOY_DIR_IMAGE}/socfpga_arria10_socdk_qspi.dtb ${DEPLOY_DIR_IMAGE}/intel/socfpga
-# install -m 0644 ${DEPLOY_DIR_IMAGE}/socfpga_arria10_socdk_nand.dtb ${DEPLOY_DIR_IMAGE}/intel/socfpga
-}
+        # 3
+        чтобы fit_spl_fpga.itb оказался включен в образ *.wic
+        в файл /home/iru/poky-socfpga/build/conf/local.conf  (доступен так-же как $local_conf) добавил
+        IMAGE_BOOT_FILES:append = " fit_spl_fpga.itb"
 
-проверка
-ls $deploy/wic_scan/intel/socfpga
-socfpga_arria10_socdk_sdmmc.dtb		<= только один файл
+        # 4
+        по аналогии с измениями в исходниках dts/dtsi для u-boot-socfpga 
+        пытался править соответсвующий Makefie в *arch/arm/boot/dts/intel/socfpga/Makefile
+        безуспешно, подробности в commands_prepare_and_check_dts_dtsi_linnux_socfpga_lts
+        для того, чтобы linux-socfpga-lts генерил только socfpga_arria10_socdk_sdmmc.dtb, без <nand.dtb> и <qspi.dtb>
+        добавил следующие изменения
+        файл /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/conf/machine/arria10.conf
 
+        было
+        KERNEL_DEVICETREE ?= "\
+                intel/socfpga/socfpga_arria10_socdk_sdmmc.dtb \
+                intel/socfpga/socfpga_arria10_socdk_qspi.dtb \
+                intel/socfpga/socfpga_arria10_socdk_nand.dtb \
+                "
+        стало
+        KERNEL_DEVICETREE ?= "\
+                intel/socfpga/socfpga_arria10_socdk_sdmmc.dtb \
+                "
+        после этого изменения пришлось подредактировать также и
+        файл /home/iru/poky-socfpga/poky/meta/recipes-core/images/core-image-minimal.bb
 
+        было
+        move_my_files() {
+        # Create the directory in the final deployment location
+        rm -rf ${DEPLOY_DIR_IMAGE}/intel/socfpga
+        mkdir -p ${DEPLOY_DIR_IMAGE}/intel/socfpga
 
-# для мониторинга созданного *.wic файла без записи его на sdcard делать так:
-wic ls $deploy/<name_of_wic.wic>		<= посмотреть на partitions в файле *.wic
-Num     Start        End          Size      Fstype
-1       1048576    525336575    524288000  fat32		<= boot
-2     525336576   2098200575   1572864000  ext4		<= root
-3    2098200576   2108686335     10485760			<= raw
+        # Example: Copy a file into the new directory
+        install -m 0644 ${DEPLOY_DIR_IMAGE}/socfpga_arria10_socdk_sdmmc.dtb ${DEPLOY_DIR_IMAGE}/intel/socfpga
+        install -m 0644 ${DEPLOY_DIR_IMAGE}/socfpga_arria10_socdk_qspi.dtb ${DEPLOY_DIR_IMAGE}/intel/socfpga
+        install -m 0644 ${DEPLOY_DIR_IMAGE}/socfpga_arria10_socdk_nand.dtb ${DEPLOY_DIR_IMAGE}/intel/socfpga
+        }
 
-sudo losetup -f --partscan $deploy/<name_of_wic.wic>		<= задать файл *.wic как устройство loop
+        стало
+        cp_dtb_file() {
+        # Create the directory in the deploy/intel/socfpga
+        rm -rf ${DEPLOY_DIR_IMAGE}/intel/socfpga
+        mkdir -p ${DEPLOY_DIR_IMAGE}/intel/socfpga
 
-lsblk | grep loop* | grep part					<= посмотреть структуру созданного устройства
-├─loop24p1  259:3    0   500M  0 part				<= boot
-├─loop24p2  259:4    0   1.5G  0 part				<= root
-└─loop24p3  259:5    0    10M  0 part				<= raw
+        # Copy dtb file into the intel/socfpga
+        install -m 0644 ${DEPLOY_DIR_IMAGE}/socfpga_arria10_socdk_sdmmc.dtb ${DEPLOY_DIR_IMAGE}/intel/socfpga
+        # commented 2 lines after edited layers/meta-intel-fpga/conf/machine/arria10.conf
+        # install -m 0644 ${DEPLOY_DIR_IMAGE}/socfpga_arria10_socdk_qspi.dtb ${DEPLOY_DIR_IMAGE}/intel/socfpga
+        # install -m 0644 ${DEPLOY_DIR_IMAGE}/socfpga_arria10_socdk_nand.dtb ${DEPLOY_DIR_IMAGE}/intel/socfpga
+        }
 
-mkdir $deploy/wic_scan						<= создать директорию $deploy/wic_scan
-
-sudo mount /dev/loop24p1 $deploy/wic_scan			<= примонтироваь loop24p1 к $deploy/wic_scan
-
-ls $deploy/wic_scan
-extlinux  fit_spl_fpga.itb  intel  u-boot.img  zImage		<= все на месте с правильными именами
-
-cat $deploy/wic_scan/extlinux/extlinux.conf
-
-# Generic Distro Configuration file generated by OpenEmbedded
-LABEL Arria10 SOCDK SDMMC
-KERNEL ../zImage
-FDTDIR ../intel/socfpga
-APPEND root=/dev/mmcblk0p2 rootwait rw earlyprintk memmap=16M$0x3F000000 console=ttyS0,115200n8
-
-ls $deploy/wic_scan/intel/socfpga
-socfpga_arria10_socdk_nand.dtb  socfpga_arria10_socdk_qspi.dtb  socfpga_arria10_socdk_sdmmc.dtb
-
-НЕ ЗАБЫВАТЬ ПОТОМ СДЕЛАТЬ UMOUNT!!!
-findmnt | grep wic_scan
-└─/home/iru/poky-socfpga/walnascar_deploy/images/arria10/wic_scan /dev/loop25p1          vfat            rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro
-
-/dev/loop25p1			<= mounted
-
-sudo umount /dev/loop25p1
-
-и удалить loop устройство
-sudo losetup -d /dev/loop25
-
-
-# OK цель достигута 
+        проверка
+        ls $deploy/wic_scan/intel/socfpga
+        socfpga_arria10_socdk_sdmmc.dtb		<= только один файл
 
 
 
+        # для мониторинга созданного *.wic файла без записи его на sdcard делать так:
+        wic ls $deploy/<name_of_wic.wic>		<= посмотреть на partitions в файле *.wic
+        Num     Start        End          Size      Fstype
+        1       1048576    525336575    524288000  fat32		<= boot
+        2     525336576   2098200575   1572864000  ext4		<= root
+        3    2098200576   2108686335     10485760			<= raw
+
+        sudo losetup -f --partscan $deploy/<name_of_wic.wic>		<= задать файл *.wic как устройство loop
+
+        lsblk | grep loop* | grep part					<= посмотреть структуру созданного устройства
+        ├─loop24p1  259:3    0   500M  0 part				<= boot
+        ├─loop24p2  259:4    0   1.5G  0 part				<= root
+        └─loop24p3  259:5    0    10M  0 part				<= raw
+
+        mkdir $deploy/wic_scan						<= создать директорию $deploy/wic_scan
+
+        sudo mount /dev/loop24p1 $deploy/wic_scan			<= примонтироваь loop24p1 к $deploy/wic_scan
+
+        ls $deploy/wic_scan
+        extlinux  fit_spl_fpga.itb  intel  u-boot.img  zImage		<= все на месте с правильными именами
+
+        cat $deploy/wic_scan/extlinux/extlinux.conf
+
+        # Generic Distro Configuration file generated by OpenEmbedded
+        LABEL Arria10 SOCDK SDMMC
+        KERNEL ../zImage
+        FDTDIR ../intel/socfpga
+        APPEND root=/dev/mmcblk0p2 rootwait rw earlyprintk memmap=16M$0x3F000000 console=ttyS0,115200n8
+
+        ls $deploy/wic_scan/intel/socfpga
+        socfpga_arria10_socdk_nand.dtb  socfpga_arria10_socdk_qspi.dtb  socfpga_arria10_socdk_sdmmc.dtb
+
+        НЕ ЗАБЫВАТЬ ПОТОМ СДЕЛАТЬ UMOUNT!!!
+        findmnt | grep wic_scan
+        └─/home/iru/poky-socfpga/walnascar_deploy/images/arria10/wic_scan /dev/loop25p1          vfat            rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro
+
+        /dev/loop25p1			<= mounted
+
+        sudo umount /dev/loop25p1
+
+        и удалить loop устройство
+        sudo losetup -d /dev/loop25
 
 
-###################### 28_12_2025 Игнат делал следующее
-# цель => внести изменения в исходники linux-socfpga-lts, в сам рецепт и переменные bitbake
-# чтобы исключить обращения к нодам gmac0 и gmac1 
+        # OK цель достигута 
 
-devtool status			<= empty
-devtool modify linux-socfpga-dts
-code -n /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts
-cd arch/arm/boot/dts/intel/socfpga
-mkdir .not_used
+#28_12_2025 Игнат делал следующее
+        # цель => внести изменения в исходники linux-socfpga-lts, в сам рецепт и переменные bitbake
+        # чтобы исключить обращения к нодам gmac0 и gmac1 
 
-перенес файлы, не относящмеся к arria10 в .not_used
+        devtool status			<= empty
+        devtool modify linux-socfpga-dts
+        code -n /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts
+        cd arch/arm/boot/dts/intel/socfpga
+        mkdir .not_used
 
-# осталось в arch/arm/boot/dts/intel/socfpga:
-ls
-Makefile  socfpga_arria10.dtsi  socfpga_arria10_socdk.dtsi  socfpga_arria10_socdk_sdmmc.dts  socfpga.dtsi
+        перенес файлы, не относящмеся к arria10 в .not_used
 
-devtool build linux-socfpga-lts		<= OK
+        # осталось в arch/arm/boot/dts/intel/socfpga:
+        ls
+        Makefile  socfpga_arria10.dtsi  socfpga_arria10_socdk.dtsi  socfpga_arria10_socdk_sdmmc.dts  socfpga.dtsi
 
-ls $deploy | grep .dtb
-socfpga_arria10_socdk_sdmmc--6.12.33-lts+git-r0-arria10-20251228110158.dtb
-socfpga_arria10_socdk_sdmmc-arria10.dtb
-socfpga_arria10_socdk_sdmmc.dtb		<= благополучно собрался !
+        devtool build linux-socfpga-lts		<= OK
 
-похоже файл <socfpga.dtsi> тоже не нужен, ссылок <#include socfpga.dtsi> на него не нашел
-перенес socfpga.dtsi в .not_used
+        ls $deploy | grep .dtb
+        socfpga_arria10_socdk_sdmmc--6.12.33-lts+git-r0-arria10-20251228110158.dtb
+        socfpga_arria10_socdk_sdmmc-arria10.dtb
+        socfpga_arria10_socdk_sdmmc.dtb		<= благополучно собрался !
 
-devtool build linux-socfpga-lts         <= OK
+        похоже файл <socfpga.dtsi> тоже не нужен, ссылок <#include socfpga.dtsi> на него не нашел
+        перенес socfpga.dtsi в .not_used
 
-в файле /home/iru/poky-socfpga/build/workspace/*/*/arch/arm/boot/dts/intel/socfpga/Makefile
-оставил только это
-# SPDX-License-Identifier: GPL-2.0
-dtb-$(CONFIG_ARCH_INTEL_SOCFPGA) += \
+        devtool build linux-socfpga-lts         <= OK
+
+        в файле /home/iru/poky-socfpga/build/workspace/*/*/arch/arm/boot/dts/intel/socfpga/Makefile
+        оставил только это
+        # SPDX-License-Identifier: GPL-2.0
+        dtb-$(CONFIG_ARCH_INTEL_SOCFPGA) += \
+                socfpga_arria10_socdk_sdmmc.dtb
+
+        devtool build linux-socfpga-lts         <= OK
+
+        в файле 
+        /arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+        # 1
+        aliases {
+        /*
+        * Ignat changed ethernet0 = &gmac0 to ethernet0 = &gmac2
+        */
+        ethernet0 = &gmac2;
+        serial0 = &uart1;
+        };
+
+        # 2
+        /*
+        * Ignat changed &gmac0 to &gmac2
+        */
+        &gmac2 {
+        phy-mode = "rgmii";
+        phy-addr = <0xffffffff>; /* probe for phy addr */
+
+        /*
+        * These skews assume the user's FPGA design is adding 600ps of delay
+        * for TX_CLK on Arria 10.
+        *
+        * All skews are offset since hardware skew values for the ksz9031
+        * range from a negative skew to a positive skew.
+        * See the micrel-ksz90x1.txt Documentation file for details.
+        */
+        txd0-skew-ps = <0>; /* -420ps */
+        txd1-skew-ps = <0>; /* -420ps */
+        txd2-skew-ps = <0>; /* -420ps */
+        txd3-skew-ps = <0>; /* -420ps */
+        rxd0-skew-ps = <420>; /* 0ps */
+        rxd1-skew-ps = <420>; /* 0ps */
+        rxd2-skew-ps = <420>; /* 0ps */
+        rxd3-skew-ps = <420>; /* 0ps */
+        txen-skew-ps = <0>; /* -420ps */
+        txc-skew-ps = <1860>; /* 960ps */
+        rxdv-skew-ps = <420>; /* 0ps */
+        rxc-skew-ps = <1680>; /* 780ps */
+        max-frame-size = <3800>;
+        status = "okay";
+        };
+
+
+        в файле
+        /home/iru/poky-socfpga/build/workspace/*/*/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
+        # 1	полностью удалил ноды для gmac0 и gmac1
+
+        # 2
+        emac0-rx-ecc@ff8c0800 {
+        compatible = "altr,socfpga-eth-mac-ecc";
+        reg = <0xff8c0800 0x400>;
+        altr,ecc-parent = <&gmac2>;		<= изменил &gmac0 на &gmac2
+        interrupts = <4 IRQ_TYPE_LEVEL_HIGH>,
+        <36 IRQ_TYPE_LEVEL_HIGH>;
+        };
+
+        emac0-tx-ecc@ff8c0c00 {
+        compatible = "altr,socfpga-eth-mac-ecc";
+        reg = <0xff8c0c00 0x400>;
+        altr,ecc-parent = <&gmac2>;             <= изменил &gmac0 на &gmac2
+        interrupts = <5 IRQ_TYPE_LEVEL_HIGH>,
+        <37 IRQ_TYPE_LEVEL_HIGH>;
+        };
+
+
+        devtool build linux-socfpga-lts         <= OK
+
+        на всякий случай 
+        pwd
+        /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts/arch/arm/boot/dts/intel/socfpga
+
+        mv .not_used ~/poky-socfpga/not_used_dts_dtsi_linux_socfpga_lts
+
+        # фиксирую
+        git status
+        Refresh index: 100% (86814/86814), done.
+        On branch devtool
+        Changes not staged for commit:
+        (use "git add/rm <file>..." to update what will be committed)
+        (use "git restore <file>..." to discard changes in working directory)
+        modified:   Makefile
+        deleted:    socfpga.dtsi
+        modified:   socfpga_arria10.dtsi
+        deleted:    socfpga_arria10_chameleonv3.dts
+        deleted:    socfpga_arria10_mercury_aa1.dtsi
+        deleted:    socfpga_arria10_mercury_pe1.dts
+        modified:   socfpga_arria10_socdk.dtsi
+        deleted:    socfpga_arria10_socdk_nand.dts
+        deleted:    socfpga_arria10_socdk_qspi.dts
+        deleted:    socfpga_arria5.dtsi
+        deleted:    socfpga_arria5_socdk.dts
+        deleted:    socfpga_cyclone5.dtsi
+        deleted:    socfpga_cyclone5_chameleon96.dts
+        deleted:    socfpga_cyclone5_de0_nano_soc.dts
+        deleted:    socfpga_cyclone5_mcv.dtsi
+        deleted:    socfpga_cyclone5_mcvevk.dts
+        deleted:    socfpga_cyclone5_socdk.dts
+        deleted:    socfpga_cyclone5_sockit.dts
+        deleted:    socfpga_cyclone5_socrates.dts
+        deleted:    socfpga_cyclone5_sodia.dts
+        deleted:    socfpga_cyclone5_vining_fpga.dts
+        deleted:    socfpga_vt.dts
+
+        # какой слой у рецепта linux-socfpga-lts?
+        bitbake -e linux-socfpga-lts | grep ^FILE=
+        FILE="/home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bb"
+
+        meta-intel-fpga			<= слой
+
+        git commit -a 
+        <arch-arm-boot-dts-intel-socfpga-modified-3-deleted-19>
+
+        devtool finish linux-socfpga-lts meta-intel-fpga
+        ...
+        INFO: Adding new patch 0001-arch-arm-boot-dts-intel-socfpga-modified-3-deleted-1.patch
+        ...
+
+        добавил <Upstream-Status: Pending> в <0001-arch-arm-boot-dts-intel-socfpga-modified-3-deleted-1.patch> 
+
+        bitbake core-image-minimal	<= OK !
+
+        # проверка .wic 
+        sudo losetup -f --partscan $deploy/core-image-minimal-arria10.rootfs-20251228143125.wic
+
+        lsblk | grep loop* | grep part
+        ├─loop26p1  259:9    0   500M  0 part		<=boot 
+        ├─loop26p2  259:10   0   1.5G  0 part 
+        └─loop26p3  259:11   0    10M  0 part
+
+        sudo mount /dev/loop26p1 $deploy/wic_scan
+
+        ls $deploy/wic_scan
+        extlinux  fit_spl_fpga.itb  intel  u-boot.img  zImage
+
+        ls $deploy/wic_scan/intel/socfpga
         socfpga_arria10_socdk_sdmmc.dtb
 
-devtool build linux-socfpga-lts         <= OK
+        cat $deploy/wic_scan/extlinux/extlinux.conf
+        # Generic Distro Configuration file generated by OpenEmbedded
+        LABEL Arria10 SOCDK SDMMC
+        KERNEL ../zImage
+        FDTDIR ../intel/socfpga
+        APPEND root=/dev/mmcblk0p2 rootwait rw earlyprintk memmap=16M$0x3F000000 console=ttyS0,115200n8
 
-в файле 
-/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
-# 1
-aliases {
-/*
-* Ignat changed ethernet0 = &gmac0 to ethernet0 = &gmac2
-*/
-ethernet0 = &gmac2;
-serial0 = &uart1;
-};
-
-# 2
-/*
-* Ignat changed &gmac0 to &gmac2
-*/
-&gmac2 {
-phy-mode = "rgmii";
-phy-addr = <0xffffffff>; /* probe for phy addr */
-
-/*
-* These skews assume the user's FPGA design is adding 600ps of delay
-* for TX_CLK on Arria 10.
-*
-* All skews are offset since hardware skew values for the ksz9031
-* range from a negative skew to a positive skew.
-* See the micrel-ksz90x1.txt Documentation file for details.
-*/
-txd0-skew-ps = <0>; /* -420ps */
-txd1-skew-ps = <0>; /* -420ps */
-txd2-skew-ps = <0>; /* -420ps */
-txd3-skew-ps = <0>; /* -420ps */
-rxd0-skew-ps = <420>; /* 0ps */
-rxd1-skew-ps = <420>; /* 0ps */
-rxd2-skew-ps = <420>; /* 0ps */
-rxd3-skew-ps = <420>; /* 0ps */
-txen-skew-ps = <0>; /* -420ps */
-txc-skew-ps = <1860>; /* 960ps */
-rxdv-skew-ps = <420>; /* 0ps */
-rxc-skew-ps = <1680>; /* 780ps */
-max-frame-size = <3800>;
-status = "okay";
-};
-
-
-в файле
-/home/iru/poky-socfpga/build/workspace/*/*/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
-# 1	полностью удалил ноды для gmac0 и gmac1
-
-# 2
-emac0-rx-ecc@ff8c0800 {
-compatible = "altr,socfpga-eth-mac-ecc";
-reg = <0xff8c0800 0x400>;
-altr,ecc-parent = <&gmac2>;		<= изменил &gmac0 на &gmac2
-interrupts = <4 IRQ_TYPE_LEVEL_HIGH>,
-<36 IRQ_TYPE_LEVEL_HIGH>;
-};
-
-emac0-tx-ecc@ff8c0c00 {
-compatible = "altr,socfpga-eth-mac-ecc";
-reg = <0xff8c0c00 0x400>;
-altr,ecc-parent = <&gmac2>;             <= изменил &gmac0 на &gmac2
-interrupts = <5 IRQ_TYPE_LEVEL_HIGH>,
-<37 IRQ_TYPE_LEVEL_HIGH>;
-};
-
-
-devtool build linux-socfpga-lts         <= OK
-
-на всякий случай 
-pwd
-/home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts/arch/arm/boot/dts/intel/socfpga
-
-mv .not_used ~/poky-socfpga/not_used_dts_dtsi_linux_socfpga_lts
-
-# фиксирую
-git status
-Refresh index: 100% (86814/86814), done.
-On branch devtool
-Changes not staged for commit:
-(use "git add/rm <file>..." to update what will be committed)
-(use "git restore <file>..." to discard changes in working directory)
-modified:   Makefile
-deleted:    socfpga.dtsi
-modified:   socfpga_arria10.dtsi
-deleted:    socfpga_arria10_chameleonv3.dts
-deleted:    socfpga_arria10_mercury_aa1.dtsi
-deleted:    socfpga_arria10_mercury_pe1.dts
-modified:   socfpga_arria10_socdk.dtsi
-deleted:    socfpga_arria10_socdk_nand.dts
-deleted:    socfpga_arria10_socdk_qspi.dts
-deleted:    socfpga_arria5.dtsi
-deleted:    socfpga_arria5_socdk.dts
-deleted:    socfpga_cyclone5.dtsi
-deleted:    socfpga_cyclone5_chameleon96.dts
-deleted:    socfpga_cyclone5_de0_nano_soc.dts
-deleted:    socfpga_cyclone5_mcv.dtsi
-deleted:    socfpga_cyclone5_mcvevk.dts
-deleted:    socfpga_cyclone5_socdk.dts
-deleted:    socfpga_cyclone5_sockit.dts
-deleted:    socfpga_cyclone5_socrates.dts
-deleted:    socfpga_cyclone5_sodia.dts
-deleted:    socfpga_cyclone5_vining_fpga.dts
-deleted:    socfpga_vt.dts
-
-# какой слой у рецепта linux-socfpga-lts?
-bitbake -e linux-socfpga-lts | grep ^FILE=
-FILE="/home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bb"
-
-meta-intel-fpga			<= слой
-
-git commit -a 
-<arch-arm-boot-dts-intel-socfpga-modified-3-deleted-19>
-
-devtool finish linux-socfpga-lts meta-intel-fpga
-...
-INFO: Adding new patch 0001-arch-arm-boot-dts-intel-socfpga-modified-3-deleted-1.patch
-...
-
-добавил <Upstream-Status: Pending> в <0001-arch-arm-boot-dts-intel-socfpga-modified-3-deleted-1.patch> 
-
-bitbake core-image-minimal	<= OK !
-
-# проверка .wic 
-sudo losetup -f --partscan $deploy/core-image-minimal-arria10.rootfs-20251228143125.wic
-
-lsblk | grep loop* | grep part
-├─loop26p1  259:9    0   500M  0 part		<=boot 
-├─loop26p2  259:10   0   1.5G  0 part 
-└─loop26p3  259:11   0    10M  0 part
-
-sudo mount /dev/loop26p1 $deploy/wic_scan
-
-ls $deploy/wic_scan
-extlinux  fit_spl_fpga.itb  intel  u-boot.img  zImage
-
-ls $deploy/wic_scan/intel/socfpga
-socfpga_arria10_socdk_sdmmc.dtb
-
-cat $deploy/wic_scan/extlinux/extlinux.conf
-# Generic Distro Configuration file generated by OpenEmbedded
-LABEL Arria10 SOCDK SDMMC
-KERNEL ../zImage
-FDTDIR ../intel/socfpga
-APPEND root=/dev/mmcblk0p2 rootwait rw earlyprintk memmap=16M$0x3F000000 console=ttyS0,115200n8
-
-OK, все на местах
-
+        OK, все на местах
 
 #10_01_2026
-взял файл .config использованный в cyclone5 для конфигурирования  virtual/kernel
+        взял файл .config использованный в cyclone5 для конфигурирования  virtual/kernel
 
-cp cyclone_working_kernel_config 
-/home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/linux-socfpga-lts/6.12.33-lts+git/linux-arria10-standard-build/cyclone
-(as cyclone)
-
-
-сделал back_up для имеющегося .config
-cp /home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/linux-socfpga-lts/6.12.33-lts+git/linux-arria10-standard-build/.config \
-        back_up_virt_kernel_arria_config
-
-запустил
-bitbake -c menuconfig -f virtual/kernel
-
-load config <cyclone>
-благополучно загрузился, по пути конфигурации
-[...] Device Drivers  ---> Network device support > PHY Device support and infrastructure
-вижу:
-<*>   Marvell 88Q2XXX PHY                                       
-<*>   Marvell 88X2222 PHY 
-
-далее exit без изменений
-
-проверил еще раз
-bitbake -c menuconfig -f virtual/kernel
-MARVELL on the same place OK!
+        cp cyclone_working_kernel_config 
+        /home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/linux-socfpga-lts/6.12.33-lts+git/linux-arria10-standard-build/cyclone
+        (as cyclone)
 
 
-bitbake -f -c compile virtual/kernel && bitbake -f -c deploy virtual/kernel
-OK!
-file $deploy/zImage--6.12.33-lts+git0+3234b1ed89-r0-arria10-20260110102220.bin
-/home/iru/poky-socfpga/walnascar_deploy/images/arria10/zImage--6.12.33-lts+git0+3234b1ed89-r0-arria10-20260110102220.bin: 
-Linux kernel ARM boot executable zImage (little-endian)
+        сделал back_up для имеющегося .config
+        cp /home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/linux-socfpga-lts/6.12.33-lts+git/linux-arria10-standard-build/.config \
+                back_up_virt_kernel_arria_config
 
-bitbake core-image-minimal
-WARNING: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bb:do_compile 
-is tainted from a forced run
+        запустил
+        bitbake -c menuconfig -f virtual/kernel
 
-issue:
-bitbake -c clean linux-socfpga-lts
-OK!
+        load config <cyclone>
+        благополучно загрузился, по пути конфигурации
+        [...] Device Drivers  ---> Network device support > PHY Device support and infrastructure
+        вижу:
+        <*>   Marvell 88Q2XXX PHY                                       
+        <*>   Marvell 88X2222 PHY 
 
-bitbake core-image-minimal
-NO WARNINGS OK!
+        далее exit без изменений
 
-
-также работает и для u-boot-socfpga
-bitbake u-boot-socfpga -c menuconfig
-Device Drivers > Ethernet PHY (physical media interface) support
-[*]   Marvell Ethernet PHYs support 
-поиск установок возможен посредством ввода <?>
-
-оказывается после bitbake -c clean <RECEIPT> все установки для  MARVELL сброшены
-перезаписал
-bitbake -c menuconfig -f virtual/kernel
-bitbake -f -c compile virtual/kernel && bitbake -f -c deploy virtual/kernel
-
-WARNING: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bb:do_compile 
-is tainted from a forced run
-собрался OK
+        проверил еще раз
+        bitbake -c menuconfig -f virtual/kernel
+        MARVELL on the same place OK!
 
 
+        bitbake -f -c compile virtual/kernel && bitbake -f -c deploy virtual/kernel
+        OK!
+        file $deploy/zImage--6.12.33-lts+git0+3234b1ed89-r0-arria10-20260110102220.bin
+        /home/iru/poky-socfpga/walnascar_deploy/images/arria10/zImage--6.12.33-lts+git0+3234b1ed89-r0-arria10-20260110102220.bin: 
+        Linux kernel ARM boot executable zImage (little-endian)
 
-bitbake core-image-minimal
-WARNING: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bb:do_compile 
-is tainted from a forced run
-WARNING: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bb:do_deploy 
-is tainted from a forced run
-WARNING: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga_v2025.07.bb:do_compile 
-is tainted from a forced run
+        bitbake core-image-minimal
+        WARNING: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bb:do_compile 
+        is tainted from a forced run
 
-OK
+        issue:
+        bitbake -c clean linux-socfpga-lts
+        OK!
 
-изменил содержимое файла
-/home/iru/poky-socfpga/.layers/meta-poky/recipes-core/base-files/files/poky/motd
-before:
-WARNING: Poky is a reference Yocto Project distribution that should be used for
-testing and development purposes only. It is recommended that you create your
-own distribution for production use.
-after:
-WARNING: Ignat's greating
+        bitbake core-image-minimal
+        NO WARNINGS OK!
 
-bitbake core-image-minimal
-Summary: There were 2 WARNING messages.
-OK
+
+        также работает и для u-boot-socfpga
+        bitbake u-boot-socfpga -c menuconfig
+        Device Drivers > Ethernet PHY (physical media interface) support
+        [*]   Marvell Ethernet PHYs support 
+        поиск установок возможен посредством ввода <?>
+
+        оказывается после bitbake -c clean <RECEIPT> все установки для  MARVELL сброшены
+        перезаписал
+        bitbake -c menuconfig -f virtual/kernel
+        bitbake -f -c compile virtual/kernel && bitbake -f -c deploy virtual/kernel
+
+        WARNING: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bb:do_compile 
+        is tainted from a forced run
+        собрался OK
+
+
+
+        bitbake core-image-minimal
+        WARNING: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bb:do_compile 
+        is tainted from a forced run
+        WARNING: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bb:do_deploy 
+        is tainted from a forced run
+        WARNING: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga_v2025.07.bb:do_compile 
+        is tainted from a forced run
+
+        OK
+
+        изменил содержимое файла
+        /home/iru/poky-socfpga/.layers/meta-poky/recipes-core/base-files/files/poky/motd
+        before:
+        WARNING: Poky is a reference Yocto Project distribution that should be used for
+        testing and development purposes only. It is recommended that you create your
+        own distribution for production use.
+        after:
+        WARNING: Ignat's greating
+
+        bitbake core-image-minimal
+        Summary: There were 2 WARNING messages.
+        OK
 
 #14_01_2026
-добавил строку для красоты в 
-/home/iru/poky-socfpga/.layers/meta-poky/recipes-core/base-files/files/poky/motd
+        добавил строку для красоты в 
+        /home/iru/poky-socfpga/.layers/meta-poky/recipes-core/base-files/files/poky/motd
 
-вижу, что wic от 13_01_2026 грузится с ошибкой по network [FAILED] Failed to start networking.service
-ifconfig not found
+        вижу, что wic от 13_01_2026 грузится с ошибкой по network [FAILED] Failed to start networking.service
+        ifconfig not found
 
 #14_01_2026 
-конфигурирование menuconfig (пример для u-boot-socfpga)
-1 devtool modify u-boot-socfpga
-2 devtool menuconfig u-boot-socfpga
-                configuration changes
-        save <= Updating config fragment /home/*/*/*/workspace/sources/u-boot-socfpga/oe-local-files/devtool-fragment.cfg
-3 devtool update-recipe u-boot-socfpga  <= creates the necessary files in  layer
+        конфигурирование menuconfig (пример для u-boot-socfpga)
+        1 devtool modify u-boot-socfpga
+        2 devtool menuconfig u-boot-socfpga
+                        configuration changes
+                save <= Updating config fragment /home/*/*/*/workspace/sources/u-boot-socfpga/oe-local-files/devtool-fragment.cfg
+        3 devtool update-recipe u-boot-socfpga  <= creates the necessary files in  layer
 
-# check
-bitbake -c menuconfig u-boot-socfpga <= внесенные изменения отображаются правильно
+        # check
+        bitbake -c menuconfig u-boot-socfpga <= внесенные изменения отображаются правильно
 
-busybox added in Miscellaneous Utilities <tree>
-# check
-cat /home/iru/poky-socfpga/build/workspace/sources/busybox/oe-local-files/devtool-fragment.cfg
-# Wed Jan 14 16:13:10 2026
-CONFIG_TREE=y
-bitbake -c menuconfig busybox
-[*] tree (2.5 kb) <= OK
+        busybox added in Miscellaneous Utilities <tree>
+        # check
+        cat /home/iru/poky-socfpga/build/workspace/sources/busybox/oe-local-files/devtool-fragment.cfg
+        # Wed Jan 14 16:13:10 2026
+        CONFIG_TREE=y
+        bitbake -c menuconfig busybox
+        [*] tree (2.5 kb) <= OK
 
-Разбираться с menuconfig через devtool прищлось по причине того, что сначала Игнат использовал
-1 bitbake -c menuconfig <recipe_name>
-2 bitbake -c compile <recipe_name> && bitbake -c deploy <recipe_name>
-3 cp deploy_file (u-boot, z-image) to sd card
-но оказалось эти изменения не применяются в случае общей сборки bitbake core-image-minimal
-
-
+        Разбираться с menuconfig через devtool прищлось по причине того, что сначала Игнат использовал
+        1 bitbake -c menuconfig <recipe_name>
+        2 bitbake -c compile <recipe_name> && bitbake -c deploy <recipe_name>
+        3 cp deploy_file (u-boot, z-image) to sd card
+        но оказалось эти изменения не применяются в случае общей сборки bitbake core-image-minimal
 
 #27_01_2026
-ссылки, используемые в YOCTO gsrd (core, periph.hps.xml) (Игнат подменял)
-<core>
-file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_ghrd_10as066n2.core.rbf
-symbolic link to 
-/home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/ghrd_10as066n2.core.rbf
-file
-/home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/ghrd_10as066n2.core.rbf
-symbolic link to 
-/home/iru/Quartus_Projects/AR_PROV4_VIC/output_files/18-December_23_02_13_ask.core.rbf
+        ссылки, используемые в YOCTO gsrd (core, periph.hps.xml) (Игнат подменял)
+        <core>
+        file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_ghrd_10as066n2.core.rbf
+        symbolic link to 
+        /home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/ghrd_10as066n2.core.rbf
+        file
+        /home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/ghrd_10as066n2.core.rbf
+        symbolic link to 
+        /home/iru/Quartus_Projects/AR_PROV4_VIC/output_files/18-December_23_02_13_ask.core.rbf
 
-<periph>
-file echo -e "\n\t\tSUCCESS" link to 
-/home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/ghrd_10as066n2.periph.rbf
-file
-/home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/ghrd_10as066n2.periph.rbf
-symbolic link to 
-/home/iru/Quartus_Projects/AR_PROV4_VIC/output_files/18-December_23_02_13_ask.periph.rbf
+        <periph>
+        file echo -e "\n\t\tSUCCESS" link to 
+        /home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/ghrd_10as066n2.periph.rbf
+        file
+        /home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/ghrd_10as066n2.periph.rbf
+        symbolic link to 
+        /home/iru/Quartus_Projects/AR_PROV4_VIC/output_files/18-December_23_02_13_ask.periph.rbf
 
-<hps.xml>
-file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_hps.xml
-symbolic link to 
-/home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/hps_xml_link
-file
-/home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/hps_xml_link
-symbolic link to /home/iru/Quartus_Projects/AR_PROV4_VIC/hps_isw_handoff/hps.xml
+        <hps.xml>
+        file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_hps.xml
+        symbolic link to 
+        /home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/hps_xml_link
+        file
+        /home/iru/a10_flow_u-boot_28_10/a10_example.sdmmc/a10_soc_devkit_ghrd_pro/software/bootloader/u-boot-socfpga/hps_xml_link
+        symbolic link to /home/iru/Quartus_Projects/AR_PROV4_VIC/hps_isw_handoff/hps.xml
 
-добавил скрипт project_choise.sh для выбора проекта Quartus из которого будут выбираться core periph hps.xml
+        добавил скрипт project_choise.sh для выбора проекта Quartus из которого будут выбираться core periph hps.xml
 
-теперь:
-file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_ghrd_10as066n2.core.rbf
-symbolic link to poky/core.rbf
-file poky/core.rbf symbolic link to choosed Quartus project (build via sof file)
+        теперь:
+        file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_ghrd_10as066n2.core.rbf
+        symbolic link to poky/core.rbf
+        file poky/core.rbf symbolic link to choosed Quartus project (build via sof file)
 
-file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_ghrd_10as066n2.periph.rbf
-symbolic link to poky/periph.rbf
-file poky/core.rbf symbolic link to choosed Quartus project (build via sof file)
+        file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_ghrd_10as066n2.periph.rbf
+        symbolic link to poky/periph.rbf
+        file poky/core.rbf symbolic link to choosed Quartus project (build via sof file)
 
-file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_hps.xml
-symbolic link to to poky/hps.xml
-file poky/hps.xml choosed Quartus project 
+        file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_hps.xml
+        symbolic link to to poky/hps.xml
+        file poky/hps.xml choosed Quartus project 
 
 # 01_02_2026
-проверяем как u-boot-socfpg использует наш patch:
-bitbake -c do_unpack_and_patch u-boot-socfpga -DDD | grep 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch -A 2
-DEBUG: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga_v2025.07.bb: Searching for 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch in paths:
-    /home/iru/poky-socfpga/build/workspace/sources/u-boot-socfpga/oe-local-files
-    /home/iru/poky-socfpga/build/workspace/appends/u-boot-socfpga/poky
---
-DEBUG: /home/iru/poky-socfpga/poky/layers/
-/recipes-bsp/u-boot/u-boot-socfpga_v2025.07.bb: Using /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga/0001-edited-3-dts-dtsi-files-for-gmac2-only.patch for 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch
-DEBUG: /home/iru/poky-socfpga/poky/meta/recipes-core/busybox/busybox_1.37.0.bb: Searching for 0001-depmod-Ignore-.debug-directories.patch in paths:
-    /home/iru/poky-socfpga/build/workspace/sources/busybox/oe-local-files
+        проверяем как u-boot-socfpg использует наш patch:
+        bitbake -c do_unpack_and_patch u-boot-socfpga -DDD | grep 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch -A 2
+        DEBUG: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga_v2025.07.bb: Searching for 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch in paths:
+        /home/iru/poky-socfpga/build/workspace/sources/u-boot-socfpga/oe-local-files
+        /home/iru/poky-socfpga/build/workspace/appends/u-boot-socfpga/poky
+        --
+        DEBUG: /home/iru/poky-socfpga/poky/layers/
+        /recipes-bsp/u-boot/u-boot-socfpga_v2025.07.bb: Using /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga/0001-edited-3-dts-dtsi-files-for-gmac2-only.patch for 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch
+        DEBUG: /home/iru/poky-socfpga/poky/meta/recipes-core/busybox/busybox_1.37.0.bb: Searching for 0001-depmod-Ignore-.debug-directories.patch in paths:
+        /home/iru/poky-socfpga/build/workspace/sources/busybox/oe-local-files
 
-оказывается linux-socfpga-lts использует тот же самый patch:
-bitbake -c do_unpack_and_patch linux-socfpga-lts -DDD | grep 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch -A 2
-DEBUG: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga_v2025.07.bb: Searching for 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch in paths:
-    /home/iru/poky-socfpga/build/workspace/sources/u-boot-socfpga/oe-local-files
-    /home/iru/poky-socfpga/build/workspace/appends/u-boot-socfpga/poky
---
-DEBUG: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga_v2025.07.bb: Using /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga/0001-edited-3-dts-dtsi-files-for-gmac2-only.patch for 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch
-DEBUG: /home/iru/poky-socfpga/poky/meta/recipes-core/busybox/busybox_1.37.0.bb: Searching for 0001-depmod-Ignore-.debug-directories.patch in paths:
-    /home/iru/poky-socfpga/build/workspace/sources/busybox/oe-local-files
-
-
-вывод: нужно норамально дописать через devtool патч для u-boot-socfpga 
-дальнейшие действия в /home/iru/poky-socfpga/poky/success_dtsi/info.txt
+        оказывается linux-socfpga-lts использует тот же самый patch:
+        bitbake -c do_unpack_and_patch linux-socfpga-lts -DDD | grep 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch -A 2
+        DEBUG: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga_v2025.07.bb: Searching for 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch in paths:
+        /home/iru/poky-socfpga/build/workspace/sources/u-boot-socfpga/oe-local-files
+        /home/iru/poky-socfpga/build/workspace/appends/u-boot-socfpga/poky
+        --
+        DEBUG: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga_v2025.07.bb: Using /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga/0001-edited-3-dts-dtsi-files-for-gmac2-only.patch for 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch
+        DEBUG: /home/iru/poky-socfpga/poky/meta/recipes-core/busybox/busybox_1.37.0.bb: Searching for 0001-depmod-Ignore-.debug-directories.patch in paths:
+        /home/iru/poky-socfpga/build/workspace/sources/busybox/oe-local-files
 
 
-Peripheral Region Address Map
-Slave Identifier        Description                     Base Address    Size
-EMAC0RXECC              Receive ECC,Ethernet MAC0       0xFF8C0800      1 KB    <= default
-EMAC0TXECC              Transmit ECC,Ethernet MAC0      0xFF8C0C00      1 KB    <= default
-EMAC1RXECC              Receive ECC,Ethernet MAC1       0xFF8C1000      1 KB
-EMAC1TXECC              Transmit ECC, Ethernet MAC1     0xFF8C1400      1 KB
-EMAC2RXECC              Receive ECC, Ethernet MAC2      0xFF8C1800      1 KB
-EMAC2TXECC              Transmit ECC, Ethernet MAC2     0xFF8C1C00      1 KB
+        вывод: нужно норамально дописать через devtool патч для u-boot-socfpga 
+        дальнейшие действия в /home/iru/poky-socfpga/poky/success_dtsi/info.txt
+
+
+        Peripheral Region Address Map
+        Slave Identifier        Description                     Base Address    Size
+        EMAC0RXECC              Receive ECC,Ethernet MAC0       0xFF8C0800      1 KB    <= default
+        EMAC0TXECC              Transmit ECC,Ethernet MAC0      0xFF8C0C00      1 KB    <= default
+        EMAC1RXECC              Receive ECC,Ethernet MAC1       0xFF8C1000      1 KB
+        EMAC1TXECC              Transmit ECC, Ethernet MAC1     0xFF8C1400      1 KB
+        EMAC2RXECC              Receive ECC, Ethernet MAC2      0xFF8C1800      1 KB
+        EMAC2TXECC              Transmit ECC, Ethernet MAC2     0xFF8C1C00      1 KB
 
 # 06_02 
         проверил состояние eth0 
@@ -779,7 +761,6 @@ EMAC2TXECC              Transmit ECC, Ethernet MAC2     0xFF8C1C00      1 KB
         [  143.066623] socfpga-dwmac ff804000.ethernet eth0: registered PTP clock                                                                 
         [  143.073200] socfpga-dwmac ff804000.ethernet eth0: configuring for phy/rgmii link mode                                                  
         root@arria10:~# [  146.327398] socfpga-dwmac ff804000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx 
-
 
 # 07_02
         1 Убедился, что  u-boot может полноценно работать через eth0, описание шагов в
@@ -816,3 +797,296 @@ EMAC2TXECC              Transmit ECC, Ethernet MAC2     0xFF8C1C00      1 KB
                 index.html           100% |**************************************************************|  2623  0:00:00 ETA 
                 'index.html' saved
                 УРА !!!
+
+# 09_02
+        переписвыаю patch via devtool пересобираю core-image-minimal via bitbake
+        cd /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts
+        git status 
+                (modified two files)
+        git commit -a
+                phy_mode_rgmii_id_phy_addr_0xffffffff_
+        devtool finish linux-socfpga-lts meta-intel-fpga
+        add <Upstream-Status: Pending> in to /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/config/0001-phy_mode_rgmii_id_phy_addr_0xffffffff_.patch
+        bitbake core-image-minimal
+                [ERROR]: Application of .kernel-meta//patches//./0001-phy_mode_rgmii_id_phy_addr_0xffffffff_.patch failed.
+                        Patch needs to be refreshed. Sample resolution script:
+                        .git/rebase-apply/resolve_rejects
+        removed some whitespaces from 0001-phy_mode_rgmii_id_phy_addr_0xffffffff_.patch
+        bitbake -c do_patch linux-socfpga-lts -DDD 
+                DEBUG: linux-socfpga-lts-6.12.33-lts+git-r0 do_patch: 
+                Using /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/config/0001-phy_mode_rgmii_id_phy_addr_0xffffffff_.patch
+                for
+                0001-phy_mode_rgmii_id_phy_addr_0xffffffff_.patch
+        bitbake core-image-minimal <= OK
+        check .wic with arria10
+                minicom:
+                socfpga-dwmac ff800000.ethernet eth0: __stmmac_open: Cannot attach to PHY (error: -22) !!!
+
+        devtool modify linux-socfpga-lts <= devtool modify in file <linux-socfpga-lts> будто ничего и не делал!
+        added changes in to dtsi again
+        devtool build linux-socfpga-lts <= OK
+        git status
+                Refresh index: 100% (86814/86814), done.
+                On branch socfpga-6.12.33-lts
+                Your branch is up to date with 'origin/socfpga-6.12.33-lts'.
+
+                You are in the middle of an am session.
+                (fix conflicts and then run "git am --continue")
+                (use "git am --skip" to skip this patch)
+                (use "git am --abort" to restore the original branch)
+
+                Changes not staged for commit:
+                (use "git add <file>..." to update what will be committed)
+                (use "git restore <file>..." to discard changes in working directory)
+                        modified:   arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
+                        modified:   arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+
+                no changes added to commit (use "git add" and/or "git commit -a")
+        
+        git am --abort
+        git add arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
+        git add arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+        devtool finish linux-socfpga-lts meta-intel-fpga
+                INFO: Would remove config fragment /tmp/devtoolnhbzpxve/tmpsi73y1ys/devtool-fragment.cfg
+                INFO: Adding new patch 0001-second_try_for_eth_config.patch
+                INFO: Updating recipe linux-socfpga-lts_6.12.bb
+                INFO: Removing file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/config/0001-phy_mode_rgmii_id_phy_addr_0xffffffff_.patch
+                INFO: Cleaning sysroot for recipe linux-socfpga-lts...
+                INFO: Preserving source tree in /home/iru/poky-socfpga/build/workspace/attic/sources/linux-socfpga-lts.20260209134358
+        bitbake -c deploy linux-socfpga-lts <= ok
+                вообще нет eth0 !
+        devtool modify linux-socfpga-lts
+        diff 
+        /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi 
+        /home/iru/poky-socfpga/poky/dts_dtsi_network_ok/socfpga_arria10.dtsi -y
+
+        =>                      emac0-rx-ecc@ff8c0800 {		      |				emac2-rx-ecc@ff8c1800 {
+                                        compatible = "altr,socfpga-et					compatible = "altr,socfpga-et
+        =>                              reg = <0xff8c0800 0x400>;     |					reg = <0xFF8C1800 0x400>;
+                                        altr,ecc-parent = <&gmac2>;					altr,ecc-parent = <&gmac2>;
+                                        interrupts = <4 IRQ_TYPE_LEVE					interrupts = <4 IRQ_TYPE_LEVE
+                                                <36 IRQ_TYPE_LEV						     <36 IRQ_TYPE_LEV
+                                };								};
+
+        =>                      emac0-tx-ecc@ff8c0c00 {		      |				emac2-tx-ecc@ff8c1c00 {
+                                        compatible = "altr,socfpga-et					compatible = "altr,socfpga-et
+        =>                              reg = <0xff8c0c00 0x400>;     |					reg = <0xFF8C1C00 0x400>;
+                                        altr,ecc-parent = <&gmac2>;					altr,ecc-parent = <&gmac2>;
+                                        interrupts = <5 IRQ_TYPE_LEVE					interrupts = <5 IRQ_TYPE_LEVE
+                                                <37 IRQ_TYPE_LEV						     <37 IRQ_TYPE_LEV
+                                };								};
+
+        cp 
+        /home/iru/poky-socfpga/poky/dts_dtsi_network_ok/socfpga_arria10.dtsi 
+        /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
+        git status
+                modified:   arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
+        git add arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
+        git commit -a
+                <trhird_try_config_eth0>
+        devtool finish linux-socfpga-lts meta-intel-fpga
+                INFO: Adding new patch 0001-trhird_try_config_eth0.patch
+                INFO: Updating recipe linux-socfpga-lts_6.12.bb
+                INFO: Removing file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/config/0001-second_try_for_eth_config.patch
+                INFO: Cleaning sysroot for recipe linux-socfpga-lts...
+                INFO: Preserving source tree in /home/iru/poky-socfpga/build/workspace/attic/sources/linux-socfpga-lts.20260209144843
+
+        bitbake -c do_patch linux-socfpga-lts
+                ERROR: linux-socfpga-lts-6.12.33-lts+git-r0 do_patch: QA Issue: Missing Upstream-Status in patch
+        added <Upstream-Status: Pending>
+                --the same situation minicom:
+                socfpga-dwmac ff800000.ethernet eth0: __stmmac_open: Cannot attach to PHY (error: -22)
+        bitbake -c do_patch linux-socfpga-lts -DDD | grep 0001
+                ERROR: linux-socfpga-lts-6.12.33-lts+git-r0 do_patch: Execution of 
+                '/home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/linux-socfpga-lts/6.12.33-lts+git/temp/run.do_patch.1321035' 
+                failed with exit code 1
+        open log
+                [ERROR]: Application of .kernel-meta//patches//./0001-trhird_try_config_eth0.patch failed.
+                Patch needs to be refreshed. Sample resolution script:
+                .git/rebase-apply/resolve_rejects
+        code -n /home/iru/poky-socfpga/build/tmp/work-shared/arria10/kernel-source
+                start terminal
+                .git/rebase-apply/resolve_rejects
+        bitbake -c do_patch linux-socfpga-lts -DDD | grep 0001
+                DEBUG: linux-socfpga-lts-6.12.33-lts+git-r0 do_patch: Searching for 0001-trhird_try_config_eth0.patch in paths:
+                DEBUG: linux-socfpga-lts-6.12.33-lts+git-r0 do_patch: 
+        =>      Using /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/config/0001-trhird_try_config_eth0.patch 
+                for 0001-trhird_try_config_eth0.patch
+
+        bitbake linux-socfpga-lts
+
+        Итого:
+                чтобы удалить ненужный patch следует удалить ссылку на него в соответствующем рецепте (файлы .bb .bbappend .inc)  
+                удалить сам рецепт
+                сбросить devtool (если он активен на этом рецепте)   
+                запустить devtool modify <RECEIPT>
+                внести необходимые изменения в исходники
+                git add 
+                git commit
+                devtool finish <RECEIPT> <LAYER>
+                добавить в .patch <Upstream-Status: Pending>
+                изменить PR для <RECEIPT> (bitbake-getvar -r <RECEIPT> PR)
+                изменить PR для <RECEIPT> (bitbake-getvar -r <RECEIPT> PR)
+                собрать <RECEIPT>
+
+# 10_02
+        predictable MAC
+        Hit any key to stop autoboot
+        printenv ethaddr
+                ethaddr=7a:b0:6c:b8:0a:5f
+        setenv -f ethaddr 0a:1b:2c:3d:4e:5f
+        printenv ethaddr
+                ethaddr=0a:1b:2c:3d:4e:5f
+        saveenv
+                Saving Environment to MMC... Writing to MMC(0)... OK
+        reboot
+        ip l show eth0                                                                                
+                2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq qlen 1000                                        
+                link/ether 0a:1b:2c:3d:4e:5f brd ff:ff:ff:ff:ff:ff      <= OK
+        for hostname edit /etc/hostname 
+
+# 11_02
+        задача: указать предустановленный MAC в boot части sd карты, откуда он мог бы быть считан
+        добавил u-boot.src как описано в
+        https://malt.zendesk.com/hc/en-us/articles/900006257843-How-to-Edit-U-Boot-Scripts
+        теперь вместо
+                Loading Environment from MMC... Reading from MMC(0)... *** Warning - bad CRC, using default environment
+        вижу
+                Loading Environment from MMC... Reading from MMC(0)... OK
+        далле при начале загрузки ядра
+                ## Executing script at 02100000                                                                                                                
+                ## Error: Can't overwrite "eth0addr"                                                                                                           
+                ## Error inserting "eth0addr" variable, errno=1                                                                                                
+                eth0addr=00:1A:2B:3C:4D:5E                                                                                                                     
+                ethaddr=0a:1b:2c:3d:4e:5f                                                                                                                      
+                Saving Environment to MMC... Writing to MMC(0)... OK
+
+        поменял в menuconfig u-boot-socfpga:
+               Configuration > Environment > allways append the env with new data set to yes
+               Configuration > Device Drivers > Ethernet PHY (physical media interface) support MArvell eth physical support to yes
+               Configuration > Networking .Random Ethaddr if unset to no
+        bitbake-core-image-minimal <= OK
+
+        write .wic to sd card without u-boot.src
+        run
+
+                Error: ethernet@ff804000 No valid MAC address found.                                                                                           
+                No ethernet found.                                                                                                                             
+                                                                                                                                                        
+                Hit any key to stop autoboot:  0                                                                                                               
+                Failed to load 'u-boot.scr'
+
+                [FAILED] Failed to start networking.service.
+        ip a
+                link/ether ee:37:f5:9e:3e:21 brd ff:ff:ff:ff:ff:ff                                                                                         
+                inet 192.168.0.30/24 brd 192.168.0.255 scope global dynamic eth0   
+
+        reboot
+                Error: ethernet@ff804000 No valid MAC address found.                                                                                           
+                No ethernet found.                                                                                                                     
+                                                                                                                                                        
+                Hit any key to stop autoboot:  0                                                                                                               
+                Failed to load 'u-boot.scr'
+        ip a
+                link/ether ee:37:f5:9e:3e:21 brd ff:ff:ff:ff:ff:ff                                                                                         
+                inet 192.168.0.30/24 brd 192.168.0.255 scope global dynamic eth0
+
+        получилось, делать надо так
+                создаем файл u-boot.txt
+                cat u-boot.txt
+                        setenv -f ethaddr 4a:bf:84:9d:00:4a
+                        saveenv
+                mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "My script" -d u-boot.txt u-boot.scr
+
+                cp u-boot.scr into boot sd_card
+                OK!!
+        работает на обоих вариантах конфигурации u-boot, но нужно следить за првльностью указания MAC  в u-boot.txt 
+        и не сдедует пользоваться nano редактором для исправлений прямо в u-boot.scr
+
+        задача 
+                добавить предустановленное значение  mac адреса, которое можно было бы 
+                находить посредством python скрипта
+                (в том числе из под Windows) и перезаписывать, для этого сгенерил patch, 
+                суть которого добавление в arch/arm/dts/socfpga_arria10_socdk-u-boot.dtsi
+                +		ethaddr = "fe:d8:d6:db:62:0a";
+                0001-add_ethaddr_into_alias_into_socfpga_arria10_socdk-u-.patch
+                увы не работает, удаляю  patch
+
+                # check
+                bitbake core-image-minimal <= OK
+
+                creat file 
+                        /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga/boot.cmd
+                with
+                        setenv -f ethaddr 0a:1b:2c:3d:4e:5f
+                        saveenv
+                creat file
+                        /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot_%.bbappend
+                with
+                        SRC_URI += "file://boot.cmd"
+                        UBOOT_ENV = "u-boot"
+                        UBOOT_ENV_SUFFIX = "scr" 
+                bitbake-getvar -r u-boot-socfpga PR >> set to >> r5
+                bitbake u-boot-socfpga <= OK
+                bitbake core-image-minimal <= OK
+
+                увы, предустановленный mac не применятся в готовой сборке
+
+# 02_12        
+        интересное значение, не менял 
+        !!! menuconfig        
+                config - U-Boot 2025.07 Configuration > Init options > Start-up hooks > reset ethernet PHY during init
+        задача: указать предустановленный MAC в boot части sd карты, откуда он мог бы быть считан
+        добавляем файл u-boot.src в boot sd_card
+                оставляем конфигурацию u-boot как:
+                        Configuration > Environment > allways append the env with new data set to yes
+                        Configuration > Device Drivers > Ethernet PHY (physical media interface) support MArvell eth physical support to yes
+                        Configuration > Networking .Random Ethaddr if unset to no
+                создаем файл:
+                ethaddr-u-boot.txt
+                cat /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga/ethaddr-u-boot.txt
+                        setenv -f ethaddr 0a:1b:2c:3d:4e:5f
+                        saveenv
+        
+                вносим изменения в:
+                /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/u-boot/u-boot-socfpga_%.bbappend  33-35
+                        do_compile:arria10() {
+                                mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Arria10 Script" -d "${UNPACKDIR}/ethaddr-u-boot.txt" ${UNPACKDIR}/u-boot.scr
+                        }
+
+                /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga-common.inc 75
+                        file://ethaddr-u-boot.txt \
+
+                /home/iru/poky-socfpga/build/conf/local.conf 317
+                        MAGE_BOOT_FILES:append = " fit_spl_fpga.itb u-boot.scr"
+
+        bitbake core-image-minimal <= OK
+        boot:
+                Loading Environment from MMC... Reading from MMC(0)... *** Warning - bad CRC, using default environment                        
+                Net:                                                                                      
+                Warning: ethernet@ff804000 (eth0) using random MAC address - f6:77:4e:f0:54:47                                                 
+                eth0: ethernet@ff804000                                                                                                        
+                Hit any key to stop autoboot:  0                                                                                               
+                115 bytes read in 3 ms (37.1 KiB/s)                                                                                            
+                ## Executing script at 02100000                                                                                                
+                Saving Environment to MMC... Writing to MMC(0)... OK    <= !!!
+
+
+                [FAILED] Failed to start networking.service.
+        ip a
+                link/ether 0a:1b:2c:3d:4e:5f brd ff:ff:ff:ff:ff:ff              <= OK                                                                         
+                inet 192.168.0.215/24 brd 192.168.0.255 scope global dynamic eth0
+
+
+        reboot: Restarting system
+                Loading Environment from MMC... Reading from MMC(0)... OK            
+                Net:   eth0: ethernet@ff804000 
+
+                Saving Environment to MMC... Writing to MMC(0)... OK
+
+        ip a
+                link/ether 0a:1b:2c:3d:4e:5f brd ff:ff:ff:ff:ff:ff              <= OK                                                                         
+                inet 192.168.0.215/24 brd 192.168.0.255 scope global dynamic eth0
+
+        все получилось
+        
