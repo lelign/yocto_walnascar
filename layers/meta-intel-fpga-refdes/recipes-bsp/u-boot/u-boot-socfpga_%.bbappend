@@ -29,9 +29,11 @@ do_compile:prepend:arria10() {
 	${S}/arch/arm/mach-socfpga/qts-filter-a10.sh ${S}/hps.xml ${S}/arch/arm/dts/socfpga_arria10_socdk_sdmmc_handoff.h
 }
 
+# mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Arria10 Script" -d "${UNPACKDIR}/ethaddr-u-boot.txt" ${UNPACKDIR}/u-boot.scr
+# mkimage -C none -A arm -T script -n "Arria10 Script" -d "${UNPACKDIR}/ethaddr-u-boot.txt" ${UNPACKDIR}/u-boot.scr
 
-do_compile:arria10() {
-	mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Arria10 Script" -d "${UNPACKDIR}/ethaddr-u-boot.txt" ${UNPACKDIR}/u-boot.scr
+do_configure:append:arria10() {
+	mkimage -C none -A arm -T script -d "${UNPACKDIR}/ethaddr-u-boot.txt" ${UNPACKDIR}/u-boot.scr
 }
 
 do_compile:append:arria10() {

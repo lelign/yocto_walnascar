@@ -72,7 +72,8 @@ RPROVIDES:${PN} = "u-boot"
 
 SRC_URI = "${UBOOT_REPO};protocol=${UBOOT_PROT};branch=${UBOOT_BRANCH} \
            file://0001-edited_makefile_and_three_dtsi.patch \
-		   file://ethaddr-u-boot.txt \
+           file://ethaddr-u-boot.txt \
+           file://0001-change-in-boot-image-board-c.patch \
            "
 
 
@@ -179,6 +180,11 @@ do_deploy:append() {
 			done
 		fi
 	fi
+}
+
+
+do_ubootscr:arria10() {
+	mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Arria10 Script" -d "${UNPACKDIR}/ethaddr-u-boot.txt" ${UNPACKDIR}/u-boot.scr
 }
 
 require ${COREBASE}/meta/recipes-bsp/u-boot/u-boot.inc

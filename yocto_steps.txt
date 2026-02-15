@@ -1032,10 +1032,11 @@
 
                 увы, предустановленный mac не применятся в готовой сборке
 
-# 02_12        
-        интересное значение, не менял 
+# 12_02        
+        интересное значение, не менял: 
         !!! menuconfig        
                 config - U-Boot 2025.07 Configuration > Init options > Start-up hooks > reset ethernet PHY during init
+        
         задача: указать предустановленный MAC в boot части sd карты, откуда он мог бы быть считан
         добавляем файл u-boot.src в boot sd_card
                 оставляем конфигурацию u-boot как:
@@ -1045,7 +1046,7 @@
                 создаем файл:
                 ethaddr-u-boot.txt
                 cat /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga/ethaddr-u-boot.txt
-                        setenv -f ethaddr 0a:1b:2c:3d:4e:5f
+                        setenv -f ethaddr 0a:1b:2c:3d:4e:5f  <= it's our default mac
                         saveenv
         
                 вносим изменения в:
@@ -1074,19 +1075,66 @@
 
                 [FAILED] Failed to start networking.service.
         ip a
-                link/ether 0a:1b:2c:3d:4e:5f brd ff:ff:ff:ff:ff:ff              <= OK                                                                         
+                link/ether 0a:1b:2c:3d:4e:5f brd ff:ff:ff:ff:ff:ff              <= default mac OK                                                                      
                 inet 192.168.0.215/24 brd 192.168.0.255 scope global dynamic eth0
 
 
-        reboot: Restarting system
+        reboot
+                Restarting system
                 Loading Environment from MMC... Reading from MMC(0)... OK            
                 Net:   eth0: ethernet@ff804000 
 
                 Saving Environment to MMC... Writing to MMC(0)... OK
 
         ip a
-                link/ether 0a:1b:2c:3d:4e:5f brd ff:ff:ff:ff:ff:ff              <= OK                                                                         
+                link/ether 0a:1b:2c:3d:4e:5f brd ff:ff:ff:ff:ff:ff              <= default mac OK                                                                          
                 inet 192.168.0.215/24 brd 192.168.0.255 scope global dynamic eth0
 
         все получилось
+                изменяя файл 
+                /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga/ethaddr-u-boot.txt
+                можно много чего сделать, начиная от bootdelay и ethaddr 
+                до перезаписи любого содержимого в boot/root sd_card
+
+# 14_02
+        про CRC все не так просто, при загрузке u-boot проверяет соответствие сохраненного в переменных u-boot значения CRC 
+        с вычисленным значением CRC  для файла u-boot.scr из boot сектора sd карты, 
+        и если они не совпадают, выдает в консоль сообщение <Bad data crc>
+        и, соответственно, не применяет данные из u-boot.scr
+        Переписал скрипты от Володи для возможности их использования в python3. К сожалению CRC для u-boot.scr после 
+        запуска этих скриптов изменяется, применить их не получится
+        варианты решения
+                1 убрать проверку CRC для u-boot.scr в u-boot
+                        изменил 35-37 cause error when bitbake -c compile u-boot-socfpga
+                        do_configure:append:arria10() {
+                                mkimage -C none -A arm -T script -d "${UNPACKDIR}/ethaddr-u-boot.txt" ${UNPACKDIR}/u-boot.scr
+                        }
+                        bitbake core-image-minimal <= OK
+                        after edit u-boot.scr message <Bad CRC data> appeared, changes not applyed
+
+                        hit_any_key
+                        setenv verify no
+                        saveenv
+        OK =>           after this if change ethaddr in u-boot.scr it will be applyed
+                        file
+                        /home/iru/poky-socfpga/build/tmp/work/*/u-boot-socfpga/*/build/socfpga_arria10_defconfig/.config
+                        change CONFIG_CRC32_VERIFY=y to CONFIG_CRC32_VERIFY=n 
+                        bitbake-getvar -r u-boot-socfpga PR >> set to 6
+                        bitbake u-boot-socfpga <= OK
+                        bitbake core-image-minimal <= OK
+                        Bad data crc !!!
+                        change all CONFIG_CRC32** to # CONFIG_CRC32** is not set
+                        Bad data crc !!!
+                        added patch 0001-change-in-tools-mtk_image-c.patch
+                        Bad data crc !!! may be missed?
+                        removed patch .0001-change-in-tools-mtk_image-c.patch
+                        added patch 0001-change-in-boot-image-board-c.patch
+        OK =>           УРА ПОЛУЧИЛОСЬ, Теперь можно редактировать u-boot.scr и писать туда как угодно и что угодно!!!
+                     
+                2 указать список допустимых CRC для u-boot.scr в u-boot, соответственно переписать скрипт проверки CRC в самом u-boot
+
+                3 самый заморочный >> редактировать u-boot.scr так, чтобы результирующий CRC совпадал с исходным CRC
+                        реализовал, не работает по причине того, что CRC алгоритм имеет разные реализации для u-boot и Python3. 
+                        Получилось создать скрипт python3, который может перезаписать файл так, чтобы он соответствовал 
+                        заданному CRC, может пригодится в будущем, сложил все в edit_crc_via_python
         

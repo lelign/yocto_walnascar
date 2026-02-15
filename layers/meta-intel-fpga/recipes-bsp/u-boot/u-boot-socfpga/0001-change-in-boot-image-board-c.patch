@@ -1,0 +1,25 @@
+From cc234ec79494476136a3603d5a82bfffcc6cc278 Mon Sep 17 00:00:00 2001
+From: lelign <ignatlelekin@gmail.com>
+Date: Mon, 16 Feb 2026 00:16:09 +0300
+Subject: [PATCH] change in boot image board c
+Upstream-Status: Pending
+
+---
+ boot/image-board.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/boot/image-board.c b/boot/image-board.c
+index 514f8e63f9c..cc11e023cac 100644
+--- a/boot/image-board.c
++++ b/boot/image-board.c
+@@ -992,8 +992,8 @@ int image_locate_script(void *buf, int size, const char *fit_uname,
+ 			}
+ 
+ 			if (verify) {
+-				if (!image_check_dcrc(hdr)) {
+-					puts("Bad data crc\n");
++				if (!image_check_hcrc(hdr)) {
++					puts("image-board.c Bad data crc\n");
+ 					return 1;
+ 				}
+ 			}
