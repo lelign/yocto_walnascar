@@ -1051,7 +1051,7 @@
         
                 вносим изменения в:
                 /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/u-boot/u-boot-socfpga_%.bbappend  33-35
-                        do_compile:arria10() {
+                        do_configure:append:arria10() {
                                 mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Arria10 Script" -d "${UNPACKDIR}/ethaddr-u-boot.txt" ${UNPACKDIR}/u-boot.scr
                         }
 
@@ -1110,7 +1110,7 @@
                                 mkimage -C none -A arm -T script -d "${UNPACKDIR}/ethaddr-u-boot.txt" ${UNPACKDIR}/u-boot.scr
                         }
                         bitbake core-image-minimal <= OK
-                        after edit u-boot.scr message <Bad CRC data> appeared, changes not applyed
+                        fter edit u-boot.scr message <Baad CRC data> appeared, changes not applyed
 
                         hit_any_key
                         setenv verify no
@@ -1128,6 +1128,7 @@
                         added patch 0001-change-in-tools-mtk_image-c.patch
                         Bad data crc !!! may be missed?
                         removed patch .0001-change-in-tools-mtk_image-c.patch
+
                         added patch 0001-change-in-boot-image-board-c.patch
         OK =>           УРА ПОЛУЧИЛОСЬ, Теперь можно редактировать u-boot.scr и писать туда как угодно и что угодно!!!
                      
@@ -1137,4 +1138,166 @@
                         реализовал, не работает по причине того, что CRC алгоритм имеет разные реализации для u-boot и Python3. 
                         Получилось создать скрипт python3, который может перезаписать файл так, чтобы он соответствовал 
                         заданному CRC, может пригодится в будущем, сложил все в edit_crc_via_python
+
+# 16_02
+        написал программу на python3 и перекомпилировал ее посредсвом nuitka в c++ .exe для Windows
+        все сложил в $HOME/change_mac_with_windows
+        осталось добавить change_mac_addr.exe в сборку Yocto, чтобы он сразу появлялся в boot sd_card
+
+# 17_02
+        Установил  на host IRU сервер lighttpd, доступен по адресу http://192.168.2.135
+        инфо в $HOME/lighttpd/info.txt
+
+# 22-02
+        Запустил в составе host IRU переделанный под 5161 <pbx-mtv-508-frontend-4.19>
+        Путь к проекту 
+        /home/iru/angular_5161/pbx-mtv-508-frontend-4.19
+        все шаги отразил в
+        /home/iru/angular_5161/websocket/begin_new.txt
+        кратко общая схема построения и запуска frontend                
+                Angular посредством библиотек node собирает из исходников 
+                /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/src
+                набор скриптов .ts и прочего всякого (всего 30 файлов)
+                копипастим исходный из 508 lighttpd.conf в IRU
+                /etc/lighttpd/lighttpd.conf
+                Файлы, собранные Angular, размещаем соответсвенно конфигурации, прописанной в
+                /etc/lighttpd/lighttpd.conf
+                вносим некотрые изменения в
+                /etc/lighttpd/lighttpd.conf
+                перезапускаем lighttpd с новой конфигурацией
+                запускаем эмулятор websocket server
+
+
+                на хосте IRU: 
+                        установил сервер lighttpd/1.4.74 (ssl)
+                        установил npm@6.14.12 + npm install ws
+                        установил node 10.24.1
+                        установил nvm Node Version Manager (v0.37.2) (nvm current => v10.24.1)
+                        установил Angular (ng version Angular: 11.2.14  Angular CLI: 11.2.19)
+
+# 24_02
+        change in /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/debug.ts
+                export const DEV_IP = '192.168.2.135'
+                # cause can't open 5161 webpage from other hosts (localhost only)
+
+        большая проблема, оказалось YOCTO поломан из-за того, что Игнат удалил мемнеджер пакетов dnf, необходимый для сборки rootfs
+                куча ошибок типа
+                        error: error creating temporary file /var/tmp/rpm-tmp.CtTguC: Permission denied
+                        error: Couldn't create temporary file for %post(libc6-2.41+git0+e7c419a295-r6.cortexa9t2hf_neon): Permission denied
+                пришлось поставить
+                        sudo chmod -R 777 /var/tmp
+                bitbake core-image-minimal <= OK
+        поскольку balena-etcher умет записыывать архивы 49MB против 2GB !!!
+                добавил в local.conf 
+                        IMAGE_FSTYPES:append = " wic.gz"                 
+                все сработало, balena-etcher благополучно записал core-image-minimal-arria10.rootfs-20260224224251.wic.gz на карту, А10 стартует
         
+
+        какая то засада с vscode, не открываются новые окна
+                сode -n  сode -n  /home/iru/ poky-socfpga/build/workspace/sources/u-boot-socfpga <= пустое окно
+
+        добавляю windows change_mac_addr.exe в boot sd_card
+                add file 
+                cp /home/iru/change_mac_with_windows/change_mac_addr.exe \
+                        /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga
+                modify file
+                        /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/u-boot/u-boot-socfpga_%.bbappend
+                        line 77: install -m 744 ${UNPACKDIR}/change_mac_addr.exe ${DEPLOYDIR}/change_mac_addr.exe
+                modify file
+                        /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga-common.inc
+                        line 77: file://change_mac_addr.exe \
+                modify file
+                        /home/iru/poky-socfpga/build/conf/local.conf
+                        line 317: IMAGE_BOOT_FILES:append = " fit_spl_fpga.itb u-boot.scr change_mac_addr.exe"
+                bitbake core-image-minimal <= OK
+                root@arria10:~# ls /mnt | grep exe
+                        change_mac_addr.exe <= OK file exist in boot      
+
+# 25_02
+        Попробую добавить lighttpd in to YOCTO
+        bitbake-layers show-recipes | grep lighttpd
+                lighttpd:                                                       <= OK exists in YOCTO
+        devtool modify lighttpd
+        bitbake-getvar -r lighttpd WORKDIR
+                WORKDIR="/home/iru/poky-socfpga/build/tmp/work/cortexa9t2hf-neon-poky-linux-gnueabi/lighttpd/1.4.77"
+        devtool find-recipe lighttpd
+                $HOME/*/*/meta/recipes-extended/lighttpd/lighttpd_1.4.77.bb     <= path to receipt
+        code -n /home/iru/poky-socfpga/poky/meta/recipes-extended/lighttpd
+
+        # hide native YOCTO lighttpd files and cp files from existing IRU's lighttpd in to YOCTO
+        pwd
+                /home/iru/poky-socfpga/poky/meta/recipes-extended/lighttpd      <= current work dir       
+        mv lighttpd/lighttpd.conf lighttpd/.lighttpd.conf                       <= hide
+        cp /etc/lighttpd/lighttpd_native_508.conf lighttpd/lighttpd.conf
+        mv lighttpd/index.html.lighttpd lighttpd/.index.html.lighttpd           <= hide
+        mkdir lighttpd/assets
+        cp /www/pages/assets/* lighttpd/assets/                                 <= gif and icon
+        cp /www/pages/* lighttpd/                                               <= scripts and other
+        cp lighttpd_1.4.77.bb .lighttpd_1.4.77.bb                               <= hide
+        
+        # edit lighttpd_1.4.77.bb        
+                # bash iteraction for SRC_URI
+                for l in $(ls lighttpd); do echo "file://"$l" \\"; done
+                # bash iteraction for do_install:append()
+                for l in $(ls lighttpd); do echo "install -m 0644 \${UNPACKDIR}/"$l" \${D}/www/pages/"$l; done
+        devtool build lighttpd                                                  <= OK
+        # check
+        bitbake-getvar -r lighttpd WORKDIR
+                WORKDIR="/home/iru/poky-socfpga/build/tmp/work/cortexa9t2hf-neon-poky-linux-gnueabi/lighttpd/1.4.77"
+        code -n /home/iru/poky-socfpga/build/tmp/work/cortexa9t2hf-neon-poky-linux-gnueabi/lighttpd/1.4.77
+        ls image
+                etc  usr  www
+        ls image/www/pages                                                      <= OK scripts and other
+        ls image/www/pages/assets
+                ajax-loader.gif  favicon.png  version.json                      <= OK assets
+        ls image/etc
+                init.d  lighttpd  lighttpd.d                                    <= OK daemon start and config
+        It seems like everything is in place !!!
+        cd /home/iru/poky-socfpga/build/workspace/sources/lighttpd
+        git status
+                On branch devtool
+                nothing to commit, working tree clean 
+                 <= cause I only edited receipt and added files (didn't touch sources)
+        
+        in /home/iru/poky-socfpga/build/conf/local.conf
+                line 318: IMAGE_INSTALL:append = " lighttpd"
+        bitbake core-image-minimal <= OK
+
+        # start on A10
+        root@arria10:~# systemctl status lighttpd
+                x lighttpd.service - Lighttpd Daemon
+                Loaded: loaded (/usr/lib/systemd/system/lighttpd.service; enabled; preset: enabled)
+                Active: failed (Result: exit-code) since Thu 2025-05-29 19:30:44 MSK; 1min 33s ago
+                Invocation: ed4bf31bdd03488a9e872781bacd68fe
+                Process: 301 ExecStartPre=/usr/sbin/lighttpd -tt -f /etc/lighttpd/lighttpd.conf (code=exited, status=255/EXCEPTION)
+        sheets !
+        root@arria10:~# /usr/sbin/lighttpd -tt -f /etc/lighttpd/lighttpd.conf
+                2025-05-29 19:32:50: (/usr/src/debug/lighttpd/1.4.77/src/plugin.c.221) dlopen() failed for: /usr/lib/lighttpd/mod_auth.so /usr/lib/lighttpd/mod_auth.so: cannot open shared object file: No such file or directory
+                2025-05-29 19:32:50: (/usr/src/debug/lighttpd/1.4.77/src/server.c.1653) loading plugins finally failed
+        
+        # check file /usr/lib/lighttpd/mod_auth.so in YOCTO
+                file /home/iru/poky-socfpga/build/tmp/work/cortexa9t2hf-neon-poky-linux-gnueabi/lighttpd/1.4.77/image/usr/lib/lighttpd/mod_auth.so
+                        ELF 32-bit LSB shared object, ARM, EABI5 version 1 (SYSV), dynamically linked, BuildID[sha1]=c21eedfc1ef595673739d8927b263cb853a2246c, with debug_info, not stripped
+                EXIST !!!
+        # check in A10
+                root@arria10:~# ls /usr/lib/lighttpd
+                        mod_accesslog.so   mod_dirlisting.so            <= NOT EXIST !!!
+        devtool finish lighttpd meta
+        bitbake core-image-minimal <= OK
+        root@arria10:~# systemctl status lighttpd <= the same error
+        oot@arria10:~# ls /usr/lib/lighttpd
+                        mod_accesslog.so   mod_dirlisting.so            <= NOT EXIST !!!
+        in /home/iru/poky-socfpga/build/conf/local.conf
+                line 318-321: IMAGE_INSTALL:append = " lighttpd lighttpd-module-auth lighttpd-module-proxy lighttpd-module-ssi lighttpd-module-authn-file \
+                lighttpd-module-dirlisting lighttpd-module-accesslog lighttpd-module-cgi lighttpd-module-h2 lighttpd-module-sockproxy \
+                lighttpd-module-vhostdb lighttpd-module-ajp13 lighttpd-module-deflate lighttpd-module-webdav lighttpd-module-extforward lighttpd-module-rrdtool \
+                lighttpd-module-userdir lighttpd-module-wstunnel lighttpd-module-status lighttpd-module-openssl"
+        bitbake core-image-minimal <= OK
+        root@arria10:~# systemctl status lighttpd       <= OK !!!
+        open http://192.168.0.45/#/status
+                Загрузка, подождите, пожалуйста
+
+        OK lighttpd works !
+
+
+

@@ -31,7 +31,7 @@ do_compile:prepend:arria10() {
 
 # mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Arria10 Script" -d "${UNPACKDIR}/ethaddr-u-boot.txt" ${UNPACKDIR}/u-boot.scr
 # mkimage -C none -A arm -T script -n "Arria10 Script" -d "${UNPACKDIR}/ethaddr-u-boot.txt" ${UNPACKDIR}/u-boot.scr
-
+# Ignat: it's final solution
 do_configure:append:arria10() {
 	mkimage -C none -A arm -T script -d "${UNPACKDIR}/ethaddr-u-boot.txt" ${UNPACKDIR}/u-boot.scr
 }
@@ -74,6 +74,7 @@ do_deploy:append:arria10() {
 		install -m 644 ${B}/${config}/spl/u-boot-splx4.sfp ${DEPLOYDIR}/u-boot-splx4.sfp
 		# Ignat added u-boot.scr to DEPLOYDIR
 		install -m 744 ${UNPACKDIR}/u-boot.scr ${DEPLOYDIR}/u-boot.scr
+		install -m 744 ${UNPACKDIR}/change_mac_addr.exe ${DEPLOYDIR}/change_mac_addr.exe
 	fi
 }
 

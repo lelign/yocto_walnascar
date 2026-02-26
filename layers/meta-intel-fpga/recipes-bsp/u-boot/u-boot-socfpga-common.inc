@@ -74,6 +74,7 @@ SRC_URI = "${UBOOT_REPO};protocol=${UBOOT_PROT};branch=${UBOOT_BRANCH} \
            file://0001-edited_makefile_and_three_dtsi.patch \
            file://ethaddr-u-boot.txt \
            file://0001-change-in-boot-image-board-c.patch \
+		   file://change_mac_addr.exe \
            "
 
 
