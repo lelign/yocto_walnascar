@@ -17,9 +17,9 @@ RRECOMMENDS:${PN} = "lighttpd-module-accesslog"
 #           "
 
 SRC_URI = "http://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-${PV}.tar.xz \
-			file://ajax-loader.gif \
-			file://favicon.png \
-			file://version.json \
+			file://assets/ajax-loader.gif \
+			file://assets/favicon.png \
+			file://assets/version.json \
 			file://index.html \
 			file://lighttpd \
 			file://lighttpd.conf \
@@ -87,9 +87,9 @@ do_install:append() {
 	install -m 0755 ${UNPACKDIR}/lighttpd ${D}${sysconfdir}/init.d
 	install -m 0644 ${UNPACKDIR}/lighttpd.conf ${D}${sysconfdir}/lighttpd
 	install -d ${D}/www/pages/assets
-	install -m 0644 ${UNPACKDIR}/ajax-loader.gif ${D}/www/pages/assets/ajax-loader.gif
-	install -m 0644 ${UNPACKDIR}/favicon.png ${D}/www/pages/assets/favicon.png
-	install -m 0644 ${UNPACKDIR}/version.json ${D}/www/pages/assets/version.json
+	install -m 0644 ${UNPACKDIR}/assets/ajax-loader.gif ${D}/www/pages/assets/ajax-loader.gif
+	install -m 0644 ${UNPACKDIR}/assets/favicon.png ${D}/www/pages/assets/favicon.png
+	install -m 0644 ${UNPACKDIR}/assets/version.json ${D}/www/pages/assets/version.json
 	install -m 0644 ${UNPACKDIR}/index.html ${D}/www/pages/index.html
 	install -m 0644 ${UNPACKDIR}/main-es2015.js ${D}/www/pages/main-es2015.js
 	install -m 0644 ${UNPACKDIR}/main-es2015.js.map ${D}/www/pages/main-es2015.js.map

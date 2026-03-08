@@ -149,7 +149,7 @@
         #ln -s /home/iru/poky-socfpga/build/../deploy/images/arria10/socfpga_arria10_socdk_qspi.dtb /home/iru/poky-socfpga/build/../deploy/images/arria10/intel/socfpga/socfpga_arria10_socdk_qspi.dtb
         #ln -s /home/iru/poky-socfpga/build/../deploy/images/arria10/socfpga_arria10_socdk_nand.dtb /home/iru/poky-socfpga/build/../deploy/images/arria10/intel/socfpga/socfpga_arria10_socdk_nand.dtb
 
-#18_12 walnascar
+#18_12          walnascar first kernel start on a10
         ERROR: Nothing PROVIDES 'core-image-minimal'
         core-image-minimal was skipped: 'debug-tweaks' in IMAGE_FEATURES (added via EXTRA_IMAGE_FEATURES) is not a valid image feature
         issue
@@ -189,7 +189,7 @@
         OK !
 
         после загрузки устройства не могу залогиниться !!!
-        добавилв в local.conf
+        добавил в local.conf
         IMAGE_FEATURES:remove = "debug-tweaks"
         IMAGE_FEATURES += "empty-root-password"
 
@@ -227,7 +227,7 @@
         После добавления patch к рецепту редактируем его и вносим запись  
         Upstream-Status: Pending
 
-#27_12_2025 Игнат добавил следующие изменения
+#27_12_2025     сборка <.wic,> включающая в себя все необходимые файлы 
         # цель => устранить ошибки при генерации содержимого boot
         #	изменить имя fit_spl_fpga_.itb на fit_spl_fpga.itb
         #	fit_spl_fpga.itb должен находиться в boot
@@ -246,13 +246,16 @@
 
         # 2
         для установки правильного имени для файла fit_spl_fpga.itb в boot-partition sdcard
-        в файле /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/u-boot/u-boot-socfpga_%.bbappend
+        в файле 
+        /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/u-boot/u-boot-socfpga_%.bbappend
 
-        было	install -m 744 ${B}/*.itb ${DEPLOYDIR}/
+        было	
+        install -m 744 ${B}/*.itb ${DEPLOYDIR}/
 
-        стало	install -m 744 ${B}/fit_spl_fpga_.itb ${DEPLOYDIR}/fit_spl_fpga.itb
-        install -m 744 ${B}/extlinux.conf ${DEPLOYDIR}/extlinux.conf <= для мониторинга
-        install -m 744 ${B}/fit_uboot_.itb ${DEPLOYDIR}/fit_uboot.itb <= для мониторинга
+        стало	
+        install -m 744 ${B}/fit_spl_fpga_.itb ${DEPLOYDIR}/fit_spl_fpga.itb
+        install -m 744 ${B}/extlinux.conf ${DEPLOYDIR}/extlinux.conf                    <= для мониторинга
+        install -m 744 ${B}/fit_uboot_.itb ${DEPLOYDIR}/fit_uboot.itb                   <= для мониторинга
 
         # 3
         чтобы fit_spl_fpga.itb оказался включен в образ *.wic
@@ -357,7 +360,7 @@
 
         # OK цель достигута 
 
-#28_12_2025 Игнат делал следующее
+#28_12_2025     разбираемся с сетевым соединением (NG)
         # цель => внести изменения в исходники linux-socfpga-lts, в сам рецепт и переменные bitbake
         # чтобы исключить обращения к нодам gmac0 и gmac1 
 
@@ -540,7 +543,7 @@
 
         OK, все на местах
 
-#10_01_2026
+#10_01_2026     разбираемся с сетевым соединением (NG)
         взял файл .config использованный в cyclone5 для конфигурирования  virtual/kernel
 
         cp cyclone_working_kernel_config 
@@ -627,14 +630,14 @@
         Summary: There were 2 WARNING messages.
         OK
 
-#14_01_2026
+#14_01_2026     разбираемся с сетевым соединением (NG)
         добавил строку для красоты в 
         /home/iru/poky-socfpga/.layers/meta-poky/recipes-core/base-files/files/poky/motd
 
         вижу, что wic от 13_01_2026 грузится с ошибкой по network [FAILED] Failed to start networking.service
         ifconfig not found
 
-#14_01_2026 
+#14_01_2026     конфигурирование menuconfig (пример для u-boot-socfpga)
         конфигурирование menuconfig (пример для u-boot-socfpga)
         1 devtool modify u-boot-socfpga
         2 devtool menuconfig u-boot-socfpga
@@ -659,7 +662,7 @@
         3 cp deploy_file (u-boot, z-image) to sd card
         но оказалось эти изменения не применяются в случае общей сборки bitbake core-image-minimal
 
-#27_01_2026
+#27_01_2026     добавил скрипт project_choise.sh для выбора проекта Quartus из которого будут выбираться core periph hps.xml
         ссылки, используемые в YOCTO gsrd (core, periph.hps.xml) (Игнат подменял)
         <core>
         file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_ghrd_10as066n2.core.rbf
@@ -701,7 +704,7 @@
         symbolic link to to poky/hps.xml
         file poky/hps.xml choosed Quartus project 
 
-# 01_02_2026
+# 01_02_2026    work with net on a10 (NG)
         проверяем как u-boot-socfpg использует наш patch:
         bitbake -c do_unpack_and_patch u-boot-socfpga -DDD | grep 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch -A 2
         DEBUG: /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga_v2025.07.bb: Searching for 0001-edited-3-dts-dtsi-files-for-gmac2-only.patch in paths:
@@ -737,7 +740,7 @@
         EMAC2RXECC              Receive ECC, Ethernet MAC2      0xFF8C1800      1 KB
         EMAC2TXECC              Transmit ECC, Ethernet MAC2     0xFF8C1C00      1 KB
 
-# 06_02 
+# 06_02         work with net on a10 (NG)
         проверил состояние eth0 
         devtool mennucinfig linuxsocfpga  <= marvell is not set, added marvell
         devtool build linux-socfpga-lts
@@ -762,7 +765,7 @@
         [  143.073200] socfpga-dwmac ff804000.ethernet eth0: configuring for phy/rgmii link mode                                                  
         root@arria10:~# [  146.327398] socfpga-dwmac ff804000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx 
 
-# 07_02
+# 07_02         NET OK ! on a10!
         1 Убедился, что  u-boot может полноценно работать через eth0, описание шагов в
         toBeShureThatU-bootCanLoadFileFromTftpServer.txt
         2 u-boot использует драйвер Marvell?
@@ -798,7 +801,7 @@
                 'index.html' saved
                 УРА !!!
 
-# 09_02
+# 09_02         NET OK ! added $HOME/*/*/*/recipes-kernel/linux/config/0001-fourth_try_to_configure_eth_iface.patch
         переписвыаю patch via devtool пересобираю core-image-minimal via bitbake
         cd /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts
         git status 
@@ -929,7 +932,7 @@
                 изменить PR для <RECEIPT> (bitbake-getvar -r <RECEIPT> PR)
                 собрать <RECEIPT>
 
-# 10_02
+# 10_02         установка MAC через переменные во время загрузки
         predictable MAC
         Hit any key to stop autoboot
         printenv ethaddr
@@ -945,7 +948,7 @@
                 link/ether 0a:1b:2c:3d:4e:5f brd ff:ff:ff:ff:ff:ff      <= OK
         for hostname edit /etc/hostname 
 
-# 11_02
+# 11_02         создание файла u-boot.src
         задача: указать предустановленный MAC в boot части sd карты, откуда он мог бы быть считан
         добавил u-boot.src как описано в
         https://malt.zendesk.com/hc/en-us/articles/900006257843-How-to-Edit-U-Boot-Scripts
@@ -1000,7 +1003,7 @@
 
                 cp u-boot.scr into boot sd_card
                 OK!!
-        работает на обоих вариантах конфигурации u-boot, но нужно следить за првльностью указания MAC  в u-boot.txt 
+        работает на обоих вариантах конфигурации u-boot, но нужно следить за правильностью указания MAC  в u-boot.txt 
         и не сдедует пользоваться nano редактором для исправлений прямо в u-boot.scr
 
         задача 
@@ -1032,7 +1035,7 @@
 
                 увы, предустановленный mac не применятся в готовой сборке
 
-# 12_02        
+# 12_02        генерация файла u-boot.scr в YOCTO 
         интересное значение, не менял: 
         !!! menuconfig        
                 config - U-Boot 2025.07 Configuration > Init options > Start-up hooks > reset ethernet PHY during init
@@ -1096,7 +1099,7 @@
                 можно много чего сделать, начиная от bootdelay и ethaddr 
                 до перезаписи любого содержимого в boot/root sd_card
 
-# 14_02
+# 14_02         решение проблемы несоответствия CRC для файла u-boot.scr в boot после внесения измений
         про CRC все не так просто, при загрузке u-boot проверяет соответствие сохраненного в переменных u-boot значения CRC 
         с вычисленным значением CRC  для файла u-boot.scr из boot сектора sd карты, 
         и если они не совпадают, выдает в консоль сообщение <Bad data crc>
@@ -1139,16 +1142,16 @@
                         Получилось создать скрипт python3, который может перезаписать файл так, чтобы он соответствовал 
                         заданному CRC, может пригодится в будущем, сложил все в edit_crc_via_python
 
-# 16_02
+# 16_02         create change_mac_addr.exe
         написал программу на python3 и перекомпилировал ее посредсвом nuitka в c++ .exe для Windows
         все сложил в $HOME/change_mac_with_windows
         осталось добавить change_mac_addr.exe в сборку Yocto, чтобы он сразу появлялся в boot sd_card
 
-# 17_02
+# 17_02         install lighttpd in to IRU
         Установил  на host IRU сервер lighttpd, доступен по адресу http://192.168.2.135
         инфо в $HOME/lighttpd/info.txt
 
-# 22-02
+# 22-02         install Frontend in to IRU
         Запустил в составе host IRU переделанный под 5161 <pbx-mtv-508-frontend-4.19>
         Путь к проекту 
         /home/iru/angular_5161/pbx-mtv-508-frontend-4.19
@@ -1175,7 +1178,7 @@
                         установил nvm Node Version Manager (v0.37.2) (nvm current => v10.24.1)
                         установил Angular (ng version Angular: 11.2.14  Angular CLI: 11.2.19)
 
-# 24_02
+# 24_02         add change_mac_addr.exe in to boot
         change in /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/debug.ts
                 export const DEV_IP = '192.168.2.135'
                 # cause can't open 5161 webpage from other hosts (localhost only)
@@ -1213,7 +1216,7 @@
                 root@arria10:~# ls /mnt | grep exe
                         change_mac_addr.exe <= OK file exist in boot      
 
-# 25_02
+# 25_02         lighttpd in to YOCTO
         Попробую добавить lighttpd in to YOCTO
         bitbake-layers show-recipes | grep lighttpd
                 lighttpd:                                                       <= OK exists in YOCTO
@@ -1292,6 +1295,7 @@
                 lighttpd-module-dirlisting lighttpd-module-accesslog lighttpd-module-cgi lighttpd-module-h2 lighttpd-module-sockproxy \
                 lighttpd-module-vhostdb lighttpd-module-ajp13 lighttpd-module-deflate lighttpd-module-webdav lighttpd-module-extforward lighttpd-module-rrdtool \
                 lighttpd-module-userdir lighttpd-module-wstunnel lighttpd-module-status lighttpd-module-openssl"
+        # все модули для lighttpd прищлось добавлять вручную, никакие другие методы не подошли
         bitbake core-image-minimal <= OK
         root@arria10:~# systemctl status lighttpd       <= OK !!!
         open http://192.168.0.45/#/status
@@ -1299,5 +1303,52 @@
 
         OK lighttpd works !
 
+# 06_03         запуск эмулятора websocketserver
+        cd /home/iru/angular_5161/websocket/websocket
+        node emulator_ws_pbx_mtv_5161.js
 
+# 08_03         сборка исполняемых скриптов для lighttpd (Frontend)
+                        cd /home/iru/angular_5161/pbx-mtv-508-frontend-4.19
+                        выбор режима сборки debug <-> production
+                        для production
+                                cp /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/src/environments/environment.prod.ts \
+                                        /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/src/environments/environment.ts
+                        для debug
+                                в режиме <debug> websocket-client, исполняемый на стороне браузера (Chrome) будет обращаться по IP адресу,
+                                указанному в файле 
+                                /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/debug.ts
+                                соответсвенно внести необходимый адрес в debug.ts (export const DEV_IP = '192.168.2.135';)
+                                cp /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/src/environments/debug_environment.ts \
+                                        /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/src/environments/environment.ts
+                        
+                        сборка сразу в каталог исполняемых скриптов lighttpd
+                                rm /www/pages/*
+                                ng build --output-path=/www/pages
+                                sudo systemctl restart lighttpd
+                        в случае запуска на IRU проследить, что запущен emulator_ws_pbx_mtv_5161.js
+                                cd ~/angular_5161/websocket/websocket$/
+                                node emulator_ws_pbx_mtv_5161.js 
 
+                        проверка работоспособности
+                                общая
+                                        на внешнем хосте Chrome open <IP_address_IRU>/app
+                                websocketserver
+                                        на внешнем хосте Chrome => Chrome => Extension => Simple websocket client => ws://<IP_address_IRU>/app
+
+                        сборка сразу в каталог исполняемых скриптов lighttpd для последующей компиляции в YOCTO
+                                путь  к каталогу YOCTO
+                                /home/iru/poky-socfpga/poky/meta/recipes-extended/lighttpd/lighttpd
+                                ng build --output-path=/home/iru/poky-socfpga/poky/meta/recipes-extended/lighttpd/lighttpd/
+                                рецепт
+                                /home/iru/poky-socfpga/poky/meta/recipes-extended/lighttpd/lighttpd_1.4.77.bb
+                                теперь в files этого рецепта не хватает двух файлов, поэтому
+                                cp lighttpd.conf \
+                                        /home/iru/poky-socfpga/poky/meta/recipes-extended/lighttpd/lighttpd/lighttpd.conf
+                                cp lighttpd \
+                                        /home/iru/poky-socfpga/poky/meta/recipes-extended/lighttpd/lighttpd/lighttpd
+                                # check
+                                bitbake lighttpd                <= OK
+                                bitbake core-image-minimal      <= OK
+
+                        примеры кастомизации скриптов для Frontend указаны в файле
+                                /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/changes.txt

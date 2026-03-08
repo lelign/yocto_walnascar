@@ -799,24 +799,11 @@ StreamComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineCo
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "environment", function() { return environment; });
-/* harmony import */ var _debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../debug */ "fzo5");
-
+const loc = window.location;
 const environment = {
-    /*
-    для конфигурации с запущенным эмулятором ws
-    ~/angular_508/websocket/websocket $ sudo node emulator_ws_pbx-mtv-508.js
-
-    */
-    //dev_ip: 'ws://' + DEV_IP + ':8080', // it works with pbx-mtv-508 
-    /*
-    работает
-    с  pbx-mtv-508 базовое значение dev_ip: 'ws://' + DEV_IP + '/app',
-    с  pbx-mtv-508 вроде как работает на значении'ws://' + DEV_IP + ':8080',
-    */
-    dev_ip: 'ws://' + _debug__WEBPACK_IMPORTED_MODULE_0__["DEV_IP"] + '/app',
-    production: false
+    dev_ip: 'ws://' + loc.host + '/app',
+    production: true
 };
-// commentr1
 
 
 /***/ }),
@@ -3115,31 +3102,6 @@ LayoutComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineCo
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("disabled", ctx.wsData.layoutData.dirty === 0);
     } }, directives: [_angular_forms__WEBPACK_IMPORTED_MODULE_2__["ɵangular_packages_forms_forms_ba"], _angular_forms__WEBPACK_IMPORTED_MODULE_2__["NgControlStatusGroup"], _angular_forms__WEBPACK_IMPORTED_MODULE_2__["NgForm"], _components_view_view_component__WEBPACK_IMPORTED_MODULE_3__["ViewComponent"], _components_panel_panel_component__WEBPACK_IMPORTED_MODULE_4__["PanelComponent"], _presetselect_presetselect_component__WEBPACK_IMPORTED_MODULE_5__["PresetSelectComponent"], _components_inputfield_inputfield_component__WEBPACK_IMPORTED_MODULE_6__["InputfieldComponent"], _angular_forms__WEBPACK_IMPORTED_MODULE_2__["NgControlStatus"], _angular_forms__WEBPACK_IMPORTED_MODULE_2__["NgModel"], _components_buttongroup_buttongroup_component__WEBPACK_IMPORTED_MODULE_7__["ButtonGroupComponent"], _layouteditor_layouteditor_component__WEBPACK_IMPORTED_MODULE_8__["LayoutEditorComponent"], _components_setcancelbutton_setcancelbutton_component__WEBPACK_IMPORTED_MODULE_9__["SetCancelButtonComponent"]], styles: [".button-default[_ngcontent-%COMP%] {\n  background-color: #44af69;\n}\n.button-green[_ngcontent-%COMP%] {\n  background-color: #44af69;\n}\n.button-grey[_ngcontent-%COMP%] {\n  background-color: #B5B5B5;\n}\n.button-red[_ngcontent-%COMP%] {\n  background-color: #DB2B39;\n}\n.button-yellow[_ngcontent-%COMP%] {\n  background-color: #EDD747;\n}\nlabel[_ngcontent-%COMP%] {\n  display: inline-block;\n  max-width: 100%;\n  margin-bottom: 5px;\n  color: #676A6C;\n}\nhr[_ngcontent-%COMP%] {\n  border: 0;\n  border-top: 2px solid #d4d9e1;\n  margin-top: 0px;\n  margin-bottom: 15px;\n}\n.form-group[_ngcontent-%COMP%] {\n  margin-bottom: 0.5rem;\n}\n.right-align[_ngcontent-%COMP%] {\n  text-align: right;\n}\n.center-align[_ngcontent-%COMP%] {\n  text-align: center;\n}\n.btn[_ngcontent-%COMP%]:focus {\n  border-color: rgba(243, 243, 244, 0.5);\n  border-width: 0.0625rem;\n  outline: 0;\n  box-shadow: 0 0 0 0.12rem rgba(243, 243, 244, 0.5);\n}\n.form-control[_ngcontent-%COMP%]:focus, .form-select[_ngcontent-%COMP%]:focus, .form-check-input[_ngcontent-%COMP%]:focus {\n  border-color: white;\n  box-shadow: 0 0 0 0.12rem rgba(68, 175, 105, 0.25);\n}\n.btn-fixed-width[_ngcontent-%COMP%], .btn-fixed-width[_ngcontent-%COMP%]:hover {\n  line-height: inherit;\n  min-width: 6em;\n  color: white;\n  margin-left: 1em;\n}\n.btn-fixed-width[_ngcontent-%COMP%]:first-child, .btn-fixed-width[_ngcontent-%COMP%]:hover:first-child {\n  margin-left: 0em;\n}\n@media (max-width: 768px) {\n  .btn-fixed-width[_ngcontent-%COMP%], .btn-fixed-width[_ngcontent-%COMP%]:hover {\n    margin-top: 10px;\n  }\n}\n.btn-fixed-width[disabled][_ngcontent-%COMP%], .btn-fixed-width[_ngcontent-%COMP%]:hover[disabled] {\n  color: #d9d9d9;\n  opacity: 0.4;\n}\n.layoutpanel[_ngcontent-%COMP%] {\n  max-width: 950px;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3N0eWxlcy9jb2xvcnMubGVzcyIsImxheW91dC5jb21wb25lbnQubGVzcyIsIi4uLy4uL3N0eWxlcy9jb21tb24ubGVzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFrQkE7RUFDSSx5QkFBQTtBQ2pCSjtBRG9CQTtFQUNJLHlCQUFBO0FDbEJKO0FEcUJBO0VBQ0kseUJBQUE7QUNuQko7QURzQkE7RUFDSSx5QkFBQTtBQ3BCSjtBRHVCQTtFQUNJLHlCQUFBO0FDckJKO0FDYkE7RUFDSSxxQkFBQTtFQUNBLGVBQUE7RUFDQSxrQkFBQTtFQUNBLGNBQUE7QURlSjtBQ1pBO0VBQ0ksU0FBQTtFQUNBLDZCQUFBO0VBQ0EsZUFBQTtFQUNBLG1CQUFBO0FEY0o7QUNYQTtFQUNJLHFCQUFBO0FEYUo7QUNUQTtFQUNJLGlCQUFBO0FEV0o7QUNSQTtFQUNJLGtCQUFBO0FEVUo7QUNQQTtFQUNJLHNDQUFBO0VBQ0EsdUJBQUE7RUFDQSxVQUFBO0VBRUEsa0RBQUE7QURTSjtBQ05BOzs7RUFDSSxtQkFBQTtFQUVBLGtEQUFBO0FEVUo7QUNQQTs7RUFDSSxvQkFBQTtFQUNBLGNBQUE7RUFFQSxZQUFBO0VBRUEsZ0JBQUE7QURRSjtBQ1BJOztFQUNJLGdCQUFBO0FEVVI7QUNQSTtFQUFBOztJQUNJLGdCQUFBO0VEV047QUFDRjtBQ1RJOztFQUNJLGNBQUE7RUFDQSxZQUFBO0FEWVI7QUFyRUE7RUFDSSxnQkFBQTtBQXVFSiIsImZpbGUiOiJsYXlvdXQuY29tcG9uZW50Lmxlc3MiLCJzb3VyY2VzQ29udGVudCI6WyJAbmF2YmFyLWNvbG9yOiAjMkY0MDUwO1xuQG5hdmJhci10ZXh0OiAjQTdCMUMyO1xuQHJvdy10ZXh0OiAjNjc2QTZDO1xuQGNhcmQtYmFja2dyb3VuZDogI2YzZjNmNDtcbkBidXR0b24tY29sb3I6ICM0NGFmNjk7XG5AYnV0dG9uLWdyZXktY29sb3I6ICNCNUI1QjU7XG5AYnV0dG9uLXJlZC1jb2xvcjogI0RCMkIzOTtcbkBidXR0b24teWVsbG93LWNvbG9yOiAjRURENzQ3O1xuXG5Ac2lkZWJhci1uYXZiYXItY29sb3I6ICNGM0YzRjQ7XG5cbkBzaWRlYmFyLWNvbG9yOiAjM2U0MTQ0O1xuQHNpZGViYXItYWN0aXZlOiAjNjE2Yjc1O1xuQHNpZGViYXItZm9udDogI2E3YjFjMjtcbkBzaWRlYmFyLWZvbnQtYWN0aXZlOiAjRkZGO1xuXG5AZ3JlZW4tdGhlbWUtY29sb3I6ICM0NGFmNjk7XG5cbi5idXR0b24tZGVmYXVsdCB7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogQGJ1dHRvbi1jb2xvcjtcbn1cblxuLmJ1dHRvbi1ncmVlbiB7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogQGJ1dHRvbi1jb2xvcjtcbn1cblxuLmJ1dHRvbi1ncmV5IHtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiBAYnV0dG9uLWdyZXktY29sb3I7XG59XG5cbi5idXR0b24tcmVkIHtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiBAYnV0dG9uLXJlZC1jb2xvcjtcbn1cblxuLmJ1dHRvbi15ZWxsb3cge1xuICAgIGJhY2tncm91bmQtY29sb3I6IEBidXR0b24teWVsbG93LWNvbG9yO1xufVxuIiwiQGltcG9ydCBcIi4uLy4uL3N0eWxlcy9jb21tb24ubGVzc1wiO1xuXG4ubGF5b3V0cGFuZWwge1xuICAgIG1heC13aWR0aDogOTUwcHg7XG59XG4iLCJAaW1wb3J0IFwiY29sb3JzLmxlc3NcIjtcbmxhYmVsIHtcbiAgICBkaXNwbGF5OiBpbmxpbmUtYmxvY2s7XG4gICAgbWF4LXdpZHRoOiAxMDAlO1xuICAgIG1hcmdpbi1ib3R0b206IDVweDtcbiAgICBjb2xvcjogQHJvdy10ZXh0O1xuICB9XG5cbmhyIHtcbiAgICBib3JkZXI6IDA7XG4gICAgYm9yZGVyLXRvcDogMnB4IHNvbGlkIGxpZ2h0ZW4oQG5hdmJhci10ZXh0LCAxNSUpO1xuICAgIG1hcmdpbi10b3A6IDBweDtcbiAgICBtYXJnaW4tYm90dG9tOiAxNXB4O1xufVxuXG4uZm9ybS1ncm91cCB7XG4gICAgbWFyZ2luLWJvdHRvbTogMC41cmVtO1xufVxuXG5cbi5yaWdodC1hbGlnbiB7XG4gICAgdGV4dC1hbGlnbjogcmlnaHQ7XG59XG5cbi5jZW50ZXItYWxpZ24ge1xuICAgIHRleHQtYWxpZ246IGNlbnRlcjtcbn1cblxuLmJ0bjpmb2N1cyB7XG4gICAgYm9yZGVyLWNvbG9yOiByZ2JhKDI0MywyNDMsMjQ0LDAuNSk7XG4gICAgYm9yZGVyLXdpZHRoOiAwLjA2MjVyZW07XG4gICAgb3V0bGluZTogMDtcbiAgICAtd2Via2l0LWJveC1zaGFkb3c6IDAgMCAwIDAuMTJyZW0gIHJnYmEoMjQzLCAyNDMsIDI0NCwgMC41KTtcbiAgICBib3gtc2hhZG93OiAwIDAgMCAwLjEycmVtIHJnYmEoMjQzLDI0MywyNDQsMC41KTtcbn1cblxuLmZvcm0tY29udHJvbDpmb2N1cywgLmZvcm0tc2VsZWN0OmZvY3VzLCAuZm9ybS1jaGVjay1pbnB1dDpmb2N1cyB7XG4gICAgYm9yZGVyLWNvbG9yOiB3aGl0ZTtcbiAgICAtd2Via2l0LWJveC1zaGFkb3c6IDAgMCAwIDAuMTJyZW0gIHJnYmEoNjgsIDE3NSwgMTA1LCAwLjI1KTtcbiAgICBib3gtc2hhZG93OiAwIDAgMCAwLjEycmVtIHJnYmEoNjgsIDE3NSwgMTA1LCAwLjI1KTtcbn1cblxuLmJ0bi1maXhlZC13aWR0aCwgLmJ0bi1maXhlZC13aWR0aDpob3ZlciB7XG4gICAgbGluZS1oZWlnaHQ6IGluaGVyaXQ7XG4gICAgbWluLXdpZHRoOiA2ZW07XG4gICAgLy8g0YPQsdC40YDQsNC10LwgXCLQv9C+0LTQv9GA0YvQs9C40LLQsNC90LjQtVwiIGJvcmRlclxuICAgIGNvbG9yOiB3aGl0ZTtcbiAgICAvLyDQtNC+0LHQsNCy0LvRj9C10Lwg0YDQsNGB0YHRgtC+0Y/QvdC40LUg0LzQtdC20LTRgyDQutC90L7Qv9C60LDQvNC4XG4gICAgbWFyZ2luLWxlZnQ6IDFlbTtcbiAgICAmOmZpcnN0LWNoaWxke1xuICAgICAgICBtYXJnaW4tbGVmdDogMGVtO1xuICAgIH1cblxuICAgIEBtZWRpYSAobWF4LXdpZHRoOiA3NjhweCkge1xuICAgICAgICBtYXJnaW4tdG9wOiAxMHB4O1xuICAgIH1cblxuICAgICZbZGlzYWJsZWRdIHtcbiAgICAgICAgY29sb3I6IGRhcmtlbih3aGl0ZSwgMTUlKTtcbiAgICAgICAgb3BhY2l0eTogMC40O1xuICAgIH1cbn1cbiJdfQ== */"] });
-
-
-/***/ }),
-
-/***/ "fzo5":
-/*!******************!*\
-  !*** ./debug.ts ***!
-  \******************/
-/*! exports provided: DEV_IP */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DEV_IP", function() { return DEV_IP; });
-// it works with pbx-mtv-508
-//port const DEV_IP = '192.168.0.210';
-/* it works with emulator в этой ситуации в эмуляторе ws сервер может
- быть остановлен запустить lighttpd на 80 порту
- */
-/*
-for IRU
-192.168.2.135
-export const DEV_IP = '192.168.2.135';
-*/
-const DEV_IP = '192.168.2.135';
 
 
 /***/ }),
