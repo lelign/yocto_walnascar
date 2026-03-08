@@ -64,3 +64,4 @@ dts_dtsi_network_ok/zImage--6.12.33-lts+git-r15-arria10-20260208194842.bin
 hex_editor.py
 layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga/.0001-change-in-tools-mtk_image-c.patch
 pbx-mtv-508-frontend-4.19_condition_at_08_03.zip
+bfg-1.15.0.jar
