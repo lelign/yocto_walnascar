@@ -1314,12 +1314,14 @@
                                 cp /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/src/environments/environment.prod.ts \
                                         /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/src/environments/environment.ts
                         для debug
-                                в режиме <debug> websocket-client, исполняемый на стороне браузера (Chrome) будет обращаться по IP адресу,
-                                указанному в файле 
+                                Т.к. Frontend полноценно работает только после установки соединения с websocket-server, для настройки 
+                                Frontend используется режим debug.
+                                в режиме <debug> websocket-client, исполняемый на стороне браузера (Chrome) будет обращаться по IP адресу, указанному в файле 
                                 /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/debug.ts
                                 соответсвенно внести необходимый адрес в debug.ts (export const DEV_IP = '192.168.2.135';)
                                 cp /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/src/environments/debug_environment.ts \
                                         /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/src/environments/environment.ts
+                                Создается конфигурация с запущенным Frontend, исполняемым из под angular (команда ng serve (default port 4200))
                         
                         сборка сразу в каталог исполняемых скриптов lighttpd
                                 rm /www/pages/*
@@ -1352,3 +1354,8 @@
 
                         примеры кастомизации скриптов для Frontend указаны в файле
                                 /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/changes.txt
+
+# 08_03         remove a large file from my commit history
+                        java -jar bfg-1.15.0.jar --delete-files <path_to_big_file>
+                        git reflog expire --expire=now --all && git gc --prune=now --aggressive
+
