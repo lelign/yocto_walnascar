@@ -1359,3 +1359,9 @@
                         java -jar bfg-1.15.0.jar --delete-files <path_to_big_file>
                         git reflog expire --expire=now --all && git gc --prune=now --aggressive
 
+# 08_03         создан отдельный репозитарий для работы с приложением pbx-mtv-application
+                        https://github.com/lelign/pbx-mtv-application.git
+                прикрутил vscode к raspberry/pi4
+                отразил в /github.com/lelign/pbx-mtv-application.git все изменения в исходниках PBX-MTV-508 для сборки и запуска работоспособного прриложения
+                с поддержкой websocket-server 
+
