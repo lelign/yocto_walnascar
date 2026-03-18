@@ -1365,3 +1365,195 @@
                 отразил в /github.com/lelign/pbx-mtv-application.git все изменения в исходниках PBX-MTV-508 для сборки и запуска работоспособного прриложения
                 с поддержкой websocket-server 
 
+#_08_03-16_03 https://github.com/lelign/pbx-mtv-application.git
+
+# 16_03 Add appplication recipe into yocto
+        recipe in ubuntu notebook
+        374GB/git_profitt/ln-dir-pbx-mtv-508/pbx-mtv-508_4.14.0.bb  ln-dir-pbx-mtv-508/pbx-mtv-508_4.14.0.bb ()
+
+        DEPENDS = "qtbase qtwebsockets qtserialport libusb bitstream qtsvg zvbi"
+
+        pwd
+                /home/iru/poky-socfpga/poky
+        git clone -b walnascar https://github.com/meta-qt5/meta-qt5.git
+                fatal: destination path 'meta-qt5' already exists and is not an empty directory.
+        cd meta-qt5
+        git branch      
+                * master
+        git checkout walnascar
+                error: Your local changes /home/iru/poky-socfpga/poky to the following files would be overwritten by checkout:
+                conf/layer.conf
+                Please commit your changes or stash them before you switch branches.
+                Aborting
+        edit conf/layer.conf in meta-qt5 (git<-> https)
+        git checkout walnascar
+                branch 'walnascar' set up to track 'origin/walnascar'.
+                Switched to a new branch 'walnascar'
+        git branch
+                master
+                * walnascar
+        bitbake qtbase
+                Tasks Summary: Attempted 4251 tasks of which 4212 didn't need to be rerun and all succeeded.
+        bitbake qtserialport
+                NOTE: Tasks Summary: Attempted 4234 tasks of which 4234 didn't need to be rerun and all succeeded.
+        bitbake qtwebsockets
+                error
+        bitbake libusb
+                NOTE: Tasks Summary: Attempted 3477 tasks of which 3433 didn't need to be rerun and all succeeded.
+        bitbake bitstream
+                ERROR: Nothing PROVIDES 'bitstream
+        bitbake qtsvg
+                NOTE: Tasks Summary: Attempted 4234 tasks of which 4210 didn't need to be rerun and all succeeded.
+
+
+        Итого
+                DEPENDS = "qtbase qtwebsockets qtserialport libusb bitstream qtsvg zvbi"
+                qtbase                  <= OK
+                qtwebsockets            QA ERROR contains reference to TMPDIR [buildpaths]
+                qtserialport            <= OK
+                libusb                  <= OK
+                bitstream               <= ???
+                qtsvg                   <= OK
+                zvbi    
+
+# 17_03 решение проблемы со сборкой qtwebsocket
+                qtwebsockets            QA ERROR contains reference to TMPDIR [buildpaths]
+                проблема вот здесь:  
+                bitbake qtdeclarative
+                        ERROR: qtdeclarative-5.15.16+git-r6 do_package_qa: QA Issue: File /usr/src/debug/qtdeclarative/5.15.16+git/src/qml/qqmljsparser.cpp in package qtdeclarative-src contains reference to TMPDIR [buildpaths]
+                        ERROR: qtdeclarative-5.15.16+git-r6 do_package_qa: QA Issue: File /usr/src/debug/qtdeclarative/5.15.16+git/src/qmldevtools/qqmljsparser.cpp in package qtdeclarative-src contains reference to TMPDIR [buildpaths]
+                        ERROR: qtdeclarative-5.15.16+git-r6 do_package_qa: Fatal QA errors were found, failing task.
+                        ERROR: Logfile of failure stored in: /home/iru/poky-socfpga/build/tmp/work/cortexa9t2hf-neon-poky-linux-gnueabi/qtdeclarative/5.15.16+git/temp/log.do_package_qa.595314
+                        ERROR: Task (/home/iru/poky-socfpga/poky/meta-qt5/recipes-qt/qt5/qtdeclarative_git.bb:do_package_qa) failed with exit code '1'
+                # isuue
+                create file 
+                        /home/iru/poky-socfpga/poky/meta-qt5/recipes-qt/qt5/qtdeclarative_%.bbappend
+                add in file
+                        INSANE_SKIP:append = " buildpaths"
+                bitbake -c clean qtdeclarative
+                bitbake qtdeclarative           <= OK ( ~3 minutes 4252 tasks )
+                bitbake qtwebsockets            <= OK
+
+# 17_03 установка zvbi
+        native recipe in path 
+        git_profitt/meta-profitt-18.0.0/recipes-oe/libzvbi
+        mkdir -p /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-zvbi/zvbi
+        touch /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-zvbi/zvbi/zvbi_0.2.35.bb
+        cp /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-zvbi/zvbi/zvbi_0.2.35.bb \
+                /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-zvbi/zvbi/zvbi_0.2.35.bb
+        bitbake zvbi                    <= OK Attempted 1533 tasks of which 1511 didn't need to be rerun and all succeeded
+
+# 18_03 разбираем bitstream
+        Это библиотека с открытым исходным кодом на языке C, распространяемая по лицензии MIT, 
+        предназначенная для анализа и генерации структур транспортных потоков MPEG-2 и DVB (PAT, PMT, CAT и т. д.). 
+        Она состоит только из заголовочных файлов
+        cp git_profitt/meta-profitt-18.0.0/recipes-oe/bitstream \
+                /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-appl/
+        bitbake bitstream
+                ERROR: bitstream-1.2-r1 do_configure: no configure script found at ./configure
+
+        git clone https://code.videolan.org/videolan/bitstream.git
+        cd bitstream
+        ls
+                atsc     bitstream.pc.in  COPYING  ebu       haivision  ieee  INSTALL  Makefile  NEWS    scte   TODO
+                AUTHORS  common.h         dvb      examples  id3        ietf  itu      mpeg      README  smpte
+
+        it looks the same as 
+                git_profitt/meta-profitt-18.0.0/recipes-oe/bitstream
+
+        mkdir install_bitstream
+        make PREFIX=./install_bitstream install
+                INSTALL  ./install_bitstream/include/bitstream
+                INSTALL  ./install_bitstream/share/pkgconfig/bitstream.pc
+        tree install_bitstream
+                куча директорий с заголовочными файлами, все благополучно собралось без всякого ./configure
+
+        Вывод:
+                из рецепта 
+                /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-appl/bitstream/bitstream_1.2.bb
+                следует исключить этап do_configure
+                line 7 do_configure[noexec] = "1"
+                bitbake -c clean bitstream              <= OK
+                bitbake bitstream                       <= OK
+
+# 18_03 about git meta-qt5
+                pwd
+                        /home/iru/poky-socfpga/poky
+                realpath meta-qt5
+                        /home/iru/poky-socfpga/poky/meta-qt5
+                git submodule add /home/iru/poky-socfpga/poky/meta-qt5
+                        The following paths are ignored by one of your .gitignore files:
+                        meta-qt5
+                edit /home/iru/poky-socfpga/poky/.gitignore
+                        comment line :10 # meta-*/
+                git submodule add /home/iru/poky-socfpga/poky/meta-qt5
+                        Adding existing repo at 'meta-qt5' to the index
+                cd meta-qt5
+                git status
+                        Changes not staged for commit:
+                                modified:   recipes-qt/qt5/qtwebsockets_git.bb
+                        Untracked files:
+                                recipes-qt/qt5/qtdeclarative_%.bbappend
+                git add recipes-qt/qt5/qtdeclarative_%.bbappend
+                git restore recipes-qt/qt5/qtwebsockets_git.bb
+                # check 
+                bitbake qtwebsockets            <= OK
+
+# 18_03 add application into YOCTO
+        path
+        /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-appl/application
+        tree /*/*/*/poky/layers/meta-customer/classes
+                                                ├── initscript.bbclass
+                                                └── update-rc.d-nostart.bbclass
+        tree /*/*/*/poky/layers/meta-customer/recipes-appl/application
+                                                                ├── app_4.14.0.bb
+                                                                └── files
+                                                                        ├── app-4.14.0.tar.xz
+                                                                        ├── event_log_class_description
+                                                                        ├── mb86m21_assp_nsec_enc_h.bin
+                                                                        ├── mb86m21_assp_nsec_idle.bin
+                                                                        ├── mb86m21_assp_nsec_ldenc_h.bin
+                                                                        ├── pbx-mtv-508.sh
+                                                                        ├── qt-qpa.sh
+                                                                        ├── snmp-profitt.conf
+                                                                        └── spirom_writer_usb_c.bin
+        tree /*/*/*/poky/layers/meta-customer/recipes-zvbi
+                                                        └── zvbi
+                                                              └── zvbi_0.2.3
+
+        bitbake app
+                ninja: build stopped: subcommand failed.
+                ERROR: Task <app> do_compile) failed
+        devtool modify app
+        devtool build app
+                ninja: build stopped: subcommand failed.
+                ERROR: Task <app> do_compile) failed
+        edit /home/iru/poky-socfpga/build/workspace/sources/app/ntpdate-utils/ntpdate-utils.c
+                f_in = open(ANCIN, O_RDONLY, 0644); // added , 0644       
+                f_out = open(ANCOUT, O_RDWR|O_CREAT, 0644); // added , 0644 
+        edit /home/iru/poky-socfpga/build/workspace/sources/app/zvbi-test/anc-dump.c
+                fprintf(f, "%s", update_hwclock); // added  "%s",
+        devtool build app       <= OK
+        такие-же изменения применены на raspberry:
+                cmake .. . && make -j $(nproc)          <= OK
+        замена архива
+               /*/*/*/poky/layers/meta-customer/recipes-appl/application/files/app-4.14.0.tar.xz
+        
+        bitbake app             <= OK
+
+                
+
+
+                
+
+
+
+
+
+
+        
+
+
+# 18_03 установка application
+        mkdir -p /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-appl/application
+

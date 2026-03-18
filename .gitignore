@@ -70,3 +70,5 @@ layers/meta-customer/recipes-appl/bitstream/files/
 layers/meta-ke/
 layers/meta-customer/recipes-hello-world/
 layers/meta-customer/recipes-python-banner/
+layers/meta-customer/COPYING.MIT
+layers/meta-customer/README

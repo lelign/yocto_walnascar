@@ -1,0 +1,62 @@
+RDEPENDS_${PN} = "ca-certificates \
+	tzdata tzdata-misc tzdata-posix tzdata-right tzdata-africa \
+        tzdata-americas tzdata-antarctica tzdata-arctic tzdata-asia \
+        tzdata-atlantic tzdata-australia tzdata-europe tzdata-pacific \
+	socat net-snmp-server net-snmp-client\
+	pbx-mtv-508-modules \
+        "
+
+DEPENDS = "qtbase qtwebsockets qtserialport libusb bitstream qtsvg zvbi"
+#LICENSE = "CLOSED"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+
+
+INITSCRIPT_NAME = "pbx-mtv-508.sh"
+PACKAGE_ARCH = "${MACHINE}"
+
+# file://${PN}-${PV}.tar.gz # ign
+SRC_URI = "\ 
+        file://${BPN}-${PV}.tar.xz \
+        file://qt-qpa.sh \
+        file://mb86m21_assp_nsec_enc_h.bin \
+	file://mb86m21_assp_nsec_idle.bin \
+	file://mb86m21_assp_nsec_ldenc_h.bin \
+	file://spirom_writer_usb_c.bin \
+	file://snmp-profitt.conf \
+	file://event_log_class_description \
+"
+
+INITSCRIPT_PARAMS = "defaults 99"
+LICENSE = "CLOSED"
+
+EXTRA_OECMAKE_pnmtv581 += "-DBOARD_REV=1"
+
+PR = "r2"
+
+inherit cmake_qt5 initscript
+
+
+#do_configure_prepend() # ign
+do_configure:prepend() {
+        echo \#define VERSION \"${PV}-${PR} \(\" __DATE__ \"\)\" > ${S}/version.h
+}
+
+# do_install_append() # ign
+IMAGE_INSTALL:append() {
+        install -d ${D}${sysconfdir}/profile.d/
+        install -m 0755 ${WORKDIR}/qt-qpa.sh ${D}${sysconfdir}/profile.d/
+        
+        install -d ${D}/var
+	install -m 0755 ${WORKDIR}/mb86m21_assp_nsec_enc_h.bin ${D}/var/
+	install -m 0755 ${WORKDIR}/mb86m21_assp_nsec_idle.bin ${D}/var/
+	install -m 0755 ${WORKDIR}/mb86m21_assp_nsec_ldenc_h.bin ${D}/var/
+	install -m 0755 ${WORKDIR}/spirom_writer_usb_c.bin ${D}/var/
+        install -d ${D}/etc
+        install -m 0755 ${WORKDIR}/snmp-profitt.conf ${D}/etc
+        install -m 0644 ${WORKDIR}/event_log_class_description ${D}/var
+}
+
+pkg_postinst_${PN} () {
+        rm -f /etc/xdg/pbx-mtv-508*
+}
