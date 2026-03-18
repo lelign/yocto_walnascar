@@ -7,7 +7,7 @@ pyshtables.py
 pstage/
 scripts/oe-git-proxy-socks
 sources/
-meta-*/
+# meta-*/
 buildtools/
 !meta-skeleton
 !meta-selftest
@@ -65,3 +65,8 @@ hex_editor.py
 layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga/.0001-change-in-tools-mtk_image-c.patch
 pbx-mtv-508-frontend-4.19_condition_at_08_03.zip
 bfg-1.15.0.jar
+layers/meta-my-intel-fpga-refdes/
+layers/meta-customer/recipes-appl/bitstream/files/
+layers/meta-ke/
+layers/meta-customer/recipes-hello-world/
+layers/meta-customer/recipes-python-banner/
