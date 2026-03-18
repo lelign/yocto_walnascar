@@ -72,3 +72,16 @@ layers/meta-customer/recipes-hello-world/
 layers/meta-customer/recipes-python-banner/
 layers/meta-customer/COPYING.MIT
 layers/meta-customer/README
+layers/meta-ke/recipes-example/files/this.patch
+layers/meta-ke/recipes-example/example/.example_0.1.bbappend
+layers/meta-ke/recipes-example/example/.example_0.1.bbappend
+layers/meta-ke/recipes-example/example/.example_0.1.bbappend
+layers/meta-ke/recipes-example/example/example_0.1.bb
+layers/meta-ke/recipes-example/example/new_example_0.1
+layers/meta-ke/recipes-example/files/.my_patch.patch
+layers/meta-ke/recipes-example/files/this.patch
+layers/meta-mylayer/recipes-apps/hello-world/hello-world_1.0.bb
+layers/meta-mylayer/recipes-apps/hello-world/files/hello-world.c
+bitstream
+layers/meta-openembedded/meta-gnome/dynamic-layers/meta-security/recipes-gnome/gnome-remote-desktop/gnome-remote-desktop_48.0.bb
+layers/meta-openembedded/meta-gnome/dynamic-layers/meta-virtualization/recipes-gnome/gnome-boxes/gnome-boxes_48.0.bb
