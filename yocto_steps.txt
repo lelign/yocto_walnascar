@@ -1544,7 +1544,16 @@
         
         bitbake app             <= OK
 
-                
+# 19_03 запуск приложения в составе а10
+                для контроля через git 
+                заменил build/conf/bblayers.conf и build/conf/local.conf ссылками на соотвю файлы в ~/poky-socfpga/poky
+                добавил заглушку
+                изменил local.conf
+                запуск приложения через ssh
+                        ssh -Y root@192.168.1.42
+                        export QT_QPA_PLATFORM=offscreen
+                        /usr/bin/pbx-mtv-508
+                                QFontDatabase: Cannot find font directory /usr/lib/fonts
 
 
                 
