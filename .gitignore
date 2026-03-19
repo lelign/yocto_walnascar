@@ -87,4 +87,3 @@ layers/meta-openembedded/meta-gnome/dynamic-layers/meta-security/recipes-gnome/g
 layers/meta-openembedded/meta-gnome/dynamic-layers/meta-virtualization/recipes-gnome/gnome-boxes/gnome-boxes_48.0.bb
 layers/meta-ke/COPYING.MIT
 layers/meta-ke/README
-layers/meta-ke/conf/layer.conf
