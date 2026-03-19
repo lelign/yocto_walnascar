@@ -1550,10 +1550,33 @@
                 добавил заглушку
                 изменил local.conf
                 запуск приложения через ssh
-                        ssh -Y root@192.168.1.42
+                        ssh root@<IP_a10>
                         export QT_QPA_PLATFORM=offscreen
                         /usr/bin/pbx-mtv-508
                                 QFontDatabase: Cannot find font directory /usr/lib/fonts
+                проблема с <Cannot find font directory /usr/lib/fonts>
+                попробовал рецепт ttf-roboto
+                /*/*/*/*/layers/meta-openembedded/meta-oe/recipes-graphics/ttf-fonts/ttf-roboto_2.138.bb
+                bitbake ttf-roboto              <= OK
+                добавил  ttf-roboto в local.conf
+                bitbake core-image-minimal             <= OK
+                #check
+                ssh root@<IP_a10>
+                export QT_QPA_PLATFORM=offscreen
+                /usr/bin/pbx-mtv-508
+                        QFontDatabase: Cannot find font directory /usr/lib/fonts
+
+                рецепт ttf-roboto установил roboto fonts в
+                /usr/share/fonts/truetype
+                поэтому
+                hostname
+                        arria10
+                ln -s /usr/share/fonts/truetype /usr/lib/fonts
+                /usr/bin/pbx-mtv-508            <= no errors
+
+
+
+
 
 
                 
