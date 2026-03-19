@@ -1502,9 +1502,11 @@
 # 18_03 add application into YOCTO
         path
         /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-appl/application
+
         tree /*/*/*/poky/layers/meta-customer/classes
                                                 ├── initscript.bbclass
                                                 └── update-rc.d-nostart.bbclass
+
         tree /*/*/*/poky/layers/meta-customer/recipes-appl/application
                                                                 ├── app_4.14.0.bb
                                                                 └── files
@@ -1517,17 +1519,18 @@
                                                                         ├── qt-qpa.sh
                                                                         ├── snmp-profitt.conf
                                                                         └── spirom_writer_usb_c.bin
+
         tree /*/*/*/poky/layers/meta-customer/recipes-zvbi
                                                         └── zvbi
                                                               └── zvbi_0.2.3
 
         bitbake app
                 ninja: build stopped: subcommand failed.
-                ERROR: Task <app> do_compile) failed
+                ERROR: Task <app> do_compile failed
         devtool modify app
         devtool build app
                 ninja: build stopped: subcommand failed.
-                ERROR: Task <app> do_compile) failed
+                ERROR: Task <app> do_compile failed
         edit /home/iru/poky-socfpga/build/workspace/sources/app/ntpdate-utils/ntpdate-utils.c
                 f_in = open(ANCIN, O_RDONLY, 0644); // added , 0644       
                 f_out = open(ANCOUT, O_RDWR|O_CREAT, 0644); // added , 0644 
