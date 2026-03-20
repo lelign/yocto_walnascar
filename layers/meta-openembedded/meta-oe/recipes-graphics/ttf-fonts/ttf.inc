@@ -7,6 +7,8 @@ INHIBIT_DEFAULT_DEPS = "1"
 do_install() {
     install -d ${D}${datadir}/fonts/truetype/
     find ./ -name '*.tt[cf]' -exec install -m 0644 {} ${D}${datadir}/fonts/truetype/ \;
+    install -d ${D}${datadir}/../lib/
+    ln -sf /fonts/truetype/ ${D}/usr/lib/fonts
 }
 
 inherit allarch fontcache

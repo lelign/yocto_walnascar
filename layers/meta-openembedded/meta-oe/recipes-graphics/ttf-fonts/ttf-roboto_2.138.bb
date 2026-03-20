@@ -12,3 +12,5 @@ S = "${WORKDIR}/sources"
 UNPACKDIR = "${S}"
 
 FILES:${PN} = "${datadir}/fonts/truetype/*.ttf"
+
+FILES:${PN} += " /usr/lib/fonts"
