@@ -14,6 +14,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 INITSCRIPT_NAME = "pbx-mtv-508.sh"
 PACKAGE_ARCH = "${MACHINE}"
+SYSTEMD_SERVICE:${PN} = "pbx-mtv-508.service"
 
 # file://${PN}-${PV}.tar.gz # ign
 SRC_URI = "\ 
@@ -25,6 +26,7 @@ SRC_URI = "\
 	file://spirom_writer_usb_c.bin \
 	file://snmp-profitt.conf \
 	file://event_log_class_description \
+        file://pbx-mtv-508.sh \
 "
 
 INITSCRIPT_PARAMS = "defaults 99"
@@ -48,7 +50,10 @@ do_configure:prepend() {
 # cause bitbake -e app | grep sources-unpack
 #     [_defaultval] "${WORKDIR}/sources-unpack"
 # UNPACKDIR="/home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/app/4.14.0/sources-unpack"
+
 do_install:append() {
+        install -d ${D}${sysconfdir}/init.d
+        install -m 0755 ${UNPACKDIR}/pbx-mtv-508.sh ${D}${sysconfdir}/init.d
         install -d ${D}${sysconfdir}/profile.d/
         install -m 0755 ${UNPACKDIR}/qt-qpa.sh ${D}${sysconfdir}/profile.d/
         

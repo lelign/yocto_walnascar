@@ -1637,13 +1637,54 @@
 
 #21_03  добавил nano в local.conf
         заметил, что не все установилось для рецепта app
-        нашел ошибку в app_4.14.0.bb (заменил WORKDIR на UNPACKDIR)
-        bitbake app <= OK
+                нашел ошибку в app_4.14.0.bb (заменил WORKDIR на UNPACKDIR)
+                bitbake app <= OK
 
-        заметил также, что в qt-qpa.sh
-                export QT_QPA_PLATFORM=offscreen        <= то, что я делаю, запуская прложение через ssh
-                export QT_QPA_FONTDIR=/usr/share/fonts/ttf      <=  кажется ссылка для fonts не нужнаы
-         
+                заметил также, что в qt-qpa.sh
+                        export QT_QPA_PLATFORM=offscreen        <= то, что я делаю, запуская прложение через ssh
+                        export QT_QPA_FONTDIR=/usr/share/fonts/ttf      <=  кажется ссылка для fonts не нужнаы
+
+                # check on a10
+                ls /etc/profile.d/qt-qpa.sh
+                        /etc/profile.d/qt-qpa.sh
+                ls /var | grep .bin
+                        mb86m21_assp_nsec_enc_h.bin
+                        mb86m21_assp_nsec_idle.bin
+                        mb86m21_assp_nsec_ldenc_h.bin
+                        spirom_writer_usb_c.bin
+                ls /etc/snmp-profitt.conf
+                        /etc/snmp-profitt.conf
+                ls /var/event_log_class_description
+                        /var/event_log_class_description
+                
+                /usr/bin/pbx-mtv-508
+                        Cannot find font directory /usr/share/fonts/ttf
+                        (needs to edit qt-qpa.sh)
+                after edit no error about font
+
+
+                INITSCRIPT_NAME = "pbx-mtv-508.sh" <= NOT EXIST
+                path to lighttpd
+                /home/iru/poky-socfpga/poky/meta/recipes-extended/lighttpd/lighttpd_1.4.77.bb
+                собрал init.d/pbx-mtv-508.sh так же как и в  lighttpd
+
+                # check on a10
+                systemctl status pbx-mtv-508
+                        Loaded: loaded (/etc/init.d/pbx-mtv-508.sh; generated)
+                        Active: inactive (dead)
+                systemctl restart pbx-mtv-508
+                systemctl status pbx-mtv-508
+                        Loaded: loaded (/etc/init.d/pbx-mtv-508.sh; generated)
+                        Active: active (running) since Thu 2025-05-29 19:32:16 MSK; 24s ago
+
+                                errors:
+                                        /etc/init.d/pbx-mtv-508.sh: line 11: can't create /sys/c...ector
+
+                        ls /var/volatile/hls/
+                                media_0.ts
+
+
+
 
 
 
