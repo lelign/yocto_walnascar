@@ -1573,9 +1573,80 @@
                         arria10
                 ln -s /usr/share/fonts/truetype /usr/lib/fonts
                 /usr/bin/pbx-mtv-508            <= no errors
+# 20_03 добавил генерацию ссылки в ttf-roboto
+                recipe ttf-roboto_2.138.bb
+                        FILES:${PN} += " /usr/lib/fonts" <=  именно так для этой версии YOCTO 
+                ttf.inc
+                        do_install() {
+                                install -d ${D}${datadir}/fonts/truetype/
+                                find ./ -name '*.tt[cf]' -exec install -m 0644 {} ${D}${datadir}/fonts/truetype/ \;
+                                install -d ${D}${datadir}/../lib/
+                                ln -sf /fonts/truetype/ ${D}/usr/lib/fonts
+                                }
+                
+                следить за слэшами!!!
+                bitbake-getvar -r ttf-roboto WORKDIR
+                        WORKDIR="/home/iru/poky-socfpga/build/tmp/work/all-poky-linux/ttf-roboto/2.138"
+                bitbake-getvar -r ttf-roboto datadir
+                        export datadir="/usr/share"
+                bitbake-getvar -r ttf-roboto D
+                        D="/home/iru/poky-socfpga/build/tmp/work/all-poky-linux/ttf-roboto/2.138/image"
+                bitbake-getvar -r ttf-roboto S
+                        S="/home/iru/poky-socfpga/build/tmp/work/all-poky-linux/ttf-roboto/2.138/sources"
+                bitbake-getvar -r ttf-roboto UNPACKDIR
+                        UNPACKDIR="/home/iru/poky-socfpga/build/tmp/work/all-poky-linux/ttf-roboto/2.138/sources"
+                (S equal UNPACKDIR cause UNPACKDIR = "${S}")
+
+                # check on root@arria10:~# 
+                pwd
+                        /home/root
+                ls -al /usr/lib/fonts
+                        lrwxrwxrwx /usr/lib/fonts -> /fonts/truetype/
+
+                ссылка неправильная
+
+                edit ttf.inc 
+                ln -sf ${datadir}/fonts/truetype/ ${D}/usr/lib/fonts
+
+                # check on root@arria10:~#
+                ls -al /usr/lib/fonts
+                        lrwxrwxrwx /usr/lib/fonts -> /usr/share/fonts/truetype/
+                ссылка правильная
+
+                export QT_QPA_PLATFORM=offscreen
+                /usr/bin/pbx-mtv-508 <= no errors about fonts !!!
+                        => HLS Server: "/var/volatile/hls/media_0.ts" "No such file or directory"
+
+
+                
+
+                
 
 
 
+
+
+
+        попробовал запустить toaster через venv
+                cd ~/poky-socfpga/build
+                python3 -m venv myenv
+                source myenv/bin/activate
+                (myenv) iru@iru-ubuntu:~/poky-socfpga/build$ 
+                                pip3 install -r /home/iru/poky-socfpga/poky/bitbake/toaster-requirements.txt
+
+               directory structure
+               http://localhost:8000/toastergui/build/6/target/6/dirinfo
+               toaster => all builds  => core_image_minimal (21/03/26) => packages =>
+               => (search roboto) => roboto-ttf => <Package included in: core-image-minimal> =>
+               => press on  core-image-minimal => <File (tap on some file) =>
+               => directory structure
+
+               для успешного импорта command line builds в toaster пришлось немного поправить
+               bblayers.conf и перезапустить toaster
+
+
+
+#21_03 добавил nano в local.conf
 
 
 

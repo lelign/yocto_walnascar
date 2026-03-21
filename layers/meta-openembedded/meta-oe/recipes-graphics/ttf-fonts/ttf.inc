@@ -8,7 +8,7 @@ do_install() {
     install -d ${D}${datadir}/fonts/truetype/
     find ./ -name '*.tt[cf]' -exec install -m 0644 {} ${D}${datadir}/fonts/truetype/ \;
     install -d ${D}${datadir}/../lib/
-    ln -sf /fonts/truetype/ ${D}/usr/lib/fonts
+    ln -sf ${datadir}/fonts/truetype/ ${D}/usr/lib/fonts
 }
 
 inherit allarch fontcache
