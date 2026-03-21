@@ -43,18 +43,23 @@ do_configure:prepend() {
 }
 
 # do_install_append() # ign
-IMAGE_INSTALL:append() {
+# IMAGE_INSTALL:append() 
+# ign replased WORKDIR to UNPACKDIR
+# cause bitbake -e app | grep sources-unpack
+#     [_defaultval] "${WORKDIR}/sources-unpack"
+# UNPACKDIR="/home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/app/4.14.0/sources-unpack"
+do_install:append() {
         install -d ${D}${sysconfdir}/profile.d/
-        install -m 0755 ${WORKDIR}/qt-qpa.sh ${D}${sysconfdir}/profile.d/
+        install -m 0755 ${UNPACKDIR}/qt-qpa.sh ${D}${sysconfdir}/profile.d/
         
         install -d ${D}/var
-	install -m 0755 ${WORKDIR}/mb86m21_assp_nsec_enc_h.bin ${D}/var/
-	install -m 0755 ${WORKDIR}/mb86m21_assp_nsec_idle.bin ${D}/var/
-	install -m 0755 ${WORKDIR}/mb86m21_assp_nsec_ldenc_h.bin ${D}/var/
-	install -m 0755 ${WORKDIR}/spirom_writer_usb_c.bin ${D}/var/
+	install -m 0755 ${UNPACKDIR}/mb86m21_assp_nsec_enc_h.bin ${D}/var/
+	install -m 0755 ${UNPACKDIR}/mb86m21_assp_nsec_idle.bin ${D}/var/
+	install -m 0755 ${UNPACKDIR}/mb86m21_assp_nsec_ldenc_h.bin ${D}/var/
+	install -m 0755 ${UNPACKDIR}/spirom_writer_usb_c.bin ${D}/var/
         install -d ${D}/etc
-        install -m 0755 ${WORKDIR}/snmp-profitt.conf ${D}/etc
-        install -m 0644 ${WORKDIR}/event_log_class_description ${D}/var
+        install -m 0755 ${UNPACKDIR}/snmp-profitt.conf ${D}/etc
+        install -m 0644 ${UNPACKDIR}/event_log_class_description ${D}/var
 }
 
 pkg_postinst_${PN} () {

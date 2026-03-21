@@ -1500,6 +1500,7 @@
                 bitbake qtwebsockets            <= OK
 
 # 18_03 add application into YOCTO
+        mkdir -p /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-appl/application
         path
         /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-appl/application
 
@@ -1602,7 +1603,6 @@
                         /home/root
                 ls -al /usr/lib/fonts
                         lrwxrwxrwx /usr/lib/fonts -> /fonts/truetype/
-
                 ссылка неправильная
 
                 edit ttf.inc 
@@ -1616,15 +1616,6 @@
                 export QT_QPA_PLATFORM=offscreen
                 /usr/bin/pbx-mtv-508 <= no errors about fonts !!!
                         => HLS Server: "/var/volatile/hls/media_0.ts" "No such file or directory"
-
-
-                
-
-                
-
-
-
-
 
 
         попробовал запустить toaster через venv
@@ -1644,9 +1635,15 @@
                для успешного импорта command line builds в toaster пришлось немного поправить
                bblayers.conf и перезапустить toaster
 
+#21_03  добавил nano в local.conf
+        заметил, что не все установилось для рецепта app
+        нашел ошибку в app_4.14.0.bb (заменил WORKDIR на UNPACKDIR)
+        bitbake app <= OK
 
-
-#21_03 добавил nano в local.conf
+        заметил также, что в qt-qpa.sh
+                export QT_QPA_PLATFORM=offscreen        <= то, что я делаю, запуская прложение через ssh
+                export QT_QPA_FONTDIR=/usr/share/fonts/ttf      <=  кажется ссылка для fonts не нужнаы
+         
 
 
 
