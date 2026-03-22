@@ -1,0 +1,66 @@
+gpio_export () {
+    echo $1 > /sys/class/gpio/export
+    echo $3 > /sys/class/gpio/$2/direction
+}
+
+gpio_export_all () {
+    gpio_export 504 gpio504 low
+    gpio_export 505 gpio505 low
+    gpio_export 506 gpio506 low
+    gpio_export 507 gpio507 low
+    gpio_export 508 gpio508 low
+    gpio_export 509 gpio509 low
+    gpio_export 510 gpio510 low
+    gpio_export 511 gpio511 low
+
+    gpio_export 501 gpio501 in
+    gpio_export 502 gpio502 high
+}
+
+gpio_unexport () {
+    echo $1 > /sys/class/gpio/unexport
+}
+
+gpio_unexport_all () {
+    for i in $GPIO_LIST
+    do
+        gpio_unexport $i
+    done
+}
+
+GPIO_LIST="541 542 543 544"
+
+cat /sys/kernel/debug/gpio
+    gpiochip0: GPIOs 512-540, parent: platform/ffc02a00.gpio, ffc02a00.gpio:
+
+    gpiochip1: GPIOs 541-552, parent: spi/spi0.0, altr_a10sr_gpio, can sleep:
+    gpio-541 (                    |a10sr-led0          ) out lo ACTIVE LOW
+    gpio-542 (                    |a10sr-led1          ) out lo ACTIVE LOW
+    gpio-543 (                    |a10sr-led2          ) out lo ACTIVE LOW
+    gpio-544 (                    |a10sr-led3          ) out lo ACTIVE LOW
+
+so
+GPIO_LIST="513 514 515 516 517 518 519 520 521 523 524 525 526 527 528 529 530 531 532 533 534 535 536 537 538 539 540 545 546 547 548 549 550 551 552"
+unset a; for i in $GPIO_LIST; do let a=$a+1; echo $i; read s; echo $i > /sys/class/gpio/export; echo low > /sys/class/gpio/gpio$i/direction; done; echo -e "\texported\t$a" # ok
+
+GPIO_LIST="545 546 547 548 549 550 551 552"
+unset a; for i in $GPIO_LIST; do let a=$a+1; echo $i; read s; echo $i > /sys/class/gpio/export; echo in > /sys/class/gpio/gpio$i/direction; done; echo -e "\texported\t$a" # ok
+
+gpio_unexport () {
+    echo $1 > /sys/class/gpio/unexport
+}
+
+
+unset a; for i in $GPIO_LIST ; do let a=$a+1; gpio_unexport $i; done; echo -e "\tunexported\t $a" 
+
+# step by step
+echo 513 > /sys/class/gpio/export
+echo low > /sys/class/gpio/gpio513/direction  ( low/high/in/out )
+
+513-516 OK
+517 right led
+518 left led
+522 remove from GPIO_LIST cause system failed
+523-540 ok
+545-552 write error: Invalid argument must be in for this only
+

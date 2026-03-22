@@ -4,7 +4,10 @@ name=pbx-mtv-508
 binpath=/usr/bin/$name
 . /etc/profile.d/qt-qpa.sh
 
-GPIO_LIST="504 505 506 507 508 509 510 511 501 502 480 481 482 483 484 485 486 487 488 489 491 446 444 445"
+#GPIO_LIST="504 505 506 507 508 509 510 511 501 502 480 481 482 483 484 485 486 487 488 489 491 446 444 445"
+GPIO_LIST="513 514 515 516 517 518 519 520 521 523 524 525 526 527 528 529 530 531 532 533 534 535 536 537 538 539 540 545 546 547 548 549 550 551 552"
+
+#
 
 gpio_export () {
     echo $1 > /sys/class/gpio/export
@@ -12,35 +15,45 @@ gpio_export () {
 }
 
 gpio_export_all () {
-    gpio_export 504 gpio504 low
-    gpio_export 505 gpio505 low
-    gpio_export 506 gpio506 low
-    gpio_export 507 gpio507 low
-    gpio_export 508 gpio508 low
-    gpio_export 509 gpio509 low
-    gpio_export 510 gpio510 low
-    gpio_export 511 gpio511 low
+    gpio_export 513 gpio513 low
+    gpio_export 514 gpio514 low
+    gpio_export 515 gpio515 low
+    gpio_export 516 gpio516 low
+    gpio_export 517 gpio517 low
+    gpio_export 518 gpio518 low
+    gpio_export 519 gpio519 low
+    gpio_export 520 gpio520 low
 
-    gpio_export 501 gpio501 in
-    gpio_export 502 gpio502 high
+    gpio_export 521 gpio521 low
+    gpio_export 523 gpio523 low
+    gpio_export 524 gpio524 low
+    gpio_export 525 gpio525 low
+    gpio_export 526 gpio526 low
+    gpio_export 527 gpio527 low
+    gpio_export 528 gpio528 low
+    gpio_export 529 gpio529 low
 
-    gpio_export 480 gpio480 in
-    gpio_export 481 gpio481 in
-    gpio_export 482 gpio482 in
-    gpio_export 483 gpio483 in
-    gpio_export 484 gpio484 in
-    gpio_export 485 gpio485 in
-    gpio_export 486 gpio486 in
-    gpio_export 487 gpio487 in
-    gpio_export 488 gpio488 in
-    gpio_export 489 gpio489 in
-    
-    gpio_export 491 gpio491 high
-    
-    gpio_export 446 gpio446 low
-    
-    gpio_export 444 gpio444 in
-    gpio_export 445 gpio445 in
+    gpio_export 530 gpio530 low
+    gpio_export 531 gpio531 low
+    gpio_export 532 gpio532 low
+    gpio_export 533 gpio533 low
+    gpio_export 534 gpio534 low
+    gpio_export 535 gpio535 low
+    gpio_export 536 gpio536 low
+    gpio_export 537 gpio537 low
+    gpio_export 538 gpio538 low
+    gpio_export 539 gpio539 low
+    gpio_export 540 gpio540 low
+
+    gpio_export 545 gpio545 in
+    gpio_export 546 gpio546 in
+    gpio_export 547 gpio547 in
+    gpio_export 548 gpio548 in
+    gpio_export 549 gpio549 in
+    gpio_export 550 gpio550 in
+    gpio_export 551 gpio551 in
+    gpio_export 552 gpio552 in
+
 }
 
 gpio_unexport () {
@@ -70,10 +83,11 @@ case "$1" in
   start)
     log_begin_msg "Starting $name daemon..."
     gpio_export_all
-    m26-eeprom
+    # m26-eeprom
     mkdir -p /var/volatile/hls/
     ln -sf /var/volatile/hls/ /www/pages/
-    start-stop-daemon --start -b --startas $binpath --name $name -- -w
+    $binpath -w
+    # start-stop-daemon --start -b --startas $binpath --name $name -- -w
     ;;
   stop)
     log_begin_msg "Stopping $name daemon..."

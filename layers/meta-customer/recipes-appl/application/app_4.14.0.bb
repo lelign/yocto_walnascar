@@ -27,6 +27,7 @@ SRC_URI = "\
 	file://snmp-profitt.conf \
 	file://event_log_class_description \
         file://pbx-mtv-508.sh \
+        file://pbx-mtv-508.service \
 "
 
 INITSCRIPT_PARAMS = "defaults 99"
@@ -53,7 +54,7 @@ do_configure:prepend() {
 
 do_install:append() {
         install -d ${D}${sysconfdir}/init.d
-        install -m 0755 ${UNPACKDIR}/pbx-mtv-508.sh ${D}${sysconfdir}/init.d
+        install -m 0755 ${UNPACKDIR}/${INITSCRIPT_NAME} ${D}${sysconfdir}/init.d
         install -d ${D}${sysconfdir}/profile.d/
         install -m 0755 ${UNPACKDIR}/qt-qpa.sh ${D}${sysconfdir}/profile.d/
         
@@ -65,8 +66,13 @@ do_install:append() {
         install -d ${D}/etc
         install -m 0755 ${UNPACKDIR}/snmp-profitt.conf ${D}/etc
         install -m 0644 ${UNPACKDIR}/event_log_class_description ${D}/var
+
+        install -d ${D}${systemd_system_unitdir}
+        install -m 0644 ${UNPACKDIR}/pbx-mtv-508.service ${D}${systemd_system_unitdir}
 }
 
 pkg_postinst_${PN} () {
         rm -f /etc/xdg/pbx-mtv-508*
 }
+FILES:${PN} += "${sysconfdir}/init.d/${INITSCRIPT_NAME}"
+FILES:${PN} += "${systemd_system_unitdir}/pbx-mtv-508.service"

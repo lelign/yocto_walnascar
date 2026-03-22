@@ -1,0 +1,14 @@
+[Unit]
+Description=pbx-mtv-508 Application Service
+# Specify when to start the service (e.g., after the multi-user stage is reached)
+After=multi-user.target 
+
+[Service]
+# Type can be simple, forking, oneshot, etc.
+Type=simple
+# Command to execute (use the full path where it will be installed)
+ExecStart=/etc/init.d/pbx-mtv-508.sh start
+
+[Install]
+# This ensures the service is started with the multi-user target
+WantedBy=multi-user.target

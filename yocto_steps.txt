@@ -1683,6 +1683,18 @@
                         ls /var/volatile/hls/
                                 media_0.ts
 
+#22_03  GPIO
+                accessible GPIO
+                GPIO_LIST="513 514 515 516 517 518 519 520 521 523 524 525 526 527 528 529 530 531 532 533 534 535 536 537 538 539 540 545 546 547 548 549 550 551 552"
+                
+                513-521 bydirectional (low/high/in/out)
+                522 system fault <= ???
+                523-540 bydirectional (low/high/in/out)
+                545-552 input only (in)
+
+                переписал  в а10  /etc/init.d/pbx-mtv-508.sh согласно доступным GPIO_LIST
+                дополнительно заглушил # m26-eeprom
+                вообще не очень понятно как должно стартовать приложение
 
 
 
