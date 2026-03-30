@@ -1,0 +1,147 @@
+GPIO_LIST="513 514 515 516 517 518 519 520 521 523 524 525 526 527 528 529 \
+            530 531 532 533 534 535 536 537 538 539 540 545 546 547 548 549 550 551 552" (35)
+
+
+
+########################################################################################################
+11+8=19 штук GPIO <out>
+<ENV in 508>                           <ENV in 5161>                    <cpp>                   <preset>
+path_to_led_sdi_list {}     
+    "/gpio/gpio504/value"           "/gpio/gpio513/value"               led_class.cpp           low
+    "/gpio/gpio505/value"           "/gpio/gpio514/value"               led_class.cpp           low
+    "/gpio/gpio506/value"           "/gpio/gpio515/value"               led_class.cpp           low
+    "/gpio/gpio507/value"           "/gpio/gpio516/value"               led_class.cpp           low
+    "/gpio/gpio508/value"           "/gpio/gpio519/value"               led_class.cpp           low
+    "/gpio/gpio509/value"           "/gpio/gpio520/value"               led_class.cpp           low
+    "/gpio/gpio510/value"           "/gpio/gpio521/value"               led_class.cpp           low
+    "/gpio/gpio511/value"           "/gpio/gpio523/value"               led_class.cpp           low
+                                    "/gpio/gpio524/value"               led_class.cpp           low
+                                    "/gpio/gpio525/value"               led_class.cpp           low
+                                    "/gpio/gpio526/value"               led_class.cpp           low
+                                    "/gpio/gpio527/value"               led_class.cpp           low
+                                    "/gpio/gpio528/value"               led_class.cpp           low
+                                    "/gpio/gpio529/value"               led_class.cpp           low
+                                    "/gpio/gpio530/value"               led_class.cpp           low
+                                    "/gpio/gpio531/value"               led_class.cpp           low
+
+M26_GPIO (???)
+    "gpio446"                       "gpio446"                           board_config.h          ---
+
+PATH_TO_GPIO_OUT  
+void Gpio::set_common_alarm(...)
+    "/gpio/gpio491/value"           "/gpio/gpio532/value"               gpio.cpp                high
+
+PATH_TO_FAN_STATE_RESET 
+    "/gpio/gpio502/value"           "/gpio/gpio533/value"               hardware_diagnostics    high
+
+LED_HPS_B
+                                    "/gpio/gpio517/value"               gpio.cpp                low
+
+LED_HPS_A
+                                    "/gpio/gpio518/value"               websocketsever          low
+
+
+13 штук GPIO <in> из них 12 штук GPIO <in> на 15-контактном разьеме D-SUB        
+        444 PATH_TO_RESET_BUTTON_FILE factory_defaults.cpp void Factory_defaults                1
+        445 PATH_TO_MODEL_DEVICE_FILE mtv_web.cpp get_model_device()                            1
+        480-489 (10)  PATH_TO_GPIO_IN_(0-9) gpio.cpp Gpio()                                     10
+        501 PATH_TO_FAN_STATE hardware_diagnostics.cpp                                          1
+
+
+#######################################################################################################
+13 штук GPIO <in> из них 12 штук GPIO <in> на 15-контактном разьеме D-SUB
+
+<ENV in 508>                           <ENV in 5161>                    <cpp>
+PATH_TO_RESET_BUTTON_FILE 
+void Factory_defaults
+    "/gpio/gpio444/value"              "/gpio/gpio534/value"            factory_defaults.cpp
+
+PATH_TO_MODEL_DEVICE_FILE 
+get_model_device() 
+    "/gpio/gpio445/value"              "/gpio/gpio535/value"            mtv_web.cpp 
+
+PATH_TO_GPIO_IN_0
+    "/gpio/gpio480/value"              "/gpio/gpio536/value"            gpio.cpp
+
+PATH_TO_GPIO_IN_1
+    "/gpio/gpio481/value"              "/gpio/gpio537/value"            gpio.cpp
+
+PATH_TO_GPIO_IN_2
+    "/gpio/gpio482/value"              "/gpio/gpio538/value"            gpio.cpp
+
+PATH_TO_GPIO_IN_3
+    "/gpio/gpio483/value"              "/gpio/gpio539/value"            gpio.cpp
+
+PATH_TO_GPIO_IN_4
+    "/gpio/gpio484/value"              "/gpio/gpio540/value"            gpio.cpp
+
+PATH_TO_GPIO_IN_5
+    "/gpio/gpio485/value"              "/gpio/gpio545/value"            gpio.cpp
+
+PATH_TO_GPIO_IN_6
+    "/gpio/gpio486/value"              "/gpio/gpio546/value"            gpio.cpp
+
+PATH_TO_GPIO_IN_7
+    "/gpio/gpio488/value"              "/gpio/gpio547/value"            gpio.cpp
+
+PATH_TO_GPIO_IN_8
+    "/gpio/gpio488/value"              "/gpio/gpio548/value"            gpio.cpp
+
+PATH_TO_GPIO_IN_9
+    "/gpio/gpio489/value"              "/gpio/gpio549/value"            gpio.cpp
+
+PATH_TO_FAN_STATE 
+    "/gpio/gpio501/value"              "/gpio/gpio550/value"            hardware_diagnostics.cpp 
+
+
+PATH_TO_FILE_NAME_TEMP
+    "/sys/class/hwmon/hwmon0/temp1_input"       hardware_diagnostics.cpp:8                     
+
+PATH_TO_FILE_POWER_CONSUMPTION
+    "/sys/class/hwmon/hwmon0/power1_input" <= not such file, so hardware_diagnostics.cpp:65
+
+    int Hardware_diagnostics::get_power_W()
+        {
+            //return (get_value(PATH_TO_FILE_POWER_CONSUMPTION) + 50000) / 100000; // ign
+            // cat /sys/class/hwmon/hwmon0/power1_input        7640000 in 508
+            return (7640000 + 50000) / 100000;
+            
+        }
+
+на 30 марта вариант конфигурации GPIO
+GPIO, работающие на выход (в случае с 508 это 15- контактный разьем на плате)
+к ним добавлено еще 8 штук и еще два для светодиодов на плате А10 и еще про запас несколько
+итого   513-516 4шт
+        517-518 2шт (светодиод на плате 517 0,5сек timer_led_hps_b gpio.cpp:99 timer_led_hps_b
+                      светодиод на плате 518 timer_led_hps_a websocketserver.cpp показывает активность
+                      на соединении frontend через websocket keepalive/set)
+        519-533 15шт
+        всего   21шт
+
+GPIO, работающие на вход
+    посколку на плате нет никаких GPIO входы объединены в файл /etc/profile.d/gpio_out
+    файл формируется/удаляется скриптом /etc/init.d/pbx-mtv-508.sh
+    всего формируется 20 записей вида 
+    PATH_TO_GPIO_IN_0=1 
+    в дальнейшем с этим файлом работает gpio.cpp, который соотв. образом переписан под эти цели
+    как временное решение оставлены
+    534 PATH_TO_RESET_BUTTON_FILE (factory_defaults.cpp)
+    535 PATH_TO_MODEL_DEVICE_FILE (mtv_web.cpp)
+    550 PATH_TO_FAN_STATE (hardware_diagnostics.cpp)
+    PATH_TO_FILE_NAME_TEMP
+    "/sys/class/hwmon/hwmon0/temp1_input"       hardware_diagnostics.cpp:8                     
+
+    PATH_TO_FILE_POWER_CONSUMPTION
+    "/sys/class/hwmon/hwmon0/power1_input" <= not such file, so hardware_diagnostics.cpp:65
+
+    int Hardware_diagnostics::get_power_W()
+        {
+            //return (get_value(PATH_TO_FILE_POWER_CONSUMPTION) + 50000) / 100000; // ign
+            // cat /sys/class/hwmon/hwmon0/power1_input        7640000 in 508
+            return (7640000 + 50000) / 100000;
+            
+        }
+
+
+
+
