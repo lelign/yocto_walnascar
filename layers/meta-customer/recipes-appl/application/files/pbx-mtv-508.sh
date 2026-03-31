@@ -47,8 +47,8 @@ gpio_export_all () {
     gpio_export 535 gpio535 in
     gpio_export 550 gpio550 in
 
-
     echo "PATH_TO_GPIO_OUT=1" > $gpio_out
+    
     for i in $GPIO_OUT_LIST; do
       echo "PATH_TO_GPIO_IN_$i=1" >> $gpio_out
     done

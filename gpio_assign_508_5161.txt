@@ -123,7 +123,7 @@ GPIO, работающие на вход
     файл формируется/удаляется скриптом /etc/init.d/pbx-mtv-508.sh
     всего формируется 20 записей вида 
     PATH_TO_GPIO_IN_0=1 
-    в дальнейшем с этим файлом работает gpio.cpp, который соотв. образом переписан под эти цели
+    в дальнейшем с этим файлом работает gpio.cpp, который соотв. образом переписан под эти цели,
     как временное решение оставлены
     534 PATH_TO_RESET_BUTTON_FILE (factory_defaults.cpp)
     535 PATH_TO_MODEL_DEVICE_FILE (mtv_web.cpp)
@@ -141,7 +141,8 @@ GPIO, работающие на вход
             return (7640000 + 50000) / 100000;
             
         }
-
+    забыл #if (BOARD_REV==0) #define M26_GPIO "gpio446" in board_config.h (out)
+    change to #define M26_GPIO "gpio533"
 
 
 

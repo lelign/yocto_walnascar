@@ -29,6 +29,8 @@ SRC_URI = "file://${BPN}-${PV}.tar.xz \
            file://pbx-mtv-508.service \
            file://${INITSCRIPT_NAME} \
            file://0001-gpio_modification_from_508_to_5161.patch \
+           file://${INITSCRIPT_NAME} \
+           file://0001-change_gpio_board_config_to_533.patch \
            "
 
 INITSCRIPT_PARAMS = "defaults 99"
