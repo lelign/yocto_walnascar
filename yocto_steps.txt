@@ -1707,7 +1707,35 @@
         gpio_assign_508_5161.txt
         подробнее про  GPIO
 
+#31_03  поправил забытый gpio в board-config.h (все равно фигня)
+        автостарт
+        a10:
+                systemctl enable pbx-mtv-508
+                Created symlink '/etc/systemd/system/multi-user.target.wants/pbx-mtv-508.service' -> '/usr/lib/systemd/system/pbx-mtv-508.service'.
+        ls /etc/systemd/system/multi-user.target.wants/pbx-mtv-508.service -l
+                lrwxrwxrwx /etc/systemd/system/multi-user.target.wants/pbx-mtv-508.service -> 
+                        /usr/lib/systemd/system/pbx-mtv-508.service
 
+        ls -l /usr/lib/systemd/system/pbx-mtv-508.service
+                -rw-r--r-- /usr/lib/systemd/system/pbx-mtv-508.service
+        cat /usr/lib/systemd/system/pbx-mtv-508.service
+                [Unit]
+                Description=pbx-mtv-508 Application Service
+                # Specify when to start the service (e.g., after the multi-user stage is reached)
+                After=multi-user.target 
+
+                [Service]
+                # Type can be simple, forking, oneshot, etc.
+                Type=simple
+                # Command to execute (use the full path where it will be installed)
+                ExecStart=/etc/init.d/pbx-mtv-508.sh start
+                Restart=on-failure
+
+
+                [Install]
+                # This ensures the service is started with the multi-user target
+                WantedBy=multi-user.target
+        OK appliction started after boot/reboot
 
 
                 

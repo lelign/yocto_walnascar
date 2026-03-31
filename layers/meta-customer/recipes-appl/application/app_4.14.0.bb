@@ -72,6 +72,8 @@ do_install:append() {
 
         install -d ${D}${systemd_system_unitdir}
         install -m 0644 ${UNPACKDIR}/pbx-mtv-508.service ${D}${systemd_system_unitdir}
+        install -d ${D}/${systemd_system_unitdir}/multi-user.target.wants
+        ln -sf /usr/lib/systemd/system/pbx-mtv-508.service ${D}/${systemd_system_unitdir}/multi-user.target.wants/pbx-mtv-508.service
 }
 
 pkg_postinst_${PN} () {
@@ -79,3 +81,4 @@ pkg_postinst_${PN} () {
 }
 FILES:${PN} += "${sysconfdir}/init.d/${INITSCRIPT_NAME}"
 FILES:${PN} += "${systemd_system_unitdir}/pbx-mtv-508.service"
+FILES:${PN} += "${systemd_system_unitdir}/multi-user.target.wants/pbx-mtv-508.service"

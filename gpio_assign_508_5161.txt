@@ -118,6 +118,24 @@ GPIO, работающие на выход (в случае с 508 это 15- к
         519-533 15шт
         всего   21шт
 
+    GPIO (out) in led.cpp used as
+        "/sys/class/gpio/gpio513/value", /* led 1 */
+        "/sys/class/gpio/gpio514/value", /* led 2 */
+        "/sys/class/gpio/gpio515/value", /* led 3 */
+        "/sys/class/gpio/gpio516/value", /* led 4 */
+        "/sys/class/gpio/gpio519/value", /* led 5 */
+        "/sys/class/gpio/gpio520/value", /* led 6 */
+        "/sys/class/gpio/gpio521/value", /* led 7 */
+        "/sys/class/gpio/gpio523/value", /* led 8 */
+        "/sys/class/gpio/gpio524/value", /* led 9 */
+        "/sys/class/gpio/gpio525/value", /* led 10 */
+        "/sys/class/gpio/gpio526/value", /* led 11 */
+        "/sys/class/gpio/gpio527/value", /* led 12 */
+        "/sys/class/gpio/gpio528/value", /* led 13 */
+        "/sys/class/gpio/gpio529/value", /* led 14 */
+        "/sys/class/gpio/gpio530/value", /* led 15 */
+        "/sys/class/gpio/gpio531/value"  /* led 16 ign for all*/     
+
 GPIO, работающие на вход
     посколку на плате нет никаких GPIO входы объединены в файл /etc/profile.d/gpio_out
     файл формируется/удаляется скриптом /etc/init.d/pbx-mtv-508.sh
