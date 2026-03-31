@@ -1786,7 +1786,7 @@
             link: '/status'
           }, {
             icon: 'fa-cogs',
-            label: 'Inputs Settings',
+            label: 'Settings',
             link: '/settings'
           }, {
             icon: 'fa-th-large',
@@ -7561,8 +7561,8 @@
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵqueryRefresh"](_t = _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵloadQuery"]()) && (ctx.alarmSettingsForm = _t.first);
           }
         },
-        decls: 42,
-        vars: 26,
+        decls: 46,
+        vars: 28,
         consts: [[3, "data", "modelStr"], ["title", "Slave mode", 3, "hidden"], ["title", "Inputs Label", 3, "hidden"], ["settingsForm", "ngForm"], [3, "title", "ngModel", "hidden", "name", "ngModelChange", 4, "ngFor", "ngForOf", "ngForTrackBy"], [3, "disabled", "apply", "cancel"], ["title", "Audio Alarm Settings", 3, "hidden"], ["alarmSettingsForm", "ngForm"], ["title", "Mimimum Level, dBFS", "nocase", "", "type", "number", "name", "minumumLevel", 3, "ngModel", "ngModelChange"], ["title", "Threshold, ms", "nocase", "", "type", "number", "name", "threshold", 3, "ngModel", "ngModelChange"], ["title", "Video Alarm Settings"], ["title", "Video Output Settings"], ["title", "Output Format", "name", "outputFormat", 3, "ngModel", "ngModelChange"], [3, "value"], ["title", "HDMI Colorspace", "nocase", "", "name", "hdmi_color", 3, "ngModel", "ngModelChange"], ["title", "GPIO Settings", "nocase", ""], ["title", "GPIO Mode", "nocase", "", "name", "gpioMode", 3, "ngModel", "ngModelChange"], ["title", "Teletext Settings"], ["title", "Display", "name", "teletextEnable", 3, "ngModel", "ngModelChange"], ["title", "Page Number", "type", "number", "name", "teletextPage", 3, "ngModel", "ngModelChange"], [3, "title", "ngModel", "hidden", "name", "ngModelChange"]],
         template: function SettingsComponent_Template(rf, ctx) {
           if (rf & 1) {
@@ -7634,101 +7634,113 @@
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](17, "option", 13);
 
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](18, "1080p25");
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](18, "2160p50");
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](19, "option", 13);
 
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](20, "1080i50");
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](20, "2160p25");
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](21, "option", 13);
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](22, "1080p50");
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](23, "option", 13);
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](24, "1080i25");
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
 
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](21, "app-selectfield", 14);
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](25, "app-selectfield", 14);
 
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵlistener"]("ngModelChange", function SettingsComponent_Template_app_selectfield_ngModelChange_21_listener($event) {
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵlistener"]("ngModelChange", function SettingsComponent_Template_app_selectfield_ngModelChange_25_listener($event) {
               return ctx.settingsData.hdmi_color = $event;
             });
 
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](22, "option", 13);
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](26, "option", 13);
 
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](23, "YCbCr");
-
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
-
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](24, "option", 13);
-
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](25, "RGB");
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](27, "YCbCr");
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
-
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
-
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelement"](26, "app-panelhr", 15);
-
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](27, "app-selectfield", 16);
-
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵlistener"]("ngModelChange", function SettingsComponent_Template_app_selectfield_ngModelChange_27_listener($event) {
-              return ctx.settingsData.gpio_mode = $event;
-            });
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](28, "option", 13);
 
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](29, "Solo");
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](29, "RGB");
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
 
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](30, "option", 13);
-
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](31, "Tally");
-
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelement"](30, "app-panelhr", 15);
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](31, "app-selectfield", 16);
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵlistener"]("ngModelChange", function SettingsComponent_Template_app_selectfield_ngModelChange_31_listener($event) {
+              return ctx.settingsData.gpio_mode = $event;
+            });
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](32, "option", 13);
 
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](33, "Preset");
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](33, "Solo");
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
 
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](34, "option", 13);
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](35, "Tally");
+
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
-
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelement"](34, "app-panelhr", 17);
-
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](35, "app-selectfield", 18);
-
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵlistener"]("ngModelChange", function SettingsComponent_Template_app_selectfield_ngModelChange_35_listener($event) {
-              return ctx.settingsData.layout.teletext_enable = $event;
-            });
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](36, "option", 13);
 
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](37, "Disabled");
-
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
-
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](38, "option", 13);
-
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](39, "Enabled");
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](37, "Preset");
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
 
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](40, "app-inputfield", 19);
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelement"](38, "app-panelhr", 17);
 
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵlistener"]("ngModelChange", function SettingsComponent_Template_app_inputfield_ngModelChange_40_listener($event) {
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](39, "app-selectfield", 18);
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵlistener"]("ngModelChange", function SettingsComponent_Template_app_selectfield_ngModelChange_39_listener($event) {
+              return ctx.settingsData.layout.teletext_enable = $event;
+            });
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](40, "option", 13);
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](41, "Disabled");
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](42, "option", 13);
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](43, "Enabled");
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](44, "app-inputfield", 19);
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵlistener"]("ngModelChange", function SettingsComponent_Template_app_inputfield_ngModelChange_44_listener($event) {
               return ctx.settingsData.layout.teletext_page = $event;
             });
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]();
 
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](41, "app-setcancelbutton", 5);
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](45, "app-setcancelbutton", 5);
 
-            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵlistener"]("apply", function SettingsComponent_Template_app_setcancelbutton_apply_41_listener() {
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵlistener"]("apply", function SettingsComponent_Template_app_setcancelbutton_apply_45_listener() {
               return ctx.sendForm();
-            })("cancel", function SettingsComponent_Template_app_setcancelbutton_cancel_41_listener() {
+            })("cancel", function SettingsComponent_Template_app_setcancelbutton_cancel_45_listener() {
               return ctx.resetForm();
             });
 
@@ -7791,6 +7803,14 @@
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵadvance"](2);
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵproperty"]("value", 1);
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵadvance"](2);
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵproperty"]("value", 2);
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵadvance"](2);
+
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵproperty"]("value", 3);
 
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵadvance"](2);
 

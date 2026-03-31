@@ -17,21 +17,18 @@ PACKAGE_ARCH = "${MACHINE}"
 SYSTEMD_SERVICE:${PN} = "pbx-mtv-508.service"
 
 # file://${PN}-${PV}.tar.gz # ign
-SRC_URI = "file://${BPN}-${PV}.tar.xz \
-           file://qt-qpa.sh \
-           file://mb86m21_assp_nsec_enc_h.bin \
-           file://mb86m21_assp_nsec_idle.bin \
-           file://mb86m21_assp_nsec_ldenc_h.bin \
-           file://spirom_writer_usb_c.bin \
-           file://snmp-profitt.conf \
-           file://event_log_class_description \
-           file://pbx-mtv-508.sh \
-           file://pbx-mtv-508.service \
-           file://${INITSCRIPT_NAME} \
-           file://0001-gpio_modification_from_508_to_5161.patch \
-           file://${INITSCRIPT_NAME} \
-           file://0001-change_gpio_board_config_to_533.patch \
-           "
+SRC_URI = "\ 
+        file://${BPN}-${PV}.tar.xz \
+        file://qt-qpa.sh \
+        file://mb86m21_assp_nsec_enc_h.bin \
+	file://mb86m21_assp_nsec_idle.bin \
+	file://mb86m21_assp_nsec_ldenc_h.bin \
+	file://spirom_writer_usb_c.bin \
+	file://snmp-profitt.conf \
+	file://event_log_class_description \
+        file://pbx-mtv-508.sh \
+        file://pbx-mtv-508.service \
+"
 
 INITSCRIPT_PARAMS = "defaults 99"
 LICENSE = "CLOSED"

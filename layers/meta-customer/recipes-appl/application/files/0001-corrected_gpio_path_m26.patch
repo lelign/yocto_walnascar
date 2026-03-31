@@ -1,0 +1,41 @@
+From 5756b8c7a40bb0055928e67cc53b4156efee4c34 Mon Sep 17 00:00:00 2001
+From: lelign <ignatlelekin@gmail.com>
+Date: Tue, 31 Mar 2026 19:06:46 +0300
+Subject: [PATCH] corrected_gpio_path_m26
+Upstream-Status: Pending
+
+---
+ m26/m26-eeprom.cpp | 4 ++--
+ m26/mb86m26.h      | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/m26/m26-eeprom.cpp b/m26/m26-eeprom.cpp
+index 6bac848..856e8bd 100644
+--- a/m26/m26-eeprom.cpp
++++ b/m26/m26-eeprom.cpp
+@@ -8,8 +8,8 @@
+ #include "../board_config.h"
+ 
+ #define FIRMWARE_FILE "/var/spirom_writer_usb_c.bin"
+-//#define GPIO_VALUE "/sys/class/gpio/%s/value"
+-#define GPIO_VALUE "/home/pi/gpio_from_508/%s/value"
++#define GPIO_VALUE "/sys/class/gpio/%s/value"
++//#define GPIO_VALUE "/home/pi/gpio_from_508/%s/value" //ign
+ #define USB_MB_VENDOR_ID 0x04c5
+ #define USB_MB_SPI_PRODUCT_ID 0x202f
+ #define USB_TIMEOUT 1000
+diff --git a/m26/mb86m26.h b/m26/mb86m26.h
+index 79221d3..2f600dc 100644
+--- a/m26/mb86m26.h
++++ b/m26/mb86m26.h
+@@ -34,8 +34,8 @@
+ #define FIRMWARE_IDLE_FILE "/var/mb86m21_assp_nsec_idle.bin"
+ #define FIRMWARE_ENC_FILE "/var/mb86m21_assp_nsec_enc_h.bin"
+ #define FIRMWARE_LDENC_FILE "/var/mb86m21_assp_nsec_ldenc_h.bin"
+-//#define GPIO_VALUE "/sys/class/gpio/%s/value"
+-#define GPIO_VALUE "/gpio/%s/value" // ign
++#define GPIO_VALUE "/sys/class/gpio/%s/value"
++//#define GPIO_VALUE "/gpio/%s/value" // ign
+ 
+ // 458
+ 

@@ -1737,6 +1737,52 @@
                 WantedBy=multi-user.target
         OK appliction started after boot/reboot
 
+        не работает, приложение падает через 15 секунд
+        пришлось отkатить на версию с заглушкой по GPIO 
+        отключил все патчи в app_4.14.0.bbб больше не морgают 517 518
+        добавил в app_4.14.0.bb генерацию линка для автозапуска
+        работает
+
+
+        Angular
+        code -n /home/iru/angular_5161/pbx-mtv-508-frontend-4.19
+        in file
+        /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/src/app/views/settings.component.html:40-41
+        change from
+                <option [value]="0">1080i25</option>
+                <option [value]="1">1080p50</option>
+
+        to
+                <option [value]="0">2160p50</option>
+                <option [value]="1">2160p25</option>
+                <option [value]="2">1080p50</option>
+                <option [value]="3">1080i25</option>
+
+        in file
+        /home/iru/angular_5161/pbx-mtv-508-frontend-4.19/src/app/wsdata.service.ts
+        change from
+                {icon: 'fa-cogs', label: 'Inputs Settings', link: '/settings'}, :27
+                to
+                {icon: 'fa-cogs', label: 'Settings', link: '/settings'}, :27
+
+        <сборка frontend>
+        ng build --output-path=/home/iru/poky-socfpga/poky/meta/recipes-extended/lighttpd/lighttpd/
+                рецепт
+                /home/iru/poky-socfpga/poky/meta/recipes-extended/lighttpd/lighttpd_1.4.77.bb
+                теперь в files этого рецепта не хватает двух файлов, поэтому
+                cp lighttpd.conf \
+                        /home/iru/poky-socfpga/poky/meta/recipes-extended/lighttpd/lighttpd/lighttpd.conf
+                cp lighttpd \
+                        /home/iru/poky-socfpga/poky/meta/recipes-extended/lighttpd/lighttpd/lighttpd
+                # check
+                bitbake lighttpd                <= OK
+                bitbake core-image-minimal      <= OK
+
+        проерил, автозапуск ОК
+        Settings => Output Format =>    2160p50
+                                        2160p25
+                                        1080p50
+                                        1080i25
 
                 
 
