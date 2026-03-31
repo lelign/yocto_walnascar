@@ -1784,6 +1784,21 @@
                                         1080p50
                                         1080i25
 
+        connect with static ip
+        ssh root@192.168.0.2.37
+        nano /etc/systemd/network/50-wired-static.network
+        cp this into it:
+                [Match]
+                Name=eth0 
+
+                [Network]
+                Address=192.168.2.50/24
+                Gateway=192.168.2.1
+                DNS=8.8.8.8
+
+        CTRL+O ENTER CTRL+X
+        now a10 must be on 192.168.2.50
+
                 
 
 
