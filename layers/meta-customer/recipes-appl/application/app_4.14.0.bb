@@ -16,19 +16,19 @@ INITSCRIPT_NAME = "pbx-mtv-508.sh"
 PACKAGE_ARCH = "${MACHINE}"
 SYSTEMD_SERVICE:${PN} = "pbx-mtv-508.service"
 
-# file://${PN}-${PV}.tar.gz # ign
-SRC_URI = "\ 
-        file://${BPN}-${PV}.tar.xz \
-        file://qt-qpa.sh \
-        file://mb86m21_assp_nsec_enc_h.bin \
-	file://mb86m21_assp_nsec_idle.bin \
-	file://mb86m21_assp_nsec_ldenc_h.bin \
-	file://spirom_writer_usb_c.bin \
-	file://snmp-profitt.conf \
-	file://event_log_class_description \
-        file://pbx-mtv-508.sh \
-        file://pbx-mtv-508.service \
-"
+# file://${BPN}-${PV}.tar.xz # ign
+SRC_URI = "file://${BPN}-${PV}.tar.xz \
+           file://qt-qpa.sh \
+           file://mb86m21_assp_nsec_enc_h.bin \
+           file://mb86m21_assp_nsec_idle.bin \
+           file://mb86m21_assp_nsec_ldenc_h.bin \
+           file://spirom_writer_usb_c.bin \
+           file://snmp-profitt.conf \
+           file://event_log_class_description \
+           file://pbx-mtv-508.sh \
+           file://pbx-mtv-508.service \
+           file://${INITSCRIPT_NAME} \
+           "
 
 INITSCRIPT_PARAMS = "defaults 99"
 LICENSE = "CLOSED"
@@ -76,6 +76,7 @@ do_install:append() {
 pkg_postinst_${PN} () {
         rm -f /etc/xdg/pbx-mtv-508*
 }
+
 FILES:${PN} += "${sysconfdir}/init.d/${INITSCRIPT_NAME}"
 FILES:${PN} += "${systemd_system_unitdir}/pbx-mtv-508.service"
 FILES:${PN} += "${systemd_system_unitdir}/multi-user.target.wants/pbx-mtv-508.service"

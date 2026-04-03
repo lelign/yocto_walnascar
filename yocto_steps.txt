@@ -1799,7 +1799,7 @@
         CTRL+O ENTER CTRL+X
         now a10 must be on 192.168.2.50
 
-                
+                `
 
 
 
@@ -1809,6 +1809,101 @@
         
 
 
-# 18_03 установка application
-        mkdir -p /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-appl/application
+#02_04  после  devtool finish linux-socfpga-lts bitbake удалил 0001-fourth_try_to_configure_eth_iface.patch 
+                cd /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts
+                git status
+                        modified:   arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+                devtool build linux-socfpga-lts
+                        OK
+                devtool finish linux-socfpga-lts meta-intel-fpga
+                        INFO: Adding new patch 0001-file_socfpga_arria10_socdk.dtsi_adapted_for_5161.patch
+                        INFO: Updating recipe linux-socfpga-lts_6.12.bb
+                !!! =>  INFO: Removing file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/config/0001-fourth_try_to_configure_eth_iface.patch
+
+                bitbake linux-socfpga-lts
+                        OK
+                bitbake app
+                        OK
+                bitbake core-image-minimal
+                        OK
+
+                а10 стартует, LED (517) мигает, активность на eth присутствует
+                соединиться с а10 не могу
+                minicom
+                        u-boot
+                                OK
+                        boot
+                                115 bytes read in 2 ms (55.7 KiB/s)
+                                ## Executing script at 02100000
+                                Saving Environment to MMC... Writing to MMC(0)... OK
+                                7616664 bytes read in 686 ms (10.6 MiB/s)
+                                FPGA core bitstream
+                                Full Configuration Succeeded.
+                                FPGA: Enter user mode.
+                                switch to partitions #0, OK
+                                mmc0 is current device
+                                Scanning mmc 0:1...
+                                Found /extlinux/extlinux.conf
+                                Retrieving file: /extlinux/extlinux.conf
+                                1:      Arria10 SOCDK SDMMC
+                                Retrieving file: /extlinux/../zImage
+                                append: root=/dev/mmcblk0p2 rootwait rw earlyprintk memmap=16M$0x3F000000 console=ttyS0,115200n8
+                                Retrieving file: /extlinux/../intel/socfpga/socfpga_arria10_socdk_sdmmc.dtb
+                                Kernel image @ 0x1000000 [ 0x000000 - 0x69b8a8 ]
+                                ## Flattened Device Tree blob at 02000000
+                                Booting using the fdt blob at 0x2000000
+                                Working FDT set to 2000000
+                                Loading Device Tree to 09ff8000, end 09fff910 ... OK
+                                Working FDT set to 9ff8000
+
+                                Starting kernel ...
+
+                                Deasserting all peripheral resets
+
+                cp 0001-fourth_try_to_configure_eth_iface.patch \ 
+                        /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/config/
+                
+                add <file://0001-fourth_try_to_configure_eth_iface.patch> in to linux-socfpga-lts_6.12.bb
+                
+                bitbake core-image-minimal
+                        OK
+
+                # check on a10
+                        minicom
+                                Deasserting all peripheral resets
+                        
+                        ssh root@<ip>
+                                OK                       
+                        
+                        dmesg => 9.84 sec
+
+                        dmesg | grep i2c
+                        [    1.373397] i2c_dev: i2c /dev entries driver
+
+                        i2cdetect -y -r 0
+                                0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+                                00:                         -- -- -- -- -- -- -- -- 
+                                10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+                                20: -- -- -- -- -- -- -- -- 28 -- -- -- -- -- -- -- 
+                                30: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+                                40: -- -- -- -- -- -- -- -- 48 -- -- -- -- -- -- -- 
+                                50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+                                60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+                                70: -- 71 -- -- -- -- -- --      
+                        i2cdetect -l
+                                i2c-0	i2c       	Synopsys DesignWare I2C adapter 	I2C adapter
+
+                ПРЕКРАСНЫЙ РЕЗУЛЬТАТ 9.84 sec ! 
+
+        странная ситуация:
+                bitbake app <= OK
+        а если
+                devtool modify app
+                devtool build app <= task failure (даже без каких-либо изменений в коде исходников)
+                devtool reset app
+                bitbake app <= OK
+        возможная причина: слишком большой патч используется в арр (86K)
+        попробовать пересобрать исходный архив на raspberry
+        
+        
 

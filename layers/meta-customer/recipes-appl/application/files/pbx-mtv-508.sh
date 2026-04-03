@@ -4,68 +4,52 @@ name=pbx-mtv-508
 binpath=/usr/bin/$name
 . /etc/profile.d/qt-qpa.sh
 
-#GPIO_LIST="504 505 506 507 508 509 510 511 501 502 480 481 482 483 484 485 486 487 488 489 491 446 444 445"
-GPIO_LIST="513 514 515 516 517 518 519 520 521 523 524 525 526 527 528 529 530 531 532 533 534 535 536 537 538 539 540 545 546 547 548 549 550 551 552"
+GPIO=/var/volatile/gpio
+GPIO_LIST=$(seq 1 16)
 
-#
-
-gpio_export () {
-    echo $1 > /sys/class/gpio/export
-    echo $3 > /sys/class/gpio/$2/direction
-}
 
 gpio_export_all () {
-    gpio_export 513 gpio513 low
-    gpio_export 514 gpio514 low
-    gpio_export 515 gpio515 low
-    gpio_export 516 gpio516 low
-    gpio_export 517 gpio517 low
-    gpio_export 518 gpio518 low
-    gpio_export 519 gpio519 low
-    gpio_export 520 gpio520 low
+	rm -rf $GPIO && mkdir $GPIO
+	# leds led/led_class.cpp
+		for i in $GPIO_LIST; do
+			echo 0 > $GPIO/led_$i
+		done
+		echo 1 > $GPIO/reset_button # reset_button factory_defaults/factory_defaults.cpp (444)
 
-    gpio_export 521 gpio521 low
-    gpio_export 523 gpio523 low
-    gpio_export 524 gpio524 low
-    gpio_export 525 gpio525 low
-    gpio_export 526 gpio526 low
-    gpio_export 527 gpio527 low
-    gpio_export 528 gpio528 low
-    gpio_export 529 gpio529 low
+	# gpio inputs solo solo_disable time_counter gpio/gpio.cpp
+		for i in $GPIO_LIST; do
+			echo 1 > $GPIO/SOLO_IN_$i # /var/volatile/gpio/SOLO_IN_
+		done
+		echo 1 > $GPIO/COMMON_ALARM # gpio/gpio.cpp PATH_TO_GPIO_OUT (491)
+		echo 1 > $GPIO/SOLO_DISABLE # gpio/gpio.cpp SOLO_DISABLE (???) new var
+		echo 1 > $GPIO/TIME_COUNTER # gpio/gpio.cpp TIME_COUNTER (???) new var
 
-    gpio_export 530 gpio530 low
-    gpio_export 531 gpio531 low
-    gpio_export 532 gpio532 low
-    gpio_export 533 gpio533 low
-    gpio_export 534 gpio534 low
-    gpio_export 535 gpio535 low
-    gpio_export 536 gpio536 low
-    gpio_export 537 gpio537 low
-    gpio_export 538 gpio538 low
-    gpio_export 539 gpio539 low
-    gpio_export 540 gpio540 low
+	# model_device 
+		echo 1 > $GPIO/MODEL_DEVICE # mtv-web/mtv_web.cpp (445)
 
-    gpio_export 545 gpio545 in
-    gpio_export 546 gpio546 in
-    gpio_export 547 gpio547 in
-    gpio_export 548 gpio548 in
-    gpio_export 549 gpio549 in
-    gpio_export 550 gpio550 in
-    gpio_export 551 gpio551 in
-    gpio_export 552 gpio552 in
+	#hardware_diagnostics
+    echo 1 > $GPIO/FAN_STATE # hardware_diagnostics/hardware_diagnostics.cpp PATH_TO_FAN_STATE (501)
+    echo 1 > $GPIO/FAN_STATE_RESET # hardware_diagnostics/hardware_diagnostics.cpp PATH_TO_FAN_STATE (502)
+    echo 7340000 > $GPIO/POWER1_INPUT # temp issue
 
-}
+  # board_config.h
+    echo 1 > $GPIO/M26_GPIO #  #define M26_GPIO "M26_GPIO"
 
-gpio_unexport () {
-    echo $1 > /sys/class/gpio/unexport
-}
+  # m26-test.cpp
+    echo 1 > $GPIO/m26_a_control 
+
+	# leds on board
+		echo 517 > /sys/class/gpio/export
+		echo low > /sys/class/gpio/gpio517/direction
+		echo 518 > /sys/class/gpio/export
+		echo low > /sys/class/gpio/gpio518/direction	
+	}
 
 gpio_unexport_all () {
-    for i in $GPIO_LIST
-    do
-        gpio_unexport $i
-    done
-}
+	rm -rf $GPIO
+	echo 517 > /sys/class/gpio/unexport
+	echo 518 > /sys/class/gpio/unexport
+	}
 
 log_begin_msg () {
     echo $1
@@ -83,21 +67,26 @@ case "$1" in
   start)
     log_begin_msg "Starting $name daemon..."
     gpio_export_all
-    # m26-eeprom
+    m26-eeprom
     mkdir -p /var/volatile/hls/
     ln -sf /var/volatile/hls/ /www/pages/
-    $binpath -w
-    start-stop-daemon --start -b --startas $binpath --name $name -- -w
+    # $binpath
+    # start-stop-daemon --start -b --startas $binpath --name $name -- -w
+    start-stop-daemon --start -x $binpath
     ;;
   stop)
     log_begin_msg "Stopping $name daemon..."
     gpio_unexport_all
-    start-stop-daemon --stop --signal INT --retry 5 --name $name
+    # start-stop-daemon --stop --signal INT --retry 5 --name $name
+    start-stop-daemon --stop -x $binpath
     ;;
   restart)
     log_begin_msg "Restarting $name daemon..."
-    start-stop-daemon --stop --signal INT --retry 5 --name $name
-    start-stop-daemon --start -b --startas $binpath --name $name -- -w
+    #start-stop-daemon --stop --signal INT --retry 5 --name $name
+    #start-stop-daemon --start -b --startas $binpath --name $name -- -w
+    start-stop-daemon --stop -x $binpath
+    start-stop-daemon --start -x $binpath
+
     ;;
   reload-or-restart)
     if running

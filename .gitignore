@@ -90,3 +90,9 @@ layers/meta-ke/README
 !/layers/meta-openembedded/meta-oe/recipes-graphics/ttf-fonts/ttf-roboto_2.138.bb
 !layers/meta-openembedded/meta-oe/recipes-graphics/ttf-fonts/ttf.inc
 layers/meta-customer/recipes-appl/application/files/30_03_app-4.14.0.tar.xz
+a10_v_angular.tar.gz
+layers/meta-customer/recipes-appl/application/files/.0001-change_gpio_board_config_to_533.patch
+layers/meta-customer/recipes-appl/application/files/.0001-corrected_gpio_path_m26.patch
+layers/meta-customer/recipes-appl/application/files/.0001-gpio_modification_from_508_to_5161.patch
+natives_gpio.txt
+core-image-minimal-arria10.rootfs-20260402211126.wic.gz
