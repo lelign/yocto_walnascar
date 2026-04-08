@@ -1,0 +1,41 @@
+path to .config
+/home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/linux-socfpga-lts/\
+6.12.33-lts+git/linux-socfpga-lts-6.12.33-lts+git/.config
+
+
+1 delete from
+/home/iru/*/*/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bb
+
+           file://devtool-fragment.cfg \
+           file://0001-i2c-drivers-in-dtsi-ok.patch \
+
+bitbake linux-socfpga-lts <= OK
+
+devtool modify linux-socfpga-lts
+ Recipe linux-socfpga-lts now set up to build from 
+/home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts
+
+
+go to workspace
+code -n /home/iru/*/*/workspace/sources/linux-socfpga-lts
+
+go to dts files
+code -n /home/iru/*/*/workspace/sources/linux-socfpga-lts/arch/arm/boot/dts/intel/socfpga
+
+vscode find in files <phy-mode = "rgmii-id">   <= must be, cause include in patch
+exist   /home/iru/*/*/workspace/sources/linux-socfpga-lts/arch/arm/boot/dts/intel/socfpga/\
+							socfpga_arria10_socdk.dtsi
+so patch has been applyied!!!
+
+
+cp dtsi_i2c.d/socfpga_arria10_socdk.dtsi_final \
+/home/iru/*/*/*/*/linux-socfpga-lts/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+
+/// the same
+
+
+deleted from
+/home/iru/*/*/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bb
+	file://devtool-fragment.cfg \
+        file://0001-i2c-drivers-in-dtsi-ok.patch \
+        file://0001-fourth_try_to_configure_eth_iface.patch \

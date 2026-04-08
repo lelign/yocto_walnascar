@@ -96,3 +96,11 @@ layers/meta-customer/recipes-appl/application/files/.0001-corrected_gpio_path_m2
 layers/meta-customer/recipes-appl/application/files/.0001-gpio_modification_from_508_to_5161.patch
 natives_gpio.txt
 core-image-minimal-arria10.rootfs-20260402211126.wic.gz
+0001-fourth_try_to_configure_eth_iface.patch
+layers/meta-intel-fpga/recipes-kernel/linux/config/0001-i2c-drivers-indtsi-ok-second.patch
+layers/meta-intel-fpga/recipes-kernel/linux/config/0001-i2c-drivers-in-dtsi-ok.patch
+layers/meta-intel-fpga/recipes-kernel/linux/config/.0001-test-add-two-change.patch
+layers/meta-intel-fpga/recipes-kernel/linux/config/0001-join-netconfig-i2c-dtsi-ok.patch
+layers/meta-intel-fpga/recipes-kernel/linux/config/0001-second-try-netconfig-i2c-ok.patch
+layers/meta-intel-fpga/recipes-kernel/linux/config/0001-third-try-join-netconfig-i2c.patch
+layers/meta-intel-fpga/recipes-kernel/linux/config/devtool-fragment.cfg

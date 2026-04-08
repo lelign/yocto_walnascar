@@ -1914,8 +1914,58 @@
         далее планы
                 определение и устанока IP через frontend
                 predictable RSA for SSH
-                
 
-        
-        
+        i2c example how to
+                https://emlogic.no/2025/06/accessing-i2c-devices-from-userspace-in-linux/
+
+
+#04_06 anton
+        изменил  /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+        devtool build linux-socfpga-lts => OK
+        bitbake core-image-minimal => OK
+        Комит пока не сделан, devtool не финиширован, необходимо посмтерть результат i2cdetect на 5161
+
+#07_04 anton
+        в /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+         добавил spi_dev@0 и spi_dev@1 в секция преобразователя i2c->spi sc18is602b
+        devtool build linux-socfpga-lts => OK
+        bitbake core-image-minimal => OK
+ #07_04 ign
+        долго мучился с патчами, еще раз убедился, что devtool modify подгружает исходники с уже примененными патчами
+        правим исходник с уже примененным патчем
+        example:
+        <for dtsi>
+        cp ~/dtsi_i2c.d/socfpga_arria10_socdk.dtsi_final \
+        /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+        <for menuconfig>
+        cp ~/dtsi_i2c.d/kernel_config \
+        /home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/linux-socfpga-lts/6.12.33-lts+git/linux-socfpga-lts-6.12.33-lts+git/.config
+        выполняем 
+                git add 
+                git commit 
+                devtool update-recipe linux-socfpga-lts
+                //devtool finish <recipe name> <layer>
+        bitbake core-image-minimal => OK
+        и да, в этом случае предыдущий патч будет удален, но он и должен быть удален, т.к. все изменения будут отражены в новом patch
+        важно : 
+                НЕ ЗАПУСКАТЬ  DEVTOOL В ДРУГОМ ТЕРМИНАЛЕ !!!
+
+        пришлось полностью сбросить рецепт и пересобрать все заново
+
+        # check on a10
+                ls /dev | grep spi
+                        spidev0.0
+                        spidev0.1
+                ls /dev | grep gpio
+                        gpiochip0
+                        gpiochip1
+                        gpiochip2
+                        gpiochip3
+                cat /sys/kernel/debug/gpio
+                        gpiochip1: GPIOs 528-543, parent: i2c/1-0021, 1-0021, can sleep:
+                        gpiochip2: GPIOs 544-547, parent: i2c/2-0041, 2-0041, can sleep:
+
+        актуальный патч для linux-socfpga-lts 
+                layers/meta-intel-fpga/recipes-kernel/linux/config/0001-third-try-join-netconfig-i2c.patch
+
 

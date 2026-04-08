@@ -1,0 +1,185 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright (C) 2015 Altera Corporation <www.altera.com>
+ */
+#include "socfpga_arria10.dtsi"
+
+/ {
+	model = "Altera SOCFPGA Arria 10";
+	compatible = "altr,socfpga-arria10-socdk", "altr,socfpga-arria10", "altr,socfpga";
+
+	aliases {
+		ethernet0 = &gmac2;
+		serial0 = &uart1;
+	};
+
+	chosen {
+		bootargs = "earlyprintk";
+		stdout-path = "serial0:115200n8";
+	};
+
+	memory@0 {
+		name = "memory";
+		device_type = "memory";
+		reg = <0x0 0x40000000>; /* 1GB */
+	};
+
+	soc {
+		clkmgr@ffd04000 {
+			clocks {
+				osc1 {
+					clock-frequency = <25000000>;
+				};
+			};
+		};
+	};
+};
+
+&gmac2 {
+	phy-mode = "rgmii-id";
+	phy-addr = <0xffffffff>; /* probe for phy addr */	
+	status = "okay";
+};
+
+&gpio1 {
+	status = "okay";
+};
+
+/****************** описасние шины i2c0, идущей непосредственно от HPS ******************
+	на ней находятся:
+		коммутатор x4 pca9546 D21 (mux@71)
+		преобразователь i2с->spi для общенис с микросхемой gs12170 (4K HDMI OUT) sc18is602b D43 (spi-bridge@28)
+		контроллер HDMI SN75DP159 (управляем из приложения, здесь в списке нет)
+		температурный сенсор SA56004 D16 (temp-sensor@48)
+
+	каждое устройтсво в дереве имеет параметр reg, это непосредственно адрес конкретного устройства на шине
+****************************************************************************************/
+&i2c0 {
+	status = "okay";
+	/*
+	 * adjust the falling times to decrease the i2c frequency to 50Khz
+	 * because the LCD module does not work at the standard 100Khz
+	 */
+	clock-frequency = <100000>;
+	i2c-sda-falling-time-ns = <6000>;
+	i2c-scl-falling-time-ns = <6000>;
+
+	/****************** коммутатор x4 pca9546 D21 mux@71 ******************/
+	/*преключает i2c на одну из 4 шин. Каждая шина обозначается как i2c@num, 
+	где num - номер шины*/
+	mux@71 {
+		compatible = "nxp,pca9546";
+		reg = <0x71>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		/****************** описание 1-й шины mux@71 ******************/
+		i2c@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+
+			/*********** gpio контроллер 1 на 16 пинов(на втором этаже) ***********/
+			pca9555a: pca9555@20 {
+				compatible = "nxp,pca9555";
+				gpio-controller;
+				#gpio-cells = <16>;
+				reg = <0x20>;
+			};
+
+			/*********** gpio контроллер 2 на 16 пинов (на втором этаже) ***********/
+			pca9555b: pca9555@21 {
+				compatible = "nxp,pca9555";
+				gpio-controller;
+				#gpio-cells = <16>;
+				reg = <0x21>;
+			};
+		};
+		/****************** описание 2-й шины mux@71 ******************/
+		i2c@1 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <1>;
+
+			/************** часы bq32000 D18 **************/
+			bq32000: rtc@68 {
+				compatible = "ti,bq32000";
+				trickle-resistor-ohms = <1120>;
+				reg = <0x68>;
+			};
+
+			/************** датчик температуры LM75 D22 **************/
+			lm75@49 {
+				reg = <0x49>;
+				compatible = "national,lm75b";
+			};
+
+			/************** измеритель тока ina219 D68 **************/
+			ina219@40 {
+				compatible = "ti,ina219";
+				reg = <0x40>;
+				shunt-resistor = <55000>;
+			};
+
+			/*********** gpio контроллер 2 на 4 пина, похоже контроль вентляторов D75 ***********/
+			pca9536: pca9536@41 {
+				compatible = "nxp,pca9536";
+				gpio-controller;
+				#gpio-cells = <4>;
+				reg = <0x41>;
+			};
+		};
+		/****************** описание 3-й шины mux@71 ******************/
+		/*на этой шине висит много sdi драйверов lmh0397/1297 и др. Будем работать
+		с ними из нашего приложения*/
+		i2c@2 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <2>;
+		};
+		/****************** описание 4-й шины mux@71 ******************/
+		i2c@3 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <3>;
+		};
+	};
+
+	/****************** преобразователь i2с->spi для общенис с микросхемой gs12170 (4K HDMI OUT) sc18is602b D43 (spi-bridge@28) ******************/
+	spi-bridge@28 {
+        compatible = "nxp,sc18is602b";
+        reg = <0x28>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+		spi_dev@0 {
+            compatible = "rohm,dh2228fv"; // или "linux,spidev"
+            reg = <0>; // Chip Select 0
+            spi-max-frequency = <1000000>;
+        };
+
+		spi_dev@1 {
+            compatible = "rohm,dh2228fv"; // или "linux,spidev
+            reg = <1>; // Chip Select 1
+            spi-max-frequency = <1000000>;
+        };
+	};
+
+	/****************** температурный сенсор SA56004 D16 (temp-sensor@48) ******************/
+	temp-sensor@48 {
+        compatible = "nxp,sa56004";
+        reg = <0x48>;
+    };
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&watchdog1 {
+	status = "okay";
+};
