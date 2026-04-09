@@ -102,5 +102,4 @@ layers/meta-intel-fpga/recipes-kernel/linux/config/0001-i2c-drivers-in-dtsi-ok.p
 layers/meta-intel-fpga/recipes-kernel/linux/config/.0001-test-add-two-change.patch
 layers/meta-intel-fpga/recipes-kernel/linux/config/0001-join-netconfig-i2c-dtsi-ok.patch
 layers/meta-intel-fpga/recipes-kernel/linux/config/0001-second-try-netconfig-i2c-ok.patch
-layers/meta-intel-fpga/recipes-kernel/linux/config/0001-third-try-join-netconfig-i2c.patch
 layers/meta-intel-fpga/recipes-kernel/linux/config/devtool-fragment.cfg
