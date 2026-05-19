@@ -1,0 +1,29 @@
+From 5eabef52b56d60a4526eeaaa556ff0ca21410b58 Mon Sep 17 00:00:00 2001
+From: lelign <ignatlelekin@gmail.com>
+Date: Wed, 13 May 2026 13:20:31 +0300
+Subject: [PATCH] commit-fpga-bridge-null
+Upstream-Status: Pending
+
+---
+ arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
+index 2994ad36ae54..4546ba9eaf7a 100644
+--- a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
++++ b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
+@@ -555,6 +555,14 @@ fpga_mgr: fpga-mgr@ffd03000 {
+ 			reset-names = "fpgamgr";
+ 		};
+ 
++		fpga_bridge0: fpga-bridge@ff200000 {
++			compatible = "altr,socfpga-lwhps2fpga-bridge";
++			reg = <0xff200000 0x100000>;
++			resets = <&rst 97>;
++			clocks = <&l4_main_clk>;
++			bridge-enable = <1>; /* Включить при загрузке */
++		};
++
+ 		i2c0: i2c@ffc02200 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;

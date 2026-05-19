@@ -1,0 +1,2 @@
+CONFIG_DMA_TEST=m  # Or =y to compile in
+CONFIG_DMADEVICES=y

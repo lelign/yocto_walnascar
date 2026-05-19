@@ -1968,4 +1968,530 @@
         актуальный патч для linux-socfpga-lts 
                 layers/meta-intel-fpga/recipes-kernel/linux/config/0001-third-try-join-netconfig-i2c.patch
 
+#09_04
+        Изменили значение shunt-resistor для измерителя ina_219 в socfpga_arria10_socdk.dtsi (50000 -> 15000)
+        Через menuconfig утсановили CONFIG_SENSORS_INA2XX=y для корректной работы драйвера ina_219 (до этого подключался драйвер ADC)
+        Внутри devtool не делали новый комит, а обновили предыдущий с помощью git commit --amend
+        В результате devtool finish linux-socfpga-ltx meta-intel-fpga => OK, без удаления предыдущего патча
+
+#12_04   добавил новый архив с исходниками pbx-mtv-5161-12.04 (с актуальными значениями gpio, hwmon, /var/volatile)
+                изменил pbx-mtv-5161.sh
+                добавил рецепт pbx-mtv5161_12.04.bb
+                bitbake pbx-mtv-5161 <= OK
+                изменил local.conf
+                bitbake core-image-minimal <= OK
+                #check on a10 <= OK
+                добавил RSA KEY для SSH, рецепт собрался на img не проверял
+
+#13_04  проверил образ с RSA KEY для SSH <= ОК
+
+#08_05 изменил ссылки для 
+        file
+        /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/\
+                ghrd/files/arria10_gsrd_ghrd_10as066n2.core.rbf
+        symbolic link to 
+        /home/iru/Quartus_Projects/AR_PROV4_VIC/core_periph/arria10_gsrd_ghrd_10as066n2.core.rbf
+
+        ... periph
+
+        file
+        /home/iru/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/\
+                ghrd/files/arria10_gsrd_hps.xml
+        symbolic link to
+        home/iru/Quartus_Projects/AR_PROV4_VIC/hps_isw_handoff/hps.xml
+
+#08_05 kernel modules
+        on 508
+        lsmod
+                Module                  Size  Used by
+                ts_in                   4865  0
+                str_mem                 2886  0
+                mtv_overlay             4108  0
+        cat /proc/modules
+                ts_in 4865 0 - Live 0xbf009000 (O)
+                str_mem 2886 0 - Live 0xbf000000 (O)
+                mtv_overlay 4108 0 - Live 0xbf002000 (O)
+
+        modinfo ts_in
+                filename:       /lib/modules/4.9.78-ltsi-altera/kernel/profitt/ts-in.ko
+                license:        GPL
+                alias:          of:N*T*Cpfrt,tsinC*
+                alias:          of:N*T*Cpfrt,tsin
+
+        modinfo str_mem
+                filename:       /lib/modules/4.9.78-ltsi-altera/kernel/profitt/str-mem.ko
+                license:        GPL
+                alias:          of:N*T*Cpfrt,str-memC*
+                alias:          of:N*T*Cpfrt,str-mem
+                depends:        
+                vermagic:       4.9.78-ltsi-altera SMP mod_unload ARMv7 p2v8 
+
+        modinfo mtv_overlay
+                filename:       /lib/modules/4.9.78-ltsi-altera/kernel/profitt/mtv-overlay.ko
+                license:        GPL
+                alias:          of:N*T*Cpfrt,overlayC*
+                alias:          of:N*T*Cpfrt,overlay
+                depends:        
+                vermagic:       4.9.78-ltsi-altera SMP mod_unload ARMv7 p2v8
+
+        ls /lib/modules/4.9.78-ltsi-altera/kernel/*
+                /lib/modules/4.9.78-ltsi-altera/kernel/crypto:
+                drbg.ko               hmac.ko               sha256_generic.ko
+                echainiv.ko           jitterentropy_rng.ko
+
+                /lib/modules/4.9.78-ltsi-altera/kernel/drivers:
+                char  gpio  misc  usb
+
+                /lib/modules/4.9.78-ltsi-altera/kernel/profitt:
+                mtv-overlay.ko  str-mem.ko      ts-in.ko        ts-out-2.ko     ts-out.ko
+
+
+        on a_10
+                lsmod
+                        Module                  Size  Used by
+
+                ls /lib/modules/6.12.33-altera-gf567a356a4dc/kernel/*
+
+                /lib/modules/6.12.33-altera-gf567a356a4dc/kernel/drivers
+                char  dma   i2c   misc  net   nvme  usb
+
+08_05_anton
+
+        on ar10
+        root@arria10:~# lsmod
+        Module                  Size  Used by
+        root@arria10:~# find /lib/modules -name "*.ko"
+        /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/profitt/mtv-overlay.ko
+        /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/drivers/net/mdio.ko
+        /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/drivers/net/ethernet/intel/ixgbe/ixgbe.ko
+        /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/drivers/net/ethernet/intel/igb/igb.ko
+        /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/drivers/net/ethernet/intel/e1000e/e1000e.ko
+        /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/drivers/char/hw_random/rng-core.ko
+        /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/drivers/i2c/algos/i2c-algo-bit.ko
+        /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/drivers/usb/gadget/libcomposite.ko
+        /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/drivers/usb/gadget/legacy/g_mass_storage.ko
+        /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/drivers/usb/gadget/function/usb_f_mass_storage.ko
+        /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/drivers/nvme/host/nvme.ko
+        /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/drivers/nvme/host/nvme-core.ko
+        /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/drivers/misc/altera_ilc.ko
+        /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/drivers/misc/altera_sysid.ko
+        /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/drivers/dma/dmatest.ko
+        root@arria10:~# modinfo mtv-overlay
+        filename:       /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/profitt/mtv-overlay.ko
+        description:    Simple Hello World Kernel Module
+        author:         Your Name
+        license:        GPL
+        alias:          of:N*T*Cpfrt,overlayC*
+        alias:          of:N*T*Cpfrt,overlay
+        depends:
+        name:           mtv_overlay
+        vermagic:       6.12.33-altera-gf567a356a4dc-dirty SMP mod_unload ARMv7 p2v8
+        root@arria10:~# modprobe mtv-overlay
+        modprobe: ERROR: could not insert 'mtv_overlay': No such device
+        root@arria10:~# insmod /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/profitt/mtv-overlay.ko
+        insmod: ERROR: could not insert module /lib/modules/6.12.33-altera-gf567a356a4dc-dirty/kernel/profitt/mtv-overlay.ko: No such device
+        root@arria10:~# ls /proc/device-tree/ | grep pfrt
+
+        Далее ИИ говорит, что нужно устройство overlay в dts, он его не находит, поэтому модуль не добавляется
+        Запустил devtool modify linux-socfpga-lts
+        !!!Добавил в local_conf ERROR_QA:remove = "version-going-backwards" Наверное лучше удалить потом
+        Изменил /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+        Но при сборке мои изменения игнорируюся
+
+11_05_ign
+        разбирался с применением.наложением.добавлением патчей на примере рецепта hello-world-c
+        devtool modify hello-world-c
+        code -n /home/iru/poky-socfpga/build/workspace/sources/hello-world-c
+        редактирую строку в исходнике hello-world-c.c   :
+                from
+                printf("Hello, World with c!\\n");
+                to
+                printf("Hello, World with c!\\nadded path first\n\n");
+        git commit <added-path-first>
+        devtool update-recipe hello-world-c
+        сооттветсвующий патч появился в /home/iru/*/*/*/meta-customer/recipes-hello-world/hello-world-c/files
+        появилась запись <file://0001-added-path-first.patch> в hello-world-c_1.0.bb
+        add <Upstream-Status: Pending> into file <0001-added-path-first.patch>
+        bitbake hello-world-c -c do_patch -DDD | grep "do_patch: Using"
+                DEBUG: hello-world-c-1.0-r7 do_patch: 
+                Using .../0001-added-path-first.patch for hello-world-c.c
+
+        OK!
+        devtool finish hello-world-c meta-customer
+
+        итак у нас есть рецепт включающий в себя исходник и патч для этого исходника
+        повторим еще раз
+        devtool modify hello-world-c
+        code -n /home/iru/poky-socfpga/build/workspace/sources/hello-world-c
+        вижу что исходник загружен в devtool c уже примененным патчем <added-path-first>
+        редактирую строку в исходнике hello-world-c.c   :
+                from
+                printf("Hello, World with c!\\nadded path first\n\n");
+                to
+                printf("Hello, World with c!\\nadded path first\n\nadded path second\n\n");
+        git commit <added-path-second>
+        devtool update-recipe hello-world-c
+        сооттветсвующий патч появился в /home/iru/*/*/*/meta-customer/recipes-hello-world/hello-world-c/files
+        появилась запись <file://0001-added-path-second.patch> в hello-world-c_1.0.bb
+        devtool finish hello-world-c meta-customer
+        add <Upstream-Status: Pending> into file <0001-added-path-second.patch>
+        bitbake hello-world-c -c do_patch -DDD | grep "do_patch: Using"
+                DEBUG: hello-world-c-1.0-r7 do_patch: 
+                Using .../0001-added-path-first.patch for 0001-added-path-first.patch
+                Using .../0001-added-path-second.patch for 0001-added-path-second.patch
+
+        ОК
+        итак у нас есть рецепт включающий в себя исходник и ДВА патча для этого исходника
+
+        повторил для третьего и четвертого патчей
+
+        SRC_URI = "file://hello-world-c.c \
+           file://0001-added-path-first.patch \
+           file://0001-added-path-second.patch \
+           file://0001-added-path-third.patch \
+           file://0001-path-fourth.patch \
+           "
+        bitbake hello-world-c -c do_patch -DDD | grep "do_patch: Using"
+                DEBUG: hello-world-c-1.0-r7 do_patch: 
+                Using .../0001-added-path-first.patch for 0001-added-path-first.patch
+                Using .../0001-added-path-second.patch for 0001-added-path-second.patch
+                и т.д.
+        ОК все получается
+
+        Непонятно
+                еще раз 
+                        devtool modify hello-world-c
+                вижу что исходник загружен в devtool c уже примененными 4шт патчамим <added-path-1 2 3 4>
+                        devtool build hello-world-c
+                вижу что у devtool в исходнике теперь 
+                        printf("Hello, World with c!\\n");  <= нет патчей!!!
+                патчи как файлы на месте
+                git status
+                        On branch devtool
+                        Changes not staged for commit:
+                        (use "git add <file>..." to update what will be committed)
+                        (use "git restore <file>..." to discard changes in working directory)
+                !!! я не изменял этот файл  =>      modified:   hello-world-c.c
+
+                        Untracked files:
+                        (use "git add <file>..." to include in what will be committed)
+                это понятно      hello-world-c
+
+                bitbake hello-world-c -c do_patch -DDD | grep "do_patch: Using"
+        !!!     ERROR: Task do_patch does not exist for target hello-world-c
+                теперь у рецепта нет патчей!
+
+                devtool reset hello-world-c
+                bitbake -c clean hello-world-c
+                bitbake hello-world-c -c do_patch -DDD | grep "do_patch: Using"
+                        DEBUG: hello-world-c-1.0-r7 do_patch: 
+                        Using .../0001-added-path-first.patch for 0001-added-path-first.patch
+                        Using .../0001-added-path-second.patch for 0001-added-path-second.patch
+                        и т.д.
+                патчи вернулись на место !!!
+
+        Прихожу к выводу, что Антон, возможно, убил актуальные патчи для linux-socfpga-lts
+        выполнив команду 
+                devtool build linux-socfpga-lts
+        по этой же причине и светодиоды перестали моргать
+        но можно откатить ситуацию посредством 
+                devtool reset linux-socfpga-lts
+
+        начали
+                devtool reset linux-socfpga-lts <= OK
+                devtool modify linux-socfpga-lts
+
+        во как!!!
+                WARNING: SRC_URI is conditionally overridden in this recipe, thus several devtool-override-* branches have been created, one for each override that makes changes to SRC_URI. 
+                It is recommended that you make changes to the devtool branch first, then checkout and rebase each devtool-override-* branch and update any unique patches there 
+                (duplicates on those branches will be ignored by devtool finish/update-recipe)
+                INFO: Recipe linux-socfpga-lts now set up to build from /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts
+
+        devtoll патч не применил!!!
+                devtoll reset linux-socfpga-lts
+
+        проверяем использование патча bitbake
+                bitbake -c do_patch linux-socfpga-lts -DDD
+                        DEBUG: linux-socfpga-lts-6.12.33-lts+git-r7 do_patch: 
+                        Using /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/config/0001-third-try-join-netconfig-i2c.patch 
+                        for 0001-third-try-join-netconfig-i2c.patch
+
+        патч жив и применяется
+
+        еще раз старт devtool
+                devtool modify linux-socfpga-lts  <= NO WARNINGS
+
+        исходники загружены devtool с применением патча !
+        попробую через bbappend
+        внес изменения в arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+                git status
+                        modified:   arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+                git add .
+                git commit -m "commit-overlay"
+                        [socfpga-6.12.33-lts c22ad11aea77] commit-overlay
+                        1 file changed, 6 insertions(+)
+                devtool update-recipe -a /home/iru/poky-socfpga/poky/layers/meta-intel-fpga linux-socfpga-lts
+                        NOTE: Writing append file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bbappend
+                        NOTE: Copying 0001-commit-overlay.patch to /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts/0001-commit-overlay.patch
+        
+        предыдущий патч сохранен, 
+        добавлен layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bbappend
+        добавлен layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts/0001-commit-overlay.patch
+        
+                devtool reset linux-socfpga-lts <= OK все на месте
+
+                bitbake -c do_patch linux-socfpga-lts -DDD
+                        DEBUG: linux-socfpga-lts-6.12.33-lts+git-r7 
+                        do_patch: Using /home/iru/poky-soscfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/config/0001-third-try-join-netconfig-i2c.patch 
+                                for 0001-third-try-join-netconfig-i2c.patch
+                        
+                        DEBUG: linux-socfpga-lts-6.12.33-lts+git-r7 
+                        do_patch: Using /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts/0001-commit-overlay.patch 
+                                for 0001-commit-overlay.patch
+
+        оба патча применены! 
+        вывод
+         перед добавлением патча нужно запускать bitbake на соотв рецепте?
+
+        bitbake linux-socfpga-lts <= OK 
+        bitbake core-image-minimal <= OK 
+
+        check on a10
+                ЛАМПОЧКИ МИГАЮТ
+                lsmod
+                        Module                  Size  Used by
+
+                find /lib/modules -name "*.ko" 
+                        ...
+                        /lib/modules/6.12.33-altera-gd6c2ac5ac5e0/kernel/profitt/mtv-overlay.ko
+
+                modinfo mtv-overlay
+                        filename:       /lib/modules/6.12.33-altera-gd6c2ac5ac5e0/kernel/profitt/mtv-overlay.ko
+                        description:    Simple Hello World Kernel Module
+                        author:         Your Name
+                        license:        GPL
+                        alias:          of:N*T*Cpfrt,overlayC*
+                        alias:          of:N*T*Cpfrt,overlay
+                        depends:        
+                        name:           mtv_overlay
+                        vermagic:       6.12.33-altera-gd6c2ac5ac5e0 SMP mod_unload ARMv7 p2v8
+
+                modprobe mtv-overlay
+                        modprobe: ERROR: could not insert 'mtv_overlay': No such device
+
+                ls /proc/device-tree -l
+                        /proc/device-tree -> /sys/firmware/devicetree/base
+
+                ls /sys/firmware/devicetree/base/* | grep overlay
+                        overlay@0xFF202880 <= directory
+                
+                ls /sys/firmware/devicetree/base/soc/overlay@0xFF202880
+                        compatible  interrupts  name        reg                 <= reg files
+
+                cat /sys/firmware/devicetree/base/soc/overlay@0xFF202880/compatible
+        !!! =>         pfrt,overlay
+                cat /sys/firmware/devicetree/base/soc/overlay@0xFF202880/name
+                        overlay
+
+                cat /sys/firmware/devicetree/base/soc/overlay@0xFF202880/interrupts
+        ???                (
+
+                cat /sys/firmware/devicetree/base/soc/overlay@0xFF202880/reg
+        ???                � (�0
+
+
+                dmesg
+                        [  123.072908] sysfs: cannot create duplicate filename '/class/mtv-overlay'
+                        [  123.079702] CPU: 0 UID: 0 PID: 323 Comm: modprobe Tainted: G        W  O       6.12.33-altera-gd6c2ac5ac5e0 #1
+                        [  123.079729] Tainted: [W]=WARN, [O]=OOT_MODULE
+                        [  123.079733] Hardware name: Altera SOCFPGA Arria10
+                        [  123.079741] Call trace: 
+                        [  123.079750]  unwind_backtrace from show_stack+0x18/0x1c
+                        [  123.079798]  show_stack from dump_stack_lvl+0x54/0x68
+                        [  123.079825]  dump_stack_lvl from sysfs_warn_dup+0x60/0x6c
+                        [  123.079858]  sysfs_warn_dup from sysfs_create_dir_ns+0x100/0x110
+                        [  123.079885]  sysfs_create_dir_ns from kobject_add_internal+0xb0/0x2b8
+                        [  123.079911]  kobject_add_internal from kset_register+0x5c/0xa0
+                        [  123.079928]  kset_register from class_register+0xd8/0x158
+                        [  123.079955]  class_register from class_create+0x44/0x6c
+                        [  123.079975]  class_create from mtv_overlay_init+0x30/0x78 [mtv_overlay]
+                        [  123.080006]  mtv_overlay_init [mtv_overlay] from do_one_initcall+0x60/0x210
+                        [  123.080033]  do_one_initcall from do_init_module+0x5c/0x228
+                        [  123.080058]  do_init_module from init_module_from_file+0x9c/0xd8
+                        [  123.080080]  init_module_from_file from sys_finit_module+0x1fc/0x308
+                        [  123.080103]  sys_finit_module from ret_fast_syscall+0x0/0x54
+                        [  123.080120] Exception stack(0xf0a2dfa8 to 0xf0a2dff0)
+                        [  123.080132] dfa0:                   0047a240 0047a240 00000003 00473198 00000000 00000000
+                        [  123.080143] dfc0: 0047a240 0047a240 00000000 0000017b 00000000 0047a320 00000001 00000000
+                        [  123.080152] dfe0: bed57880 bed57870 0046e9e7 b6c8f512
+                        [  123.080197] kobject: kobject_add_internal failed for mtv-overlay with -EEXIST, don't try to register things with the same name in the same directory.
+                        [  123.223338] Failed to request mem region for dma_reg interface
+                        [  123.229178] mtv-overlay ff202880.overlay: probe with driver mtv-overlay failed with error -1
+
+        file   0001-commit-overlay.patch                      
+        +		overlay@0xFF202880 {
+        +			compatible = "pfrt,overlay";
+        +			reg = <0xFF202880 0x0030>;
+        +			interrupts = <0x0 0x28 0x4>;
+        +		};
+
+12_05 ign
+        created hello-world-module
+        check on a10
+                depmod -a
+                modprobe hello
+                lsmod
+                        Module                  Size  Used by
+                        hello                  12288  0
+
+
+        OK it's work
+
+        II Lightweight HPS-to-FPGA (LWHPS2FPGA) на Intel Arria 10 
+                cat /sys/class/fpga_bridge/br0/state
+                        # Должно быть "enabled"
+                                cat: can't open '/sys/class/fpga_bridge/br0/state': No such file or directory
+
+                Убедитесь, что при сборке ядра (через Yocto bitbake -c menuconfig virtual/kernel) включены следующие опции:
+                CONFIG_FPGA=y
+                CONFIG_FPGA_BRIDGE=y
+                CONFIG_FPGA_MGR_ALTERA_CVP=y (или аналогичный для Arria 10)
+                CONFIG_FPGA_BRIDGE_ALTERA_FPGAMGR=y
+
+                bitbake -c menuconfig virtual/kernel
+
+
+                cat /sys/class/fpga_manager/fpga0/state
+                        operating
+                                Раз статус operating, значит, FPGA успешно прошита и находится в рабочем режиме (User Mode). 
+                                Это отличная новость — аппаратная часть готова к общению.Отсутствие /sys/class/fpga_bridge при живом fpga_manager 
+                                говорит о том, что в дереве устройств (Device Tree) просто не описаны узлы мостов или не загружен соответствующий драйвер моста.
+                                Однако, раз FPGA в operating, вы можете активировать шину LWHPS "грубой силой" прямо сейчас, чтобы ваш модуль заработ
+
+                busybox add devmem2 <= NG
+                local.conf devmem2
+                bitbake core-image-minimal
+
+
+                on a10
+                cat /sys/class/fpga_manager/fpga0/state
+                        operating
+                devmem2 0xff200000 (Тест связи (без модуля))
+                        /dev/mem opened.
+                        Memory mapped at address 0xb6f18000.
+                        Read at address  0xFF200000 (0xb6f18000): 0x00000000
+
+                II Это отличный результат! 
+                Раз devmem2 выдал 0x00000000 вместо ошибки или зависания системы, это подтверждает три вещи:
+                1 Мост LWHPS активен: Сброс с него снят, и шина пропускает транзакции.
+                2 FPGA доступна: Ядро по адресу 0xFF200000 ответило на запрос (хотя и вернуло ноль).
+                3 Система стабильна: Обращение к физическому адресу прошло успешно.
+
+                Попробуйте записать и прочитать
+
+                devmem2 0xff200000 w 0xDEADBEEF
+                        /dev/mem opened.
+                        Memory mapped at address 0xb6fc9000.
+                        Read at address  0xFF200000 (0xb6fc9000): 0x00000000
+                        Write at address 0xFF200000 (0xb6fc9000): 0xDEADBEEF, readback 0xDEADBEEF
+                devmem2 0xff200000
+                        /dev/mem opened.
+                        Memory mapped at address 0xb6f3c000.
+                        Read at address  0xFF200000 (0xb6f3c000): 0xDEADBEEF
+
+                ВРУЧНУЮ РАБОТАЕТ
+15_05 ign
+        посредством камлания и танца с бубном скомпилировал и добавил к ядру модули
+        str-mem && ts-in
+        много изменений в исходниках, не во всех уверен...
+        в исходном Makefile предусмотрена также сборка бинарников ts-out && ts-out2
+        в pbx-mtv-508 таких модулей нет, да и собрать конкретно ts-out && ts-out2
+        посредством Yocto не удалось, хотя devshell их собирает без проблем
+        на а10 не прверял, вижу только что в deploy в файле манифеста 
+        core-image-minimal-arria10.rootfs.manifest от 05/15/2026 00:24 они указаны
+        dts dtsi не правил
+        
+17_05 ign
+	Для того, чтобы убедиться, что правильно понимаю способ общения по 
+	Lightweight HPS-to-FPGA (LWH2F) bus via AXI interface
+	собрал под toolchain Yocto-Rocko (pbx-mtv-508) утилиту devmem и установил
+	ее на устройство pbx-mtv-508
+	добавил в приложение pbx-mtv-508 вывод сообщений в терминал об обращении к <reg_read>
+	uint32_t PbxMtvSystem::reg_read(uint32_t block, uint32_t addr)
+	результат сравнения:
+		address 0xFF203000 <= is REG_BUILDID (ff203000-ff20307f 128 байт)
+			get_build_id() 1442068 "220120"
+			./devmem 0xFF203000
+			    0x00160114 (16) == 1442068 (10)
+
+	       address 0xFF209000 <= is REG_SDI_ADAPTER (ff209000-ff20907f 128 байт)
+			video exist on input 1
+			    read_sdi_format() 20 index 0
+			    ./devmem 0xFF209000
+				0x00000014 (16) == 20 (10)
+
+			video exist on input 2
+			    read_sdi_format() 20 index 1
+			    ./devmem 0xFF209001
+				0x14000000
+			    ./devmem 0xFF209002
+				0x00140000
+			    ./devmem 0xFF209003
+				0x00001400
+			    ./devmem 0xFF209004
+				0x00000014 (16) == 20 (10)
+
+			video exist on input 3     
+			    read_sdi_format() 20 index 2
+			    ./devmem 0xFF209008
+				0x00000014 (16) == 20 (10)
+				
+			video exist on input 8     
+			    read_sdi_format() 20 index 7
+			    ./devmem 0xFF20901c  (28)
+				0x00000014 (16) == 20 (10)
+		вывод:		
+		приложение через драйвер модуля str-mem и утилита devmem читают одно и то-же
+		
+	В Yocto-walnascar добавил рецепт read_mem (как исходник использовал mtv-system из pbx-mtv-508)
+	в нем
+			enum {
+				REG_BEGINNING,
+				REG_MIDDLE,
+				REG_END,
+				и еще 40 записей
+				}
+	Исправил arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+			strmem {
+				compatible = "pfrt,str-mem";
+				reg = <0xFF200000 0x80>, // REG_BEGINNING
+				<0xFF200200 0x80>, // REG_MIDDLE
+				<0xFF2003ff 0x04>; // REG_END				
+				};
+	Собрал образ, проерка в составе а10	 
+		devmem2 0xFF200000
+									0xAAAAAAAA
+		devmem2 0xFF200200
+									0xA5A5A5A5
+		devmem2 0xFF2003ff
+									0x55555555	
+		read_mem
+			 read-mem: REG_BEGINNING	2863311530 	0xaaaaaaaa		ок
+			 read-mem: REG_MIDDLE	 	2779096485 	0xa5a5a5a5		ок
+			 read-mem: REG_END	 	2863311445 	0xaaaaaa55		???
+	
+	
+		
+19_05 ign
+        ссылки YOCTO core, periph, hps.xml
+                $HOME/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_hps.xml
+                $HOME/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_ghrd_10as066n2.core.rbf
+                $HOME/poky-socfpga/poky/layers/meta-intel-fpga-refdes/recipes-bsp/ghrd/files/arria10_gsrd_ghrd_10as066n2.periph.rbf
+
+        создаются скриптом
+        $HOME/a10_flow_u-boot_28_10/generate_core_and_periph_from_quartus.sh
+	
+
+                
+
 

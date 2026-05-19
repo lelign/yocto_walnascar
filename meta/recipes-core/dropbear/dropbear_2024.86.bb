@@ -22,6 +22,7 @@ SRC_URI = "http://matt.ucc.asn.au/dropbear/releases/dropbear-${PV}.tar.bz2 \
            ${@bb.utils.contains('DISTRO_FEATURES', 'pam', '${PAM_SRC_URI}', '', d)} \
            ${@bb.utils.contains('PACKAGECONFIG', 'disable-weak-ciphers', 'file://dropbear-disable-weak-ciphers.patch', '', d)} \
            file://CVE-2025-47203.patch \
+		   file://dropbear_rsa_host_key \
            "
 
 SRC_URI[sha256sum] = "e78936dffc395f2e0db099321d6be659190966b99712b55c530dd0a1822e0a5e"
@@ -111,6 +112,11 @@ do_install() {
 		-e 's,@BINDIR@,${bindir},g' \
 		-e 's,@SBINDIR@,${sbindir},g' \
 		${D}${systemd_system_unitdir}/dropbear.socket ${D}${systemd_system_unitdir}/*.service
+	
+}
+
+do_install:append() {
+    install -m 0600 ${UNPACKDIR}/dropbear_rsa_host_key ${D}${sysconfdir}/dropbear/
 }
 
 inherit update-alternatives
@@ -132,3 +138,5 @@ pkg_postrm:${PN} () {
 CONFFILES:${PN} = "${sysconfdir}/default/dropbear"
 
 FILES:${PN} += "${systemd_system_unitdir}/dropbearkey.service"
+FILES:${PN} += "${sysconfdir}/dropbear/dropbear_rsa_host_key"
+

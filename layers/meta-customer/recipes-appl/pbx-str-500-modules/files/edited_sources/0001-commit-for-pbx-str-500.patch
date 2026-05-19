@@ -1,0 +1,187 @@
+From b65a821c7e3e0bb1d170896bed84a70945b1ef9a Mon Sep 17 00:00:00 2001
+From: lelign <ignatlelekin@gmail.com>
+Date: Thu, 14 May 2026 21:11:25 +0300
+Subject: [PATCH] commit-for-pbx-str-500
+Upstream-Status: Pending
+
+---
+ str-mem.c  |  9 ++++++---
+ ts-in.c    | 13 +++++++++----
+ ts-out-2.c | 13 +++++++++----
+ ts-out.c   | 13 +++++++++----
+ 4 files changed, 33 insertions(+), 15 deletions(-)
+
+diff --git a/str-mem.c b/str-mem.c
+index 1203d5f..3f080fe 100644
+--- a/str-mem.c
++++ b/str-mem.c
+@@ -154,9 +154,11 @@ long strmem_ioctl(struct file *filp,
+         return 0;
+ }
+ 
+-int str_mem_remove(struct platform_device *pdev)
++void str_mem_remove(struct platform_device *pdev)
+ {
+-        return 0;
++        // return 0;
++        // ... your cleanup code ...
++        // No return statement needed
+ }
+ 
+ MODULE_DEVICE_TABLE(of, str_mem_of_match);
+@@ -172,7 +174,8 @@ static struct platform_driver str_mem_driver = {
+ 
+ static int str_mem_init(void)
+ {
+-        board_info_grob.strmem_class = class_create(THIS_MODULE, DRV_NAME);
++        //board_info_grob.strmem_class = class_create(THIS_MODULE, DRV_NAME); // ign
++        board_info_grob.strmem_class = class_create(DRV_NAME);
+         board_info_grob.strmem_major = register_chrdev(0, DRV_NAME, &strmem_fops);
+ 
+         return platform_driver_probe(&str_mem_driver, str_mem_probe);
+diff --git a/ts-in.c b/ts-in.c
+index 05a963b..e4d46eb 100644
+--- a/ts-in.c
++++ b/ts-in.c
+@@ -288,7 +288,8 @@ int tsin_probe(struct platform_device *pdev)
+         return 0;
+ }
+ 
+-int tsin_remove(struct platform_device *pdev)
++/*int tsin_remove(struct platform_device *pdev)*/
++void tsin_remove(struct platform_device *pdev)
+ {
+         struct board_info * board = platform_get_drvdata(pdev);
+ 
+@@ -299,11 +300,12 @@ int tsin_remove(struct platform_device *pdev)
+         // dma memory reg
+         iounmap(board->lwh2f);
+         release_mem_region(board->mem_start, board->mem_size);
+-        return 0;
++        // return 0; // ign
+ }
+ 
+ static struct platform_driver tsin_driver = {
+-        .remove = tsin_remove,
++        /*.remove = tsin_remove,*/
++        .remove = 0,
+         .driver = {
+                 .name   = DRV_NAME,
+                 .owner  = THIS_MODULE,
+@@ -337,14 +339,17 @@ static void dma_audio_post(struct board_info * board, int index)
+ static int tsin_init(void)
+ {
+         printk("%s\n", __FUNCTION__);
+-        board_info_grob.tsin_class = class_create(THIS_MODULE, DRV_NAME);
++        /*board_info_grob.tsin_class = class_create(THIS_MODULE, DRV_NAME);*/ // ign
++        board_info_grob.tsin_class = class_create(DRV_NAME);
+         board_info_grob.tsin_major = register_chrdev(0, DRV_NAME, &tsin_fops);
++        tsin_remove; // ign
+         return platform_driver_probe(&tsin_driver, tsin_probe);
+ }
+ 
+ static void tsin_exit(void)
+ {
+         printk("%s\n", __FUNCTION__);
++        tsin_remove; // ign
+         platform_driver_unregister(&tsin_driver);
+         unregister_chrdev(board_info_grob.tsin_major, DRV_NAME);
+         class_destroy(board_info_grob.tsin_class);
+diff --git a/ts-out-2.c b/ts-out-2.c
+index 07658ff..80d7ede 100644
+--- a/ts-out-2.c
++++ b/ts-out-2.c
+@@ -435,7 +435,8 @@ int tsout_probe(struct platform_device *pdev)
+         return 0;
+ }
+ 
+-int tsout_remove(struct platform_device *pdev)
++/*int tsout_remove(struct platform_device *pdev)*/ // ign
++void tsout_remove(struct platform_device *pdev)
+ {
+         struct board_info * board = platform_get_drvdata(pdev);
+ 
+@@ -446,13 +447,14 @@ int tsout_remove(struct platform_device *pdev)
+         // dma memory reg
+         iounmap(board->dma_reg);
+         release_mem_region(board->mem1_start, board->mem1_size);
+-        return 0;
++        //return 0; // ign
+ }
+ 
+ MODULE_DEVICE_TABLE(of, tsout_of_match);
+ 
+ static struct platform_driver tsout_driver = {
+-        .remove = tsout_remove,
++        /*.remove = tsout_remove,*/
++        .remove = 0, // ign
+         .driver = {
+                 .name   = DRV_NAME,
+                 .owner  = THIS_MODULE,
+@@ -462,13 +464,16 @@ static struct platform_driver tsout_driver = {
+ 
+ static int tsout_init(void)
+ {
+-        board_info_grob.tsout_class = class_create(THIS_MODULE, DRV_NAME);
++        /*board_info_grob.tsout_class = class_create(THIS_MODULE, DRV_NAME);*/ // ign
++        board_info_grob.tsout_class = class_create(DRV_NAME);
+         board_info_grob.tsout_major = register_chrdev(0, DRV_NAME, &tsout_fops);
++        tsout_remove; // ign
+         return platform_driver_probe(&tsout_driver, tsout_probe);
+ }
+ 
+ static void tsout_exit(void)
+ {
++        tsout_remove; // ign
+         platform_driver_unregister(&tsout_driver);
+         unregister_chrdev(board_info_grob.tsout_major, DRV_NAME);
+         class_destroy(board_info_grob.tsout_class);
+diff --git a/ts-out.c b/ts-out.c
+index 8472dd0..6c4e4ad 100644
+--- a/ts-out.c
++++ b/ts-out.c
+@@ -359,7 +359,8 @@ int tsout_probe(struct platform_device *pdev)
+         return 0;
+ }
+ 
+-int tsout_remove(struct platform_device *pdev)
++/*int tsout_remove(struct platform_device *pdev)*/ // ign
++void tsout_remove(struct platform_device *pdev)
+ {
+         struct board_info * board = platform_get_drvdata(pdev);
+ 
+@@ -369,13 +370,14 @@ int tsout_remove(struct platform_device *pdev)
+         // dma memory reg
+         iounmap(board->dma_reg);
+         release_mem_region(board->mem1_start, board->mem1_size);
+-        return 0;
++        // return 0; // ign
+ }
+ 
+ MODULE_DEVICE_TABLE(of, tsout_of_match);
+ 
+ static struct platform_driver tsout_driver = {
+-        .remove = tsout_remove,
++        /*.remove = tsout_remove,*/ // ign
++        .remove = 0,
+         .driver = {
+                 .name   = DRV_NAME,
+                 .owner  = THIS_MODULE,
+@@ -385,13 +387,16 @@ static struct platform_driver tsout_driver = {
+ 
+ static int tsout_init(void)
+ {
+-        board_info_grob.tsout_class = class_create(THIS_MODULE, DRV_NAME);
++        // board_info_grob.tsout_class = class_create(THIS_MODULE, DRV_NAME); // ign
++        board_info_grob.tsout_class = class_create(DRV_NAME);
+         board_info_grob.tsout_major = register_chrdev(0, DRV_NAME, &tsout_fops);
++        tsout_remove; // ign
+         return platform_driver_probe(&tsout_driver, tsout_probe);
+ }
+ 
+ static void tsout_exit(void)
+ {
++        tsout_remove; // ign
+         platform_driver_unregister(&tsout_driver);
+         unregister_chrdev(board_info_grob.tsout_major, DRV_NAME);
+         class_destroy(board_info_grob.tsout_class);
