@@ -1,0 +1,306 @@
+From 4defd674d398e6bb7fedae862a1094aab01d3c9b Mon Sep 17 00:00:00 2001
+From: lelign <ignatlelekin@gmail.com>
+Date: Wed, 8 Apr 2026 00:47:32 +0300
+Subject: [PATCH] third-try-join-netconfig-i2c
+Upstream-Status: Pending
+
+---
+ .../intel/socfpga/socfpga_arria10_socdk.dtsi  | 241 ++++++++----------
+ 1 file changed, 113 insertions(+), 128 deletions(-)
+
+diff --git a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+index 98dc3f00c642..9f16f7f85ff7 100644
+--- a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
++++ b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+@@ -9,7 +9,7 @@ / {
+ 	compatible = "altr,socfpga-arria10-socdk", "altr,socfpga-arria10", "altr,socfpga";
+ 
+ 	aliases {
+-		ethernet0 = &gmac0;
++		ethernet0 = &gmac2;
+ 		serial0 = &uart1;
+ 	};
+ 
+@@ -24,37 +24,6 @@ memory@0 {
+ 		reg = <0x0 0x40000000>; /* 1GB */
+ 	};
+ 
+-	a10leds {
+-		compatible = "gpio-leds";
+-
+-		a10sr_led0 {
+-			label = "a10sr-led0";
+-			gpios = <&a10sr_gpio 0 1>;
+-		};
+-
+-		a10sr_led1 {
+-			label = "a10sr-led1";
+-			gpios = <&a10sr_gpio 1 1>;
+-		};
+-
+-		a10sr_led2 {
+-			label = "a10sr-led2";
+-			gpios = <&a10sr_gpio 2 1>;
+-		};
+-
+-		a10sr_led3 {
+-			label = "a10sr-led3";
+-			gpios = <&a10sr_gpio 3 1>;
+-		};
+-	};
+-
+-	ref_033v: 033-v-ref {
+-		compatible = "regulator-fixed";
+-		regulator-name = "0.33V";
+-		regulator-min-microvolt = <330000>;
+-		regulator-max-microvolt = <330000>;
+-	};
+-
+ 	soc {
+ 		clkmgr@ffd04000 {
+ 			clocks {
+@@ -66,31 +35,9 @@ osc1 {
+ 	};
+ };
+ 
+-&gmac0 {
+-	phy-mode = "rgmii";
+-	phy-addr = <0xffffffff>; /* probe for phy addr */
+-
+-	/*
+-	 * These skews assume the user's FPGA design is adding 600ps of delay
+-	 * for TX_CLK on Arria 10.
+-	 *
+-	 * All skews are offset since hardware skew values for the ksz9031
+-	 * range from a negative skew to a positive skew.
+-	 * See the micrel-ksz90x1.txt Documentation file for details.
+-	 */
+-	txd0-skew-ps = <0>; /* -420ps */
+-	txd1-skew-ps = <0>; /* -420ps */
+-	txd2-skew-ps = <0>; /* -420ps */
+-	txd3-skew-ps = <0>; /* -420ps */
+-	rxd0-skew-ps = <420>; /* 0ps */
+-	rxd1-skew-ps = <420>; /* 0ps */
+-	rxd2-skew-ps = <420>; /* 0ps */
+-	rxd3-skew-ps = <420>; /* 0ps */
+-	txen-skew-ps = <0>; /* -420ps */
+-	txc-skew-ps = <1860>; /* 960ps */
+-	rxdv-skew-ps = <420>; /* 0ps */
+-	rxc-skew-ps = <1680>; /* 780ps */
+-	max-frame-size = <3800>;
++&gmac2 {
++	phy-mode = "rgmii-id";
++	phy-addr = <0xffffffff>; /* probe for phy addr */	
+ 	status = "okay";
+ };
+ 
+@@ -98,39 +45,17 @@ &gpio1 {
+ 	status = "okay";
+ };
+ 
+-&spi1 {
+-	status = "okay";
+-
+-	resource-manager@0 {
+-		compatible = "altr,a10sr";
+-		reg = <0>;
+-		spi-max-frequency = <100000>;
+-		/* low-level active IRQ at GPIO1_5 */
+-		interrupt-parent = <&portb>;
+-		interrupts = <5 IRQ_TYPE_LEVEL_LOW>;
+-		interrupt-controller;
+-		#interrupt-cells = <2>;
+-
+-		a10sr_gpio: gpio-controller {
+-			compatible = "altr,a10sr-gpio";
+-			gpio-controller;
+-			#gpio-cells = <2>;
+-		};
+-
+-		a10sr_rst: reset-controller {
+-			compatible = "altr,a10sr-reset";
+-			#reset-cells = <1>;
+-		};
+-
+-		ps_alarm {
+-			compatible = "altr,a10sr-hwmon";
+-		};
+-	};
+-};
++/****************** описасние шины i2c0, идущей непосредственно от HPS ******************
++	на ней находятся:
++		коммутатор x4 pca9546 D21 (mux@71)
++		преобразователь i2с->spi для общенис с микросхемой gs12170 (4K HDMI OUT) sc18is602b D43 (spi-bridge@28)
++		контроллер HDMI SN75DP159 (управляем из приложения, здесь в списке нет)
++		температурный сенсор SA56004 D16 (temp-sensor@48)
+ 
+-&i2c1 {
++	каждое устройтсво в дереве имеет параметр reg, это непосредственно адрес конкретного устройства на шине
++****************************************************************************************/
++&i2c0 {
+ 	status = "okay";
+-
+ 	/*
+ 	 * adjust the falling times to decrease the i2c frequency to 50Khz
+ 	 * because the LCD module does not work at the standard 100Khz
+@@ -139,60 +64,120 @@ &i2c1 {
+ 	i2c-sda-falling-time-ns = <6000>;
+ 	i2c-scl-falling-time-ns = <6000>;
+ 
+-	adc@14 {
+-		compatible = "lltc,ltc2497";
+-		reg = <0x14>;
+-		vref-supply = <&ref_033v>;
+-	};
+-
+-	adc@16 {
+-		compatible = "lltc,ltc2497";
+-		reg = <0x16>;
+-		vref-supply = <&ref_033v>;
+-	};
++	/****************** коммутатор x4 pca9546 D21 mux@71 ******************/
++	/*преключает i2c на одну из 4 шин. Каждая шина обозначается как i2c@num, 
++	где num - номер шины*/
++	mux@71 {
++		compatible = "nxp,pca9546";
++		reg = <0x71>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		/****************** описание 1-й шины mux@71 ******************/
++		i2c@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++
++			/*********** gpio контроллер 1 на 16 пинов(на втором этаже) ***********/
++			pca9555a: pca9555@20 {
++				compatible = "nxp,pca9555";
++				gpio-controller;
++				#gpio-cells = <16>;
++				reg = <0x20>;
++			};
+ 
+-	lcd: lcd@28 {
+-		compatible = "newhaven,nhd-0216k3z-nsw-bbw";
+-		reg = <0x28>;
+-		height = <2>;
+-		width = <16>;
+-		brightness = <8>;
+-	};
++			/*********** gpio контроллер 2 на 16 пинов (на втором этаже) ***********/
++			pca9555b: pca9555@21 {
++				compatible = "nxp,pca9555";
++				gpio-controller;
++				#gpio-cells = <16>;
++				reg = <0x21>;
++			};
++		};
++		/****************** описание 2-й шины mux@71 ******************/
++		i2c@1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <1>;
++
++			/************** часы bq32000 D18 **************/
++			bq32000: rtc@68 {
++				compatible = "ti,bq32000";
++				trickle-resistor-ohms = <1120>;
++				reg = <0x68>;
++			};
+ 
+-	eeprom@51 {
+-		compatible = "atmel,24c32";
+-		reg = <0x51>;
+-		pagesize = <32>;
+-	};
++			/************** датчик температуры LM75 D22 **************/
++			lm75@49 {
++				reg = <0x49>;
++				compatible = "national,lm75b";
++			};
+ 
+-	rtc@68 {
+-		compatible = "dallas,ds1339";
+-		reg = <0x68>;
+-	};
++			/************** измеритель тока ina219 D68 **************/
++			ina219@40 {
++				compatible = "ti,ina219";
++				reg = <0x40>;
++				shunt-resistor = <15000>;
++			};
+ 
+-	max@4c {
+-		compatible = "max1619";
+-		reg = <0x4c>;
++			/*********** gpio контроллер 2 на 4 пина, похоже контроль вентляторов D75 ***********/
++			pca9536: pca9536@41 {
++				compatible = "nxp,pca9536";
++				gpio-controller;
++				#gpio-cells = <4>;
++				reg = <0x41>;
++			};
++		};
++		/****************** описание 3-й шины mux@71 ******************/
++		/*на этой шине висит много sdi драйверов lmh0397/1297 и др. Будем работать
++		с ними из нашего приложения*/
++		i2c@2 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <2>;
++		};
++		/****************** описание 4-й шины mux@71 ******************/
++		i2c@3 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <3>;
++		};
+ 	};
+ 
+-	ltc@5c {
+-		compatible = "ltc2977";
+-		reg = <0x5c>;
++	/****************** преобразователь i2с->spi для общенис с микросхемой gs12170 (4K HDMI OUT) sc18is602b D43 (spi-bridge@28) ******************/
++	spi-bridge@28 {
++        compatible = "nxp,sc18is602b";
++        reg = <0x28>;
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++		spi_dev@0 {
++            compatible = "rohm,dh2228fv"; // или "linux,spidev"
++            reg = <0>; // Chip Select 0
++            spi-max-frequency = <1000000>;
++        };
++
++		spi_dev@1 {
++            compatible = "rohm,dh2228fv"; // или "linux,spidev
++            reg = <1>; // Chip Select 1
++            spi-max-frequency = <1000000>;
++        };
+ 	};
+ 
+-	temp@4c {
+-		compatible = "maxim,max1619";
+-		reg = <0x4c>;
+-	};
++	/****************** температурный сенсор SA56004 D16 (temp-sensor@48) ******************/
++	temp-sensor@48 {
++        compatible = "nxp,sa56004";
++        reg = <0x48>;
++    };
+ };
+ 
+-&uart1 {
++&uart0 {
+ 	status = "okay";
+ };
+ 
+-&usb0 {
++&uart1 {
+ 	status = "okay";
+-	disable-over-current;
+ };
+ 
+ &watchdog1 {

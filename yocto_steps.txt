@@ -1880,7 +1880,7 @@
                         dmesg | grep i2c
                         [    1.373397] i2c_dev: i2c /dev entries driver
 
-                        i2cdetect -y -r 0
+                        i2cdetect -y 0
                                 0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
                                 00:                         -- -- -- -- -- -- -- -- 
                                 10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
@@ -2492,6 +2492,278 @@
         $HOME/a10_flow_u-boot_28_10/generate_core_and_periph_from_quartus.sh
 	
 
-                
+
+        посредством попытки сборки hello-world включающего <include> <some Qt> из под SDK
+        убедился, что проблема не в CMakelists.txt или  <include> в исходниках, а в самом SDK
+        Критическм важно
+                (после . /opt/poky/5.2.4/environment-setup-cortexa9t2hf-neon-poky-linux-gnueabi)
+                find $OECORE_NATIVE_SYSROOT -name "moc"
+                        /opt/poky/5.2.4/sysroots/x86_64-pokysdk-linux/usr/bin/moc  <= must have
+                find $OECORE_NATIVE_SYSROOT -name "qmake" 
+                        /opt/poky/5.2.4/sysroots/x86_64-pokysdk-linux/usr/bin/qmake   <= must have
+
+        пересобрал SDK с добавлением в local.conf
+                TOOLCHAIN_HOST_TASK:append = " nativesdk-packagegroup-qt5-toolchain-host"
+
+                # Добавляет библиотеки Qt5 и файлы разработки (mkspecs, заголовочные файлы) для самой ПЛАТЫ в SDK
+                #TOOLCHAIN_TARGET_TASK:append = " packagegroup-qt5-toolchain-target" <= неудачно do_fetch
+                # Добавляет только самые необходимые библиотеки Qt5
+                TOOLCHAIN_TARGET_TASK:append = " qtbase qtbase-dev qtbase-mkspecs"   <= ok 
+
+        
+
+        cd <Project>
+        pwd
+                /home/iru/Projects/pbx-mtv-5161/pbx-mtv-5161-12.04/build
+
+        # source <SDK>
+        . /opt/poky/5.2.4/environment-setup-cortexa9t2hf-neon-poky-linux-gnueabi
+        
+
+        add bitstream_<hacker's method>
+                pwd
+                        /home/iru/Projects/pbx-mtv-5161/pbx-mtv-5161-12.04/build
+                git clone https://code.videolan.org/videolan/bitstream.git ../../../bitstream
+                sudo cp -r ../../../bitstream $SDKTARGETSYSROOT/usr/include/
+
+               
+        старт cmake
+                cmake -DCMAKE_TOOLCHAIN_FILE=$OECORE_NATIVE_SYSROOT/usr/share/cmake/OEToolchainConfig.cmake ..
+        старт build
+                cmake --build .
+                or
+                make -j $(nproc)
+
+        file pbx-mtv-5161
+                pbx-mtv-5161: ELF 32-bit LSB pie executable, ARM, EABI5 version 1 (GNU/Linux), 
+                dynamically linked, interpreter /lib/ld-linux-armhf.so.3, 
+                BuildID[sha1]=b96219bf6fce9165a186bae6f9f7e798ac7aa740, 
+                for GNU/Linux 5.15.0, with debug_info, not stripped
+
+25_05 ign
+        с 21_05 по 26_05 собирал исходники для приложения 5161
+        ситуация (было)
+                приложение 5161 из под yocto-walnascar благополучно собирается, 
+                но имеет много лишнего и в нем прописаны заглушки для работоспособности
+
+                приложение 508 собиралось до сих пор на raspberry либо из под sdk  2.4.4
+                без заглушек и в нем убрано все, что не нужно для 5161
+
+        результат
+                в /home/iru/ProjectsSDK/from_508_to_5161 
+                с отслеживанием через отдельный git
+
+26_05 ign
+        теперь актуальный рецепт для сборки приложения pbx-mtv-5161
+        $HOME/poky-socfpga/poky/layers/meta-customer/recipes-appl/application_26_05
+        исходники для приложения слинкованы с SDK
+        ln -s $HOME/ProjectsSDK/from_508_to_5161/pbx-mtv-5161-26.05.tar.xz \
+        $HOME/poky-socfpga/poky/layers/meta-customer/recipes-appl/application_26_05/files/pbx-mtv-5161-26.05.tar.x
+         
 
 
+15_06 ign
+        в настоящий момент на IRU установлено два SDK "508" и "5161"
+        "508" /home/iru/ProjectsSDK/pbx-mtv-508-software
+                в нем:
+                драйвер mtv-overlay с использованием аллокации DMA функция <dma_alloc_coherent>
+                /home/iru/ProjectsSDK/pbx-mtv-508-software/my_driver_mtv_overlay
+                переписан драйвер ядра Altera 4.9 убрана жесткая фрагментация памяти, ядро выделяет честный 
+                монолитный буфер 8 МБ из пула CMA.
+                Ядро работает с Userspace через Zero-Copy технологию (mmap), убрана задержка в 15 мс на копирование 
+                каждого кадра.
+                Добавлена  синхронизацию на 60 Гц таймера Qt, обойдены аппаратные ограничения GPIO прерываний платы 
+                HPStoFPGA работает на аппаратном максимуме шины процессора Cyclone V
+
+                Детальное_описание_кода для драйвера:
+                /home/iru/ProjectsSDK/pbx-mtv-508-software/Детальное_описание_кода_mtv-overlay_508.odt
+                сборка драйвера посредством Makefile
+
+                В код приложения pbx-mtv-508 внесены неоходимые изменения для работы с драйвером см <git>
+                активация  SDK для текущего терминала
+                . /opt/poky/2.4.4/environment-setup-armv7ahf-neon-poky-linux-gnueabi
+
+                в SDK также вручную добавлены исходники для ядра 4.*
+
+        "508" /home/iru/ProjectsSDK/read_mem/read_mem_for_508_re
+                всякие утилиты, использованные для настройки и контроля обновленного драйвера mtv-overlay (508)
+
+        "5161" /home/iru/ProjectsSDK/from_508_to_5161
+                актуальная версия pbx-mtv-5161
+
+                приложение использует новый драйвер mtv-overlay 
+                (отличается от "508" /home/iru/ProjectsSDK/pbx-mtv-508-software/my_driver_mtv_overlay)
+
+                сборка:
+                        rm -rf *; cmake ..; make -j $(nproc)  <= собственно сборка  
+                        make create_versioned_tarball	<= архив с исходниками pbx-mtv-5161 будет помещен в рецепт
+                        /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-customer/application_26_05/pbx-mtv-5161_26.05.bb
+                        и опознан как NEWEST_TAR
+
+
+        "5161 read_mem_for_5161" /home/iru/ProjectsSDK/read_mem/read_mem_for_5161
+                всякие утилиты, использованные для настройки и контроля обновленного драйвера mtv-overlay (5161)
+
+                сборка:
+                        rm -rf *; cmake ..; make copy_executables <= собранные бинарники будут помещены в
+                /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-customer/read-mem-tools/files
+                собираются рецептом read-mem-tools
+                и будут доступны в /home/root/ на а10 после core-image-minimal                
+
+
+        Драйвер mtv-overlay для а10 (5161) 
+                собирается в YOCTO (walnascar)
+                /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-customer/mtv-overlay
+                        
+                рецепт mtv-overlay
+                /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-customer/mtv-overlay/mtv-overlay_1.0.bb
+
+                драйвер может использоваться утилитой mtv_dump_via_flag
+                детальное описание драйвера mtv-overlay (5161)	с учетом dtsi и mtv_dump_via_flag 
+                /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-customer/mtv-overlay/files/\
+                        Детальное_описание_кода_mtv-overlay_with_qt_stop_via_flag.odt
+
+                используемый dtsi для драйвера (на всякий случай)
+                        /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-customer/mtv-overlay/files/\
+                                socfpga_arria10_socdk.dtsi
+
+
+        замечено, что Yocto иногда не использует модифицированные источники для геенерации рецепта,
+        хотя и сообщает, что видит актуальный исходник, так при
+        bitbake-getvar -r pbx-mtv-5161 NEWEST_TAR
+        сообщает о последней версии архива с исходниками, но использует при генерации
+        bitbake core-image-minimal 
+        СТАРЫЙ АРХИВ !!!       
+        
+        решение:
+                bitbake-getvar -r pbx-mtv-5161 PR
+                set /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-customer/application_26_05/pbx-mtv-5161_26.05.bb:58
+                #     "r2"
+        редактировать рецепт , поднимая версию PR
+
+16_06 ign
+        настроил конвертацию в mtv-system.cpp   void draw_overlay => void convert_line для поддержки альфа-канала
+        video_resolution 1920*1080*3
+        video_size = 1920*1080*3 = 6220800
+        байтовая последовательность Y CrCb Alphaыs
+
+        адреса:
+                за mtv-overlay закреплен адрес ff204a00 и зарезервировано 16МВ памяти (DTSI)
+                физический адрес (как правило, но можно уточнить запустив приложение в терминале а10)
+                        START address: 0xb50a5000
+                        END   address: 0xb5693c00
+
+                при старте приложения void PbxMtvSystem::init_overlay_memory() занимает buffer
+                buffer = (char*)mmap(NULL, video_size, PROT_READ | PROT_WRITE, MAP_SHARED, overlay_fd, 0); 
+                где video_size = 1920*1080*3 = 6220800
+
+        распределение адресного пространства:
+                0 – 6220799 (6220800 байт): Чистые видеоданные кадра 1920×1080×3.
+                6220800 – 6221815 (1016 байт): Защитный промежуток (Padding) для выравнивания по страницам Linux MMU.
+                6221816 – 6221819 (4 байта): флаг готовности кадра (uint32_t).
+                6221820 – 6221823 (4 байта): Остаток буфера до границы 4096 байт
+        
+        BUFF_SIZE = frame_size + 1024 = 6221824 <= должен быть кратен 4096 (всего 1519 страниц)
+                значение 6221824 используется 
+                        в утилите mtv_dump_via_flag #define BUFF_SIZE
+                                /home/iru/ProjectsSDK/read_mem/read_mem_for_5161/mtv_dump_via_flag/mtv_dump_via_flag.cpp 
+                        в драйвере mtv-overlay #define BUFF_SIZE
+                                /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-customer/mtv-overlay/files/mtv-overlay.c
+
+        флаг готовности "1" записвыается в 6221824 - 8 = 6221816
+                значение 6221816 используется 
+                        в утилите mtv_dump_via_flag чтение флага готовности
+                                /home/iru/ProjectsSDK/read_mem/read_mem_for_5161/mtv_dump_via_flag/mtv_dump_via_flag.cpp
+                        в pbx-mtv-5161/mtv-system/mtv-system.cpp запись флага готовности
+                                /home/iru/ProjectsSDK/from_508_to_5161/mtv-system/mtv-system.cpp      
+        
+        утилита mtv_dump_via_flag включена в сборку (/home/root)
+                после запуска по готовности флага в 6221816  утилита на a10 созздает файлы /tmp/dump_<timestamp>.data
+                следующий файл /tmp/dump_<timestamp>.data будет сделан только если очередной кадр отличается от 
+                предыдущего (поместить на экран часы)
+                файлы следует забрать из а10 и конвертировать в .png посредсвом python скриптов:
+                FRAME:
+                        /home/iru/ProjectsSDK/read_mem/read_mem_for_5161/mtv_dump_via_flag/check_dump.py 
+                ALPHA:
+                        /home/iru/ProjectsSDK/read_mem/read_mem_for_5161/mtv_dump_via_flag/check_dump_alpha.py
+
+                Использование:
+                        <pip install numpy opencv-python> 
+                        python3 check_dump.py dump_<timestamp>.data
+                        python3 check_dump_alpha.py dump_<timestamp>.data
+17_06 ign       
+        как всегда, танец с бубном при завершении в devtool рецепта linux-socfpga-lts
+
+        devtool удалил предыдущий патч
+                0001-third-try-join-netconfig-i2c.patch
+        bitbake соотв. crashed
+
+        восстановил как
+                cp /home/iru/POKY/dtsi_i2c.d/0001-third-try-join-netconfig-i2c.patch \
+                        /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts/
+
+        восстановил через menuconfig CONFIG_SENSORS_INA2XX=y
+        пересобрал ядро
+                bitbake -c compile -f linux-socfpga-lts
+        проверил, что dtsi именно такой, какой нужен
+                bitbake-getvar -r linux-socfpga-lts S
+                        S="/home/iru/poky-socfpga/build/tmp/work-shared/arria10/kernel-source"
+
+        файл $S\arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi правильный!
+
+        на всякий случай
+                cp /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts/\
+                        0001-mtv-evrlay-16MB-and-str-mem-74REG.patch \
+                        /home/iru/POKY/dtsi_i2c.d
+
+                cp $S/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi \
+                        /home/iru/POKY/dtsi_i2c.d/17_06_socfpga_arria10_socdk.dtsi
+
+        WARNING: linux-socfpga-lts_6.12.bb:do_compile is tainted from a forced run
+        ussue:
+                bitbake -c savedefconfig virtual/kernel
+                        Saving defconfig to:
+                                /home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/linux-socfpga-lts/\
+                                        6.12.33-lts+git/linux-arria10-standard-build/defconfig
+                cp /home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/linux-socfpga-lts/\
+                        6.12.33-lts+git/linux-arria10-standard-build/defconfig \
+                        /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts
+
+                add in to /home/iru/poky-socfpga/poky/layers/meta-intel-fpga\
+                                /recipes-kernel/linux/linux-socfpga-lts_6.12.bbappend:
+
+                        # Добавляем наш конфигурационный файл в список исходников рецепта
+                        SRC_URI += "file://defconfig"
+
+                        # Опционально: если ваше ядро использует мета-данные Yocto (yocto-kernel-architecture),
+                        # эта строка гарантирует, что defconfig принудительно заменит стандартную конфигурацию.
+                        KBUILD_DEFCONFIG = ""
+        
+                bitbake -c cleansstate linux-socfpga-lts
+                bitbake linux-socfpga-lts <= NO WARNINGS!!!
+
+        проблема
+                после помещения config как defconfig в 
+                        
+                /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts/defconfig
+
+                и сборки bitbake core-image-minimal оказалось, что многих пресетов не хватает
+                вручную добавили из git непсредствеено в defconfig
+                изменили значение шунт.резистора прямо в патче
+
+                после запуска на а10, оказалось, что пресеты не применены
+
+        решение 
+
+                bitbake -c cleansstate core-image-minimal
+                bitbake core-image-minimal
+                ОК все появилось
+
+                полезные команды
+                проверка пресета CONFIG_I2C_MUX прямо на а10
+                zcat /proc/config.gz | grep CONFIG_I2C_MUX
+                CONFIG_I2C_MUX=y
+
+                проверка наличия пресета в конфигурации, испольованной YOCTO при сборке:
+                grep "CONFIG_I2C_MUX" tmp/work/arria10-poky-linux-gnueabi/linux-socfpga-lts/6.12.33-lts+git/\
+                                        linux-arria10-standard-build/.config

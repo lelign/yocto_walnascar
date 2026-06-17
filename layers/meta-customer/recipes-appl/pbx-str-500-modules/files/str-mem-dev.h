@@ -1,1 +1,0 @@
-/home/iru/Projects/pbx-str-500-modules/str-mem-dev.h

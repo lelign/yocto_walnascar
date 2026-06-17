@@ -1,0 +1,140 @@
+From 74fd59bfe8715e35235ac76dc4e3eb054bef0942 Mon Sep 17 00:00:00 2001
+From: lelign <ignatlelekin@gmail.com>
+Date: Wed, 17 Jun 2026 08:21:17 +0300
+Subject: [PATCH] mtv-evrlay-16MB-and-str-mem-74REG
+Upstream-Status: Pending
+
+---
+ .../intel/socfpga/socfpga_arria10_socdk.dtsi  | 112 ++++++++++++++++++
+ 1 file changed, 112 insertions(+)
+
+diff --git a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+index 6a046901e852..290edd106774 100644
+--- a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
++++ b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+@@ -24,6 +24,25 @@ memory@0 {
+ 		reg = <0x0 0x40000000>; /* 1GB */
+ 	};
+ 
++	/*с этой версией dtsi ьщдуль благополучно загрузился на старте*/
++	/* Резервируем блок строго непрерывной памяти под двойной буфер */
++	
++	reserved-memory {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++
++		vmsgdma_cma_region: vmsgdma_cma@0 {
++			compatible = "shared-dma-pool";
++			reusable;
++			size = <0x01000000>; /* ИСПРАВЛЕНО: Ровно 16 МБ под Double Buffering */
++			alignment = <0x00001000>; /* Выравнивание по границе страницы (4КБ) */
++		};
++	};
++
++
++		/* Обратите внимание: базовые #address-cells и #size-cells для корня 
++	   уже определены внутри socfpga_arria10.dtsi, дублировать их тут не нужно */
+ 	soc {
+ 		clkmgr@ffd04000 {
+ 			clocks {
+@@ -32,6 +51,99 @@ osc1 {
+ 				};
+ 			};
+ 		};
++
++		/* ИСПРАВЛЕНО: адрес в имени узла переведен в нижний регистр */
++		mtv_overlay: overlay@ff204a00 {
++			compatible = "pfrt,overlay";
++			reg = <0xFF204A00 0x0030>;
++			memory-region = <&vmsgdma_cma_region>; /* Связка с CMA */
++			status = "okay";
++		};
++
++		/*overlay@0xFF204A00 {
++			compatible = "pfrt,overlay";
++			reg = <0xFF204A00 0x0030>;
++			interrupts = <0x0 0x28 0x4>;
++		};*/
++
++		strmem {
++			compatible = "pfrt,str-mem";
++				reg =   <0xFF200000 0x80>,  // REG_HDMI_OUT
++				<0xFF200100 0x80>,   // REG_MOSAIC
++				<0xFF200200 0x80>,   // REG_FRAMEBUFFER_0
++				<0xFF200300 0x80>,   // REG_FRAMEBUFFER_1
++				<0xFF200400 0x80>,   // REG_FRAMEBUFFER_2
++				<0xFF200500 0x80>,   // REG_FRAMEBUFFER_3
++				<0xFF200600 0x80>,   // REG_FRAMEBUFFER_4
++				<0xFF200700 0x80>,   // REG_FRAMEBUFFER_5
++				<0xFF200800 0x80>,   // REG_FRAMEBUFFER_6
++				<0xFF200900 0x80>,   // REG_FRAMEBUFFER_7
++				<0xFF200A00 0x80>,   // REG_FRAMEBUFFER_8
++				<0xFF200B00 0x80>,   // REG_FRAMEBUFFER_9
++				<0xFF200C00 0x80>,   // REG_FRAMEBUFFER_10
++				<0xFF200D00 0x80>,   // REG_FRAMEBUFFER_11
++				<0xFF200E00 0x80>,   // REG_FRAMEBUFFER_12
++				<0xFF200F00 0x80>,   // REG_FRAMEBUFFER_13
++				<0xFF201000 0x80>,   // REG_FRAMEBUFFER_14
++				<0xFF201100 0x80>,   // REG_FRAMEBUFFER_15
++				<0xFF201200 0x80>,   // REG_SDI_ADAPTER
++				<0xFF201300 0x80>,   // REG_CVI_0
++				<0xFF201400 0x80>,   // REG_SCALER_0
++				<0xFF201500 0x80>,   // REG_CVI_1
++				<0xFF201600 0x80>,   // REG_SCALER_1 
++				<0xFF201700 0x80>,   // REG_CVI_2
++				<0xFF201800 0x80>,   // REG_SCALER_2
++				<0xFF201900 0x80>,   // REG_CVI_3
++				<0xFF201A00 0x80>,   // REG_SCALER_3
++				<0xFF201B00 0x80>,   // REG_CVI_4
++				<0xFF201C00 0x80>,   // REG_SCALER_4
++				<0xFF201D00 0x80>,   // REG_CVI_5
++				<0xFF201E00 0x80>,   // REG_SCALER_5
++				<0xFF201F00 0x80>,   // REG_CVI_6
++				<0xFF202000 0x80>,   // REG_SCALER_6
++				<0xFF202100 0x80>,   // REG_CVI_7
++				<0xFF202200 0x80>,   // REG_SCALER_7
++				<0xFF202300 0x80>,   // REG_CVI_7a
++				<0xFF202400 0x80>,   // REG_SCALER_7a
++				<0xFF202500 0x80>,   // REG_CVI_8
++				<0xFF202600 0x80>,   // REG_SCALER_8
++				<0xFF202700 0x80>,   // REG_CVI_9
++				<0xFF202800 0x80>,   // REG_SCALER_9
++				<0xFF202900 0x80>,   // REG_CVI_10
++				<0xFF202A00 0x80>,   // REG_SCALER_10
++				<0xFF202B00 0x80>,   // REG_CVI_11
++				<0xFF202C00 0x80>,   // REG_SCALER_11
++				<0xFF202D00 0x80>,   // REG_CVI_12
++				<0xFF202E00 0x80>,   // REG_SCALER_12
++				<0xFF202F00 0x80>,   // REG_CVI_13
++				<0xFF203000 0x80>,   // REG_SCALER_13
++				<0xFF203100 0x80>,   // REG_CVI_14
++				<0xFF203200 0x80>,   // REG_SCALER_14
++				<0xFF203300 0x80>,   // REG_CVI_15
++				<0xFF203400 0x80>,   // REG_SCALER_15
++				<0xFF203500 0x80>,   // REG_BUILDID
++				<0xFF203600 0x80>,   // REG_BARS
++				<0xFF203700 0x80>,   // REG_AUDIO_SELECTOR
++				<0xFF203800 0x80>,   // REG_MOTION_0
++				<0xFF203900 0x80>,   // REG_MOTION_1
++				<0xFF203A00 0x80>,   // REG_MOTION_2
++				<0xFF203B00 0x80>,   // REG_MOTION_3
++				<0xFF203C00 0x80>,   // REG_MOTION_4
++				<0xFF203D00 0x80>,   // REG_MOTION_5
++				<0xFF203E00 0x80>,   // REG_MOTION_6
++				<0xFF203F00 0x80>,   // REG_MOTION_7
++				<0xFF204000 0x80>,   // REG_MOTION_8
++				<0xFF204100 0x80>,   // REG_MOTION_9
++				<0xFF204200 0x80>,   // REG_MOTION_10
++				<0xFF204300 0x80>,   // REG_MOTION_11
++				<0xFF204400 0x80>,   // REG_MOTION_12
++				<0xFF204500 0x80>,   // REG_MOTION_13
++				<0xFF204600 0x80>,   // REG_MOTION_14
++				<0xFF204700 0x80>,   // REG_MOTION_15
++				<0xFF204800 0x80>,   // REG_DEI
++				<0xFF204900 0x80>   // REG_SDI_CVO		
++				;		
++		};
+ 	};
+ };
+ 

@@ -1,1 +1,0 @@
-/home/iru/Projects/pbx-str-500-modules/ts-out-2.c

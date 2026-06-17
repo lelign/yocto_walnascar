@@ -165,3 +165,11 @@ layers/meta-customer/recipes-appl/pbx-mtv-508-modules/files/.pbx-mtv-508-modules
 layers/meta-customer/recipes-appl/pbx-mtv-508-modules/files/.pbx-mtv-508-modules-0.1/mtv-overlay.c
 layers/meta-customer/recipes-appl/pbx-mtv-508-modules/files/.pbx-mtv-508-modules-0.1/Makefile
 back_up_anton_socfpga_arria10_socdk.dtsi
+/.layers
+# /layers/meta-customer/recipes-customer
+layers/meta-customer/recipes-customer/back_up_hello-world-cpp/
+layers/meta-customer/recipes-customer/hello-world-c/
+layers/meta-customer/recipes-customer/hello-world-module/
+layers/meta-customer/recipes-customer/mtv-overlay/files/*
+!layers/meta-customer/recipes-customer/mtv-overlay/files/Makefile
+!layers/meta-customer/recipes-customer/mtv-overlay/files/mtv-overlay.c
