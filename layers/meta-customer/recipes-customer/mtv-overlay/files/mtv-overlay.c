@@ -51,8 +51,7 @@ MODULE_DESCRIPTION("Monolithic 8MB RGB888 Video Overlay Driver for Arria 10 (Lin
    Ядро пресекает это и возвращает ошибку.
 */
 /* ИСПРАВЛЕНО: Размер увеличен до 4149248 байт (1013 страниц по 4КБ) для выравнивания с Qt */
-/*увеличиваем до 1920*1080*3 +1024 = 6221824  (кратность 1519 свободно 1024 байт)*/
-#define BUFF_SIZE 6221824
+#define BUFF_SIZE 6221824 //02_07 with 4149248  mtv-overlay: remap_vmalloc_range failed (size mismatch or flags conflict!)
 
 /* Регистры mSGDMA */
 #define DMATS_CONTROL 0x0000
@@ -103,13 +102,11 @@ static void reg_write(struct board_info *board, unsigned int base, unsigned int 
 static void dma_post(struct board_info *board)
 {
         /* ИСПРАВЛЕНО: 1920 * 1080 * 2 байта для YCrCb */
-        /*увеличил до 1920*1080*3 for alpha*/
-        int video_size = 1920 * 1080 * 3;  /* 4147200 => 6220800 */
+        int video_size = 1920 * 1080 * 2;  /* 4147200 байт */
         
-        reg_write(board, DMATS_CONTROL, 0, 0 | (1 << 1)); /* Импульс Reset */
-        reg_write(board, DMATS_CONTROL, 0, 0);             /* Снятие Reset */
+        reg_write(board, DMATS_CONTROL, 0, 0 | (1 << 1)); /* Reset */
+        reg_write(board, DMATS_CONTROL, 0, 0);             
         
-        /* Передаем адрес кадра в mSGDMA контроллер FPGA Arria 10 */
         reg_write(board, DMATS_DESC, DMA_DESC_READ, (unsigned int)board->dma);
         reg_write(board, DMATS_DESC, DMA_DESC_LEN, video_size);
         reg_write(board, DMATS_DESC, DMA_DESC_CONTROL, 
@@ -133,7 +130,7 @@ static ssize_t mtv_write(struct file *filp, const char __user *buf, size_t count
                 return -ERESTARTSYS; 
         }
 
-        dma_post(board); /* Пинок DMA */
+        dma_post(board); 
         return count;
 }
 
@@ -181,9 +178,7 @@ static long mtv_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long i
 */
 
 
-/*вывод расширенной отладочной информации прямо в функцию mtv_mmap драйвера. 
-Это покажет, с какими параметрами приложение Qt приходит в ядро, 
-и какой адрес у vmalloc на самом деле*/
+/*вывод расширенной отладочной информации прямо в функцию mtv_mmap вашего драйвера. Это покажет, с какими параметрами приложение Qt приходит в ядро, и какой адрес у vmalloc на самом деле*/
 static int mtv_mmap(struct file *filp, struct vm_area_struct *vma)
 {
         struct board_info *board = filp->private_data;
@@ -198,12 +193,9 @@ static int mtv_mmap(struct file *filp, struct vm_area_struct *vma)
         pr_info("  -> Kernel vmalloc ptr: %p\n", board->virt);
         pr_info("  -> VMA flags: 0x%lx\n", vma->vm_flags);
 
-        /* Отключение процессорного кэширования для когерентности */
         vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
         vm_flags_set(vma, VM_SHARED | VM_DONTEXPAND | VM_DONTDUMP);
 
-        /* remap_vmalloc_range теперь сработает со 100% успехом, */
-        /* так как память выделена через vmalloc_user() и имеет флаг VM_USERMAP */
         if (remap_vmalloc_range(vma, board->virt, 0)) {
                 pr_err("mtv-overlay: remap_vmalloc_range failed (size mismatch or flags conflict!)\n");
                 return -EAGAIN;
@@ -217,7 +209,6 @@ static int mtv_release(struct inode *inode, struct file *filp)
         return 0;
 }
 
-/* Probe для Linux 6.12 */
 static int mtv_overlay_probe(struct platform_device *pdev)
 {
         struct board_info *board;
@@ -240,8 +231,6 @@ static int mtv_overlay_probe(struct platform_device *pdev)
         board->mem_reg = devm_ioremap_resource(&pdev->dev, res);
         if (IS_ERR(board->mem_reg)) return PTR_ERR(board->mem_reg);
 
-        /* ИСПРАВЛЕНО: Используем vmalloc_user() вместо vmalloc(). Это принудительно */
-        /* прописывает флаг VM_USERMAP, полностью убирая ошибку ядра EAGAIN (Resource unavailable)! */
         board->virt = vmalloc_user(BUFF_SIZE);
         if (!board->virt) {
                 dev_err(&pdev->dev, "vmalloc_user 8MB Memory allocation failed\n");

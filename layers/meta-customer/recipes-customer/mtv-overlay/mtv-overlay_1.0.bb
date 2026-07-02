@@ -34,7 +34,7 @@ SRC_URI = " \
     file://Makefile \
 "
 
-PR = "r8"
+PR = "r10"
 
 S = "${WORKDIR}/sources"
 UNPACKDIR = "${S}"
