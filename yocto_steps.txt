@@ -2971,4 +2971,15 @@
         cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns
                 0 <= OK after reboot
 
+        проверяем mtv-overlay
+                bitbake mtv-overlay <= OK
+        из 
+        /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-customer/mtv-overlay/files
+        перенес все старое, ненужное в 
+        /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-customer/mtv-overlay/files/some_old
+
+        проверяем mtv-overlay
+                bitbake mtv-overlay <= OK
+
+
                 

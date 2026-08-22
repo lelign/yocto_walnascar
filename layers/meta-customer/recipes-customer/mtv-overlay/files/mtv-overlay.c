@@ -2,73 +2,50 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/fs.h>
-#include <linux/dma-mapping.h>
 #include <linux/delay.h>
 #include <linux/slab.h>
-#include <linux/interrupt.h>
 #include <linux/platform_device.h>
 #include <linux/mod_devicetable.h>
-#include <linux/of.h>
-#include <linux/of_address.h>
-#include <linux/of_platform.h>
 #include <linux/cdev.h>
-#include <linux/major.h>
 #include <linux/mm.h>
 #include <linux/device.h>
-#include <linux/vmalloc.h> 
-#include <asm/io.h>
+#include <linux/io.h>
 #include <linux/ioctl.h>
 #include <linux/mutex.h>
 #include <linux/wait.h>
+#include <linux/of.h>
+#include <linux/of_address.h>
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Altera OpenSource Dev");
-MODULE_DESCRIPTION("Monolithic 8MB RGB888 Video Overlay Driver for Arria 10 (Linux 6.12)");
+MODULE_DESCRIPTION("Monolithic DTS Dynamic Overlay Video Driver for Arria 10 (Linux 6.12)");
 
 #define DRV_NAME "mtv-overlay"
-#define OVERLAY_REG_BASE  0xFF204A00 
-#define OVERLAY_REG_SIZE  0x0030
-//#define BUFF_SIZE (1024*1024*8)
-/* ИСПРАВЛЕНО: Строгий размер Full HD кадра YCrCb для синхронизации с Qt (4 147 200 байт) */
-//#define BUFF_SIZE (1920 * 1080 * 2) 
-/*[   57.838491] mtv-overlay MMAP DEBUG:
-[   57.842047]   -> Qt requested size: 4149248 bytes
-[   57.846830]   -> Driver BUFF_SIZE:  4147200 bytes
-[   57.851520]   -> Kernel vmalloc ptr: 82b51979
-[   57.855942]   -> VMA flags: 0xfb
-   Вот она, истинная причина сбоя! Логи отладки показали критическое расхождение в размерах:
-   Driver BUFF_SIZE: 4 147 200 байт (это ровно 1920 × 1080 × 2).Qt requested size: 4 149 248 байт.
-   Разница составляет ровно 2048 байт (ровно половина страницы памяти PAGE_SIZE, которая на архитектуре 
-   ARMv7 равна 4096 байтам).🧩 Почему так произошло?В Linux любой маппинг через mmap в пространстве 
-   пользователя обязан быть кратен размеру страницы памяти (PAGE_SIZE = 4096 байт).
-   Ваш чистый размер кадра 4 147 200 при делении на 4096 дает 1012.5 страниц.
-   Вызов mmap со стороны Qt/C++ (или выделение памяти внутри графического фреймворка) 
-   автоматически округлил размер вверх до ближайшей целой страницы, чтобы выровнять участок памяти. 
-   Ближайшее число — это 1013 страниц, что равняется строго 4 149 248 байтам.
-   Функция remap_vmalloc_range видит, что Qt просит 4149248 байт, а буфер драйвера имеет 
-   размер всего 4147200 байт. 
-   Ядро понимает, что если оно разрешит маппинг, Qt зайдет за границы буфера драйвера на 2048 байт. 
-   Ядро пресекает это и возвращает ошибку.
-*/
-/* ИСПРАВЛЕНО: Размер увеличен до 4149248 байт (1013 страниц по 4КБ) для выравнивания с Qt */
-#define BUFF_SIZE 6221824 //02_07 with 4149248  mtv-overlay: remap_vmalloc_range failed (size mismatch or flags conflict!)
 
 /* Регистры mSGDMA */
 #define DMATS_CONTROL 0x0000
-#define DMATS_DESC 0x0020
-#define DMA_DESC_READ 0x00
-#define DMA_DESC_LEN 0x08
-#define DMA_DESC_CONTROL 0x0C
+// #define DMATS_DESC 0x0020
+// #define DMA_DESC_READ 0x00
+// #define DMA_DESC_LEN 0x08
+// #define DMA_DESC_CONTROL 0x0C
 
-#define STRMEM_MAGIC 'm'
-#define STRMEM_IOCTL_LOCK_BUFFER    _IO(STRMEM_MAGIC, 10)
-#define STRMEM_IOCTL_UNLOCK_BUFFER  _IO(STRMEM_MAGIC, 11)
+#define OVERLAY_MAGIC 'm'
+#define OVERLAY_IOCTL_LOCK_BUFFER    _IO(OVERLAY_MAGIC, 10)
+#define OVERLAY_IOCTL_UNLOCK_BUFFER  _IO(OVERLAY_MAGIC, 11)
+#define OVERLAY_IOCTL_DMA_START      _IO(OVERLAY_MAGIC, 12)
+#define OVERLAY_IOCTL_DMA_STOP       _IO(OVERLAY_MAGIC, 13)
+/* Новые команды управления буферами */
+#define OVERLAY_IOCTL_FLIP_BUFFER    _IOW(OVERLAY_MAGIC, 14, int)
+
+/* Размер одного кадра 1920*1080*3 = 6220800 байт */
+#define FRAME_SIZE /*6220800*/6221824
 
 struct board_info {
         void __iomem *mem_reg;
         struct device *mtv_device;
-        dma_addr_t dma;
-        void *virt;
+        dma_addr_t dma;               /* Физический адрес региона из DTS */
+        size_t mem_size;              /* Размер региона из DTS */
+        void __iomem *virt;           /* Виртуальный адрес региона в ядре */
         struct cdev cdev;
         dev_t devt;
 
@@ -79,11 +56,172 @@ struct board_info {
 
 static struct class *mtv_class = NULL;
 
-static int mtv_open(struct inode *inode, struct file *filp);
-static ssize_t mtv_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos);
-static int mtv_mmap(struct file *filp, struct vm_area_struct *vma);
-static int mtv_release(struct inode *inode, struct file *filp);
-static long mtv_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_param);
+static void reg_write(struct board_info *board, unsigned int base, unsigned int addr, unsigned int data)
+{
+        iowrite32(data, board->mem_reg + (base + addr));
+}
+
+/*static void dma_start(struct board_info *board){
+        reg_write(board, DMATS_CONTROL, 1, 1 << 0); 
+}
+
+static void dma_stop(struct board_info *board){
+        reg_write(board, DMATS_CONTROL, 1, 0);
+}*/
+
+/* Исправленный и безопасный блок управления mSGDMA */
+static void dma_start(struct board_info *board){
+        // Пишем 1 в регистр 0xFF200004 (смещение 4)
+        reg_write(board, DMATS_CONTROL, 4, 1); 
+}
+
+static void dma_stop(struct board_info *board){
+        // Пишем 0 в регистр 0xFF200004 (смещение 4), НЕ трогая регистр 0xFF200000!
+        reg_write(board, DMATS_CONTROL, 4, 0); 
+}
+
+static void dma_init(struct board_info *board){
+        reg_write(board, DMATS_CONTROL, 0, (board->dma / 1024));
+        dma_start(board);
+}
+
+static int mtv_open(struct inode *inode, struct file *filp)
+{
+        struct board_info *board = container_of(inode->i_cdev, struct board_info, cdev);
+        filp->private_data = board;
+        pr_info("static int mtv_open\n");
+        return 0;
+}
+
+/* Вызывается вашим Qt-приложением как триггер кадра (write 1 байта) */
+static ssize_t mtv_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos)
+{
+        struct board_info *board = filp->private_data;
+        int video_size = (1920 * 1080 * 3) + 1024; 
+
+        // pr_info("mtv_write !!!\n");
+
+        if (!board || !board->virt) return -EFAULT;
+
+        if (wait_event_interruptible(board->wait_queue, !board->is_locked)) {
+                return -ERESTARTSYS; 
+        }
+
+        // Если вдруг юзерспейс решит передать полноценный кадр через write
+        if (count > 1) {
+                if (copy_from_user((__force void *)board->virt, buf, (count > video_size) ? video_size : count)) {
+                        return -EFAULT;
+                }
+        }
+
+        // Пинаем DMA на вычитку
+        //dma_post(board); 
+        return count;
+}
+
+// previos at 28_07_16:20
+/*static long mtv_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_param)
+{
+        struct board_info *board = filp->private_data;
+        if (!board) return -EFAULT;
+
+        switch (ioctl_num) {
+        case OVERLAY_IOCTL_LOCK_BUFFER:
+                mutex_lock(&board->lock);
+                board->is_locked = 1;
+                mutex_unlock(&board->lock);
+                break;
+
+        case OVERLAY_IOCTL_UNLOCK_BUFFER:
+                mutex_lock(&board->lock);
+                board->is_locked = 0;
+                mutex_unlock(&board->lock);
+                wake_up_interruptible(&board->wait_queue);
+                break;
+        
+        case OVERLAY_IOCTL_DMA_START:
+                dma_start(board);
+                break;
+                
+        case OVERLAY_IOCTL_DMA_STOP:
+                dma_stop(board);
+                break;
+
+        default:
+                return -ENOTTY;
+        }
+        pr_info("mtv_ioctl");
+        return 0;
+}*/
+
+static long mtv_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_param)
+{
+        struct board_info *board = filp->private_data;
+        int buffer_idx;
+        dma_addr_t new_dma_addr;
+
+        if (!board) return -EFAULT;
+
+        switch (ioctl_num) {
+        case OVERLAY_IOCTL_FLIP_BUFFER:
+                /* Получаем номер буфера (0 или 1) из user-space */
+                if (copy_from_user(&buffer_idx, (int __user *)ioctl_param, sizeof(buffer_idx))) {
+                        return -EFAULT;
+                }
+
+                /* Рассчитываем физический адрес для mSGDMA */
+                if (buffer_idx == 0) {
+                        new_dma_addr = board->dma; // Начало региона (Буфер А)
+                } else if (buffer_idx == 1) {
+                        new_dma_addr = board->dma + FRAME_SIZE; // Смещение на 1 кадр (Буфер Б)
+                } else {
+                        return -EINVAL;
+                }
+
+                /* Мгновенно переключаем базовый адрес чтения mSGDMA (делим на 1024 по спецификации) */
+                iowrite32((unsigned int)(new_dma_addr / 1024), board->mem_reg + DMATS_CONTROL);
+                break;
+
+        /* Оставляем старые кейсы для совместимости, если они нужны */
+        case OVERLAY_IOCTL_LOCK_BUFFER:
+                board->is_locked = 1;
+                break;
+        case OVERLAY_IOCTL_UNLOCK_BUFFER:
+                board->is_locked = 0;
+                wake_up_interruptible(&board->wait_queue);
+                break;
+
+        default:
+                return -ENOTTY;
+        }
+        return 0;
+}
+
+/* Синхронизация mmap без процессорного кэширования ARM */
+static int mtv_mmap(struct file *filp, struct vm_area_struct *vma)
+{
+        struct board_info *board = filp->private_data;
+        unsigned long size = vma->vm_end - vma->vm_start;
+
+        if (!board || !board->dma) return -EFAULT;
+        if (size > board->mem_size) return -EINVAL;
+
+        // Включаем Write-Combining для максимальной скорости заливки графики из Qt
+        vma->vm_page_prot = pgprot_writecombine(vma->vm_page_prot);
+        vm_flags_set(vma, VM_SHARED | VM_DONTEXPAND | VM_DONTDUMP);
+
+        // Мапим физический кусок памяти в пространство пользователя с нулевого смещения
+        if (remap_pfn_range(vma, vma->vm_start, board->dma >> PAGE_SHIFT, size, vma->vm_page_prot)) {
+                return -EAGAIN;
+        }
+        return 0;
+}
+
+static int mtv_release(struct inode *inode, struct file *filp)
+{
+        pr_info("static int mtv_release");
+        return 0;
+}
 
 static const struct file_operations mtv_fops = {
         .owner          = THIS_MODULE,
@@ -94,194 +232,100 @@ static const struct file_operations mtv_fops = {
         .unlocked_ioctl = mtv_ioctl,
 };
 
-static void reg_write(struct board_info *board, unsigned int base, unsigned int addr, unsigned int data)
-{
-        iowrite32(data, board->mem_reg + (base + addr));
-}
-
-static void dma_post(struct board_info *board)
-{
-        /* ИСПРАВЛЕНО: 1920 * 1080 * 2 байта для YCrCb */
-        int video_size = 1920 * 1080 * 2;  /* 4147200 байт */
-        
-        reg_write(board, DMATS_CONTROL, 0, 0 | (1 << 1)); /* Reset */
-        reg_write(board, DMATS_CONTROL, 0, 0);             
-        
-        reg_write(board, DMATS_DESC, DMA_DESC_READ, (unsigned int)board->dma);
-        reg_write(board, DMATS_DESC, DMA_DESC_LEN, video_size);
-        reg_write(board, DMATS_DESC, DMA_DESC_CONTROL, 
-                  (1 << 31) | (1 << 15) | (1 << 14) | (1 << 9) | (1 << 8));
-}
-
-static int mtv_open(struct inode *inode, struct file *filp)
-{
-        struct board_info *board = container_of(inode->i_cdev, struct board_info, cdev);
-        filp->private_data = board;
-        return 0;
-}
-
-static ssize_t mtv_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos)
-{
-        struct board_info *board = filp->private_data;
-        if (!board) return -EFAULT;
-
-        /* Безопасное засыпание потока Qt, если утилита делает дамп */
-        if (wait_event_interruptible(board->wait_queue, !board->is_locked)) {
-                return -ERESTARTSYS; 
-        }
-
-        dma_post(board); 
-        return count;
-}
-
-static long mtv_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_param)
-{
-        struct board_info *board = filp->private_data;
-        if (!board) return -EFAULT;
-
-        switch (ioctl_num) {
-        case STRMEM_IOCTL_LOCK_BUFFER:
-                mutex_lock(&board->lock);
-                board->is_locked = 1;
-                mutex_unlock(&board->lock);
-                dev_info(board->mtv_device, "Buffer LOCKED. Qt suspended.\n");
-                break;
-
-        case STRMEM_IOCTL_UNLOCK_BUFFER:
-                mutex_lock(&board->lock);
-                board->is_locked = 0;
-                mutex_unlock(&board->lock);
-                wake_up_interruptible(&board->wait_queue); /* Пробуждение Qt */
-                dev_info(board->mtv_device, "Buffer UNLOCKED. Qt resumed.\n");
-                break;
-
-        default:
-                return -ENOTTY;
-        }
-        return 0;
-}
-
-/*static int mtv_mmap(struct file *filp, struct vm_area_struct *vma)
-{
-        struct board_info *board = filp->private_data;
-        if (!board || !board->virt) return -EFAULT;
-
-        vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
-        vm_flags_set(vma, VM_SHARED | VM_DONTEXPAND | VM_DONTDUMP);
-
-        if (remap_vmalloc_range(vma, board->virt, 0)) {
-                pr_err("mtv-overlay: remap_vmalloc_range failed\n");
-                return -EAGAIN;
-        }
-        return 0;
-}
-*/
-
-
-/*вывод расширенной отладочной информации прямо в функцию mtv_mmap вашего драйвера. Это покажет, с какими параметрами приложение Qt приходит в ядро, и какой адрес у vmalloc на самом деле*/
-static int mtv_mmap(struct file *filp, struct vm_area_struct *vma)
-{
-        struct board_info *board = filp->private_data;
-        size_t requested_size = vma->vm_end - vma->vm_start;
-
-        if (!board || !board->virt) return -EFAULT;
-
-        // ВЫВОД ВСЕХ АДРЕСОВ И РАЗМЕРОВ В DMESG
-        pr_info("mtv-overlay MMAP DEBUG:\n");
-        pr_info("  -> Qt requested size: %zu bytes\n", requested_size);
-        pr_info("  -> Driver BUFF_SIZE:  %d bytes\n", BUFF_SIZE);
-        pr_info("  -> Kernel vmalloc ptr: %p\n", board->virt);
-        pr_info("  -> VMA flags: 0x%lx\n", vma->vm_flags);
-
-        vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
-        vm_flags_set(vma, VM_SHARED | VM_DONTEXPAND | VM_DONTDUMP);
-
-        if (remap_vmalloc_range(vma, board->virt, 0)) {
-                pr_err("mtv-overlay: remap_vmalloc_range failed (size mismatch or flags conflict!)\n");
-                return -EAGAIN;
-        }
-        return 0;
-}
-
-
-static int mtv_release(struct inode *inode, struct file *filp)
-{
-        return 0;
-}
-
 static int mtv_overlay_probe(struct platform_device *pdev)
 {
         struct board_info *board;
         struct resource *res;
+        struct device_node *mem_node;
+        struct resource mem_res;
         int ret;
 
-        dev_info(&pdev->dev, "Modern Probe started for Linux 6.12 (8MB RGB888 Mode)\n");
+        //dev_info(&pdev->dev, "v35 DTS Clean Auto-Discovery Probe started\n");
 
         board = devm_kzalloc(&pdev->dev, sizeof(*board), GFP_KERNEL);
         if (!board) return -ENOMEM;
-
         platform_set_drvdata(pdev, board);
 
-        /* ИСПРАВЛЕНО: Критически важная инициализация примитивов синхронизации! */
         init_waitqueue_head(&board->wait_queue);
         mutex_init(&board->lock);
         board->is_locked = 0;
 
+        // 1. Отображаем регистры mSGDMA
         res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
         board->mem_reg = devm_ioremap_resource(&pdev->dev, res);
         if (IS_ERR(board->mem_reg)) return PTR_ERR(board->mem_reg);
 
-        board->virt = vmalloc_user(BUFF_SIZE);
+        // 2. Ищем no-map узел памяти в Device Tree
+        mem_node = of_parse_phandle(pdev->dev.of_node, "memory-region", 0);
+        if (!mem_node) {
+                dev_err(&pdev->dev, "Missing 'memory-region' property in device tree node!\n");
+                return -ENODEV;
+        }
+
+        // Извлекаем физические адреса из узла памяти
+        ret = of_address_to_resource(mem_node, 0, &mem_res);
+        of_node_put(mem_node);
+        if (ret) {
+                dev_err(&pdev->dev, "Failed to parse reserved memory parameters from DTS\n");
+                return ret;
+        }
+
+        board->dma = mem_res.start;
+        board->mem_size = resource_size(&mem_res);
+
+        // 3. Отображаем физический видеобуфер в ядро
+        board->virt = devm_ioremap_wc(&pdev->dev, board->dma, board->mem_size);
         if (!board->virt) {
-                dev_err(&pdev->dev, "vmalloc_user 8MB Memory allocation failed\n");
+                dev_err(&pdev->dev, "Failed to ioremap static memory region!\n");
                 return -ENOMEM;
         }
-        memset(board->virt, 0, BUFF_SIZE);
+        memset_io(board->virt, 0, board->mem_size);
 
-        board->dma = vmalloc_to_pfn(board->virt) << PAGE_SHIFT;
+        
+        dev_info(&pdev->dev, "v35.4 DTS PHYSICAL BASE ADDRESS: 0x%llx\n", (unsigned long long)board->dma);
+        dev_info(&pdev->dev, "v35.4 DTS MEMORY SIZE: %zu bytes\n", board->mem_size);
+        dev_info(&pdev->dev, "v35.4 Kernel Virtual Space (virt): %p\n", board->virt);
+        dev_info(&pdev->dev, "NEW FLIP IOCTL CODE: FLIP=0x%X\n", (unsigned int)OVERLAY_IOCTL_FLIP_BUFFER);
 
-        dev_info(&pdev->dev, "==================================================\n");
-        dev_info(&pdev->dev, "6.12 MONOLITHIC PHYSICAL ADDRESS: %pad\n", &board->dma);
-        dev_info(&pdev->dev, "==================================================\n");
-
+        // Регистрация символьного устройства
         ret = alloc_chrdev_region(&board->devt, 0, 1, DRV_NAME);
-        if (ret < 0) goto err_free_vmalloc;
+        if (ret < 0) return ret;
 
         cdev_init(&board->cdev, &mtv_fops);
         board->cdev.owner = THIS_MODULE;
         ret = cdev_add(&board->cdev, board->devt, 1);
         if (ret < 0) goto err_unregister;
 
-        /* ИСПРАВЛЕНО: Завершено создание узла */
         board->mtv_device = device_create(mtv_class, &pdev->dev, board->devt, NULL, DRV_NAME);
         if (IS_ERR(board->mtv_device)) {
                 ret = PTR_ERR(board->mtv_device);
                 goto err_cdev_del;
         }
 
-        dev_info(&pdev->dev, "Modern initialization completed successfully!\n");
+        dma_init(board);
+
+        dev_info(&pdev->dev, "Dynamic driver without offsets initialized successfully!\n");
+        
         return 0;
 
 err_cdev_del:
         cdev_del(&board->cdev);
 err_unregister:
         unregister_chrdev_region(board->devt, 1);
-err_free_vmalloc:
-        vfree(board->virt);
         return ret;
 }
 
 static void mtv_overlay_remove(struct platform_device *pdev)
 {
         struct board_info *board = platform_get_drvdata(pdev);
+        pr_info("static int mtv_overlay_remove");
+        dma_stop(board);
         if (board) {
                 if (board->mtv_device)
                         device_destroy(mtv_class, board->devt);
                 cdev_del(&board->cdev);
                 unregister_chrdev_region(board->devt, 1);
-                if (board->virt) vfree(board->virt);
         }
-        dev_info(&pdev->dev, "Driver removed successfully\n");
 }
 
 static const struct of_device_id mtv_overlay_of_match[] = {
@@ -311,11 +355,13 @@ static int __init mtv_overlay_init(void)
                 class_destroy(mtv_class);
                 return ret;
         }
+        //pr_info("static int mtv_overlay_init");
         return 0;
 }
 
 static void __exit mtv_overlay_exit(void)
 {
+        pr_info("static int mtv_overlay_exit");
         platform_driver_unregister(&mtv_overlay_driver);
         if (mtv_class) class_destroy(mtv_class);
 }

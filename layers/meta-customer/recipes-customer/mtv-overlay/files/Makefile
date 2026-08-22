@@ -1,4 +1,4 @@
-obj-m := mtv-overlay.o
+obj-m := mtv-overlay.o one-buffer-mtv-overlay.o
 
 SRC := $(shell pwd)
 
