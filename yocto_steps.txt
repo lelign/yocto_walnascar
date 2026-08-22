@@ -2767,3 +2767,206 @@
                 проверка наличия пресета в конфигурации, испольованной YOCTO при сборке:
                 grep "CONFIG_I2C_MUX" tmp/work/arria10-poky-linux-gnueabi/linux-socfpga-lts/6.12.33-lts+git/\
                                         linux-arria10-standard-build/.config
+09_06 ign
+        devtool
+                devtool modify linux-socfpga-lts
+                <edit source>
+                следить за актуальностью директории особенно если попал туда через
+                code -n /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts
+                the best do 
+                pwd
+                         /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts
+                cd ..
+                cd linux-socfpga-lts <= the same name but other descriptor!
+                git status
+                        ...
+                        modified:   arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+                check build`
+                devtool build linux-socfpga-lts 
+                git status
+                git add arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+                git commit -m "dts: arm: a10: fix overlay and strmem addresses to match current quartus layout"
+                git format-patch -1 HEAD --output-directory /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts
+                devtool reset linux-socfpga-lts
+                add line with patch into bbappend
+                        SRC_URI += "file://0001-third-try-join-netconfig-i2c.patch \
+                                        file://0001-mtv-evrlay-16MB-and-str-mem-74REG.patch \   
+                                        file://0001-dts-arm-a10-fix-mdio-phy-polling-flat-version.patch  \
+                                        file://0001-dts-arm-a10-fix-overlay-and-strmem-addresses-to-matc.patch  \ <= new patch
+                                        file://devtool-fragment.cfg \
+                                        "
+                add into patch 
+                        Upstream-Status: Inappropriate [oe specific]
+                applying patches
+                bitbake linux-socfpga-lts -c configure
+
+                
+                
+                
+                
+                check device tree on the board
+                dtc -I fs -O dts -o live_tree.dts /proc/device-tree
+                cat live_tree.dts
+
+        workking with mtv-overlay
+                find /home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/mtv-overlay/1.0/ -name "mtv-overlay.ko"
+
+                bitbake mtv-overlay -c package -f
+
+        scp /home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/mtv-overlay/1.0/packages-split/kernel-module-mtv-overlay-6.12.33-altera-g57bbae52cfc9/usr/lib/modules/6.12.33-altera-g57bbae52cfc9/kernel/profitt/mtv-overlay.ko \
+        root@192.168.2.37:/lib/modules/6.12.33-altera-g57bbae52cfc9/kernel/profitt/mtv-overlay.ko
+
+
+        devmem2 control
+                devmem2 0xff200000 w 0xFC000    <= screen start
+                screen start at 0x3f000000 
+                screen end      0x3f5eebff <= последний значимый адрес, разница между 0x3f5eebff и 0x3f000000 = 6220800 !!!
+
+        ошибочное чтение "второго экрана" начинается с FCBDD соответственно:
+                devmem2 0xff200000 w 0xFCBDD
+
+        дистанционное подключение клиентов из локальной сети Профитт через VPN
+        терминальный доступ к А10 (SSH)
+                ssh -p 2222 root@192.168.5.125
+        WEB доступ к А10 (brouser)
+                http://192.168.5.125:1234
+
+
+
+29_07_19:00
+        devtool modify u-boot-socfpga
+        code -n /home/iru/poky-socfpga/build/workspace/sources/u-boot-socfpg
+        edit file /home/iru/poky-socfpga/build/workspace/sources/u-boot-socfpga/arch/arm/dts/socfpga_arria10-handoff.dtsi
+                
+                i_noc: noc@0xffd10000 {
+                        compatible = "altr,socfpga-a10-noc";
+                        reg = <0xffd10000 0x00008000>;
+                        reg-names = "mpu_m0";
+                        bootph-all;
+
+                        /* ===== ADD YOUR F2S PORT PRIORITIES HERE ===== */
+                        /* Value ranges from 0x0 (Lowest priority) to 0x7 (Highest priority) */
+                        f2s-priority-port0 = <0x7>;  /* Assign highest priority to Port 0 */
+                        //f2s-priority-port1 = <0x5>;  /* Assign medium priority to Port 1 */
+                        //f2s-priority-port2 = <0x0>;  /* Assign lowest priority to Port 2  */
+
+                        firewall {
+                                mpu0 = <0x00000000 0x0000ffff>;
+                                l3-0 = <0x00000000 0x0000ffff>;
+                                fpga2sdram0-0 = <0x00000000 0x0000ffff>;
+                                fpga2sdram1-0 = <0x00000000 0x0000ffff>;
+                                fpga2sdram2-0 = <0x00000000 0x0000ffff>;
+                                bootph-all;
+                        };
+
+                        
+                };
+
+        devtool build u-boot-socfpga <= ok
+        git status
+                Changes not staged for commit:
+                        (use "git add <file>..." to update what will be committed)
+                        (use "git restore <file>..." to discard changes in working directory)
+                                modified:   arch/arm/dts/socfpga_arria10-handoff.dtsi
+
+                        Untracked files:
+                        (use "git add <file>..." to include in what will be committed)
+                                Image
+                                arch/arm/dts/socfpga_arria10_socdk_sdmmc_handoff.h
+                                ghrd_10as066n2.core.rbf
+                                ghrd_10as066n2.periph.rbf
+                                hps.xml
+
+        git add arch/arm/dts/socfpga_arria10-handoff.dtsi
+        git commit -m "f2s-priority-port0 = <0x7> Assign highest priority to Port 0"
+        git format-patch -1 HEAD --output-directory /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga
+
+        file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga/0001-f2s-priority-port0-0x7-Assign-highest-priority-to-Po.patch
+                .../001-f2s-priority-port0-0x7-Assign-highest-priority-to-Po.patch: unified diff output text, 1st line "From 3d9013d94a63fc486b4c0002292584baa0bbd526 Mon Sep 17 00:00:00 2001", 2nd line "From: lelign <ignatlelekin@gmail.com>", 3rd line "Date: Wed, 29 Jul 2026 19:06:42 +0300", ASCII text
+
+
+        in /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-bsp/u-boot/u-boot-socfpga-common.inc
+                SRC_URI = "${UBOOT_REPO};protocol=${UBOOT_PROT};branch=${UBOOT_BRANCH} \
+                        file://0001-edited_makefile_and_three_dtsi.patch \
+                        file://ethaddr-u-boot.txt \
+                        file://0001-change-in-boot-image-board-c.patch \
+                        file://0001-f2s-priority-port0-0x7-Assign-highest-priority-to-Po.patch \ << == add
+                        file://change_mac_addr.exe \
+                        "
+        add Upstream-Status: Inappropriate [oe specific] into patch
+
+        devtool reset u-boot-socfpga
+        applying patches:
+        bitbake u-boot-socfpga -c configure <= OK!
+
+        bitbake core-image-minimal <= THE SAME RESULT!!!моргает!
+
+        edit :
+        /home/iru/poky-socfpga/build/tmp/work/arria10-poky-linux-gnueabi/u-boot-socfpga/v2025.07+git/git/arch/arm/mach-socfpga/spl_a10.c
+        void spl_board_init(void)
+                {
+                /* ... здесь находится существующий код инициализации (sdram, pinmux и т.д.) ... */
+
+                // Инициализация NoC и других блоков уже завершена, принудительно выставляем приоритет 0x7:
+                asm volatile("": : :"memory"); // Барьер памяти для надежности
+                *(volatile unsigned int *)(0xFFD12000) = 0xFA9ECC07;
+                asm volatile("": : :"memory");
+                }
+        bitbake -c compile -f u-boot-socfpga
+
+
+
+        проверить правильность приоритета можно только из md.l 0xffd16108 1 (minicom)
+
+30_07_10:51
+        ignat returned patch:
+                0001-increased-reg-0x3f000000-0x00BDE000-12443648-0xBDE00.patch
+        ignat added dual-buffer-mtv-overlay.ko in the same dir as mtv-overlay.ko (not loaded on boot)
+
+        check existings modules:
+                grep "dual-buffer" /home/iru/poky-socfpga/walnascar_deploy/images/arria10/core-image-minimal-arria10.rootfs*.manifest
+                        kernel-module-dual-buffer-mtv-overlay-6.12.33-altera-g423feba2ca62 arria10 1.0 <= exist!!!
+
+        замена драйвера на платеcd /usr/lib/modules/6.12.33-altera-g423feba2ca62/kernel/profitt
+
+                # 1. Переименовываем оригинальный старый драйвер (сохраняем как бэкап)
+                mv mtv-overlay.ko mtv-overlay.ko.bak
+
+                # 2. Копируем новый двухбуферный драйвер на место старого
+                
+                # если надо новый, ищем его в yocto и копируем на машину
+                /poky-socfpga/build$ find tmp -type f -name dual-buffer-mtv-overlay.ko
+                ls -al tmp/work/arria10-poky-linux-gnueabi/mtv-overlay/1.0/packages-split/kernel-module-dual-buffer-mtv-overlay-6.12.33-altera-g423feba2ca62/usr/lib/modules/6.12.33-altera-g423feba2ca62/kernel/profitt/dual-buffer-mtv-overlay.ko
+                -rw-r--r-- 2 iru iru 11572 Jul 31 11:06 tmp/work/arria10-poky-linux-gnueabi/mtv-overlay/1.0/packages-split/kernel-module-dual-buffer-mtv-overlay-6.12.33-altera-g423feba2ca62/usr/lib/modules/6.12.33-altera-g423feba2ca62/kernel/profitt/dual-buffer-mtv-overlay.ko
+
+                cp dual-buffer-mtv-overlay.ko mtv-overlay.ko
+
+                # 3. Удаляем файл с двойным именем, чтобы он не путался
+                rm dual-buffer-mtv-overlay.ko
+
+                # 4 заставить операционную систему пересчитать зависимости и внутренние индексы модулей
+                depmod -a
+
+                # 5 reboot
+
+
+20_08_14:43
+        presets for mtv5161 хранятся по пути /etc/xdg 
+
+22_08
+        Чтобы в Ubuntu 24.04 навсегда перевести параметр apparmor_restrict_unprivileged_userns в значение 0 
+        (отключить ограничение на создание пространств имен для обычных пользователей), 
+        выполните две простые команды в терминале
+                sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+                        kernel.apparmor_restrict_unprivileged_userns = 0
+        По умолчанию Ubuntu 24.04 сбрасывает этот параметр обратно в 1 при перезагрузке. 
+        Чтобы этого не происходило, создайте специальный файл конфигурации в системной папке sysctl.d
+                echo "kernel.apparmor_restrict_unprivileged_userns = 0" | sudo tee /etc/sysctl.d/60-apparmor-namespace.conf
+                       kernel.apparmor_restrict_unprivileged_userns = 0 
+        Убедитесь, что система приняла новые настройки
+                cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns
+                        0
+        После этого bitbake благополучно собрал pbx-mtv-5161
+        проверяю reboot
+
+                

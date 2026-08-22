@@ -72,7 +72,7 @@ case "$1" in
     ln -sf /var/volatile/hls/ /www/pages/
     # $binpath
     # start-stop-daemon --start -b --startas $binpath --name $name -- -w
-    start-stop-daemon --start -x $binpath
+#    start-stop-daemon --start -x $binpath
     ;;
   stop)
     log_begin_msg "Stopping $name daemon..."

@@ -33,16 +33,10 @@ DEPENDS = "qtbase qtwebsockets qtserialport libusb bitstream qtsvg zvbi"
 # 1. Явно указываем Yocto искать файлы в подпапке files рядом с рецептом
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI = "file://dma_test_rw \
-           file://mtv_dump_tool \ 
-           file://mtv_dump_qt_stop_gradient \
-           file://mtv_dump_qt_stop_gradient_v422 \
-           file://r_reg_via_dev_mem_II\
-           file://read_all_via_dev_mem_II \
-           file://rw_via_dev_mem_II \
-           file://rw_via_str_mem_3_const \
-           file://rw_via_str_mem_74_reg \
-           file://mtv_dump_via_flag \
+SRC_URI = "file://mtv_dump_via_flag \
+           file://mtv-fill \
+           file://drawing_horizontal.sh \
+           file://drawing_vertical.sh \
            "
 # 1. Добавляем путь к папке files
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
@@ -62,26 +56,14 @@ do_install() {
     install -d ${D}/home/root
     
     # Копируем файл с правами 0755 (выполнение) или 0644 (только чтение)
-    install -m 0755 ${UNPACKDIR}/dma_test_rw ${D}/home/root/
-    install -m 0755 ${UNPACKDIR}/mtv_dump_tool ${D}/home/root/
-    install -m 0755 ${UNPACKDIR}/mtv_dump_qt_stop_gradient ${D}/home/root/
-    install -m 0755 ${UNPACKDIR}/mtv_dump_qt_stop_gradient_v422 ${D}/home/root/
-    install -m 0755 ${UNPACKDIR}/r_reg_via_dev_mem_II ${D}/home/root/
-    install -m 0755 ${UNPACKDIR}/read_all_via_dev_mem_II ${D}/home/root/
-    install -m 0755 ${UNPACKDIR}/rw_via_dev_mem_II ${D}/home/root/
-    install -m 0755 ${UNPACKDIR}/rw_via_str_mem_3_const ${D}/home/root/
-    install -m 0755 ${UNPACKDIR}/rw_via_str_mem_74_reg ${D}/home/root/
+    install -m 0755 ${UNPACKDIR}/drawing_vertical.sh ${D}/home/root/
+    install -m 0755 ${UNPACKDIR}/drawing_horizontal.sh ${D}/home/root/
+    install -m 0755 ${UNPACKDIR}/mtv-fill ${D}/home/root/
     install -m 0755 ${UNPACKDIR}/mtv_dump_via_flag ${D}/home/root/
 }
 
 # 3. Обязательно регистрируем путь, чтобы Yocto упаковал его в rpm/ipk/deb пакет
-FILES:${PN} += "/home/root/dma_test_rw"
-FILES:${PN} += "/home/root/mtv_dump_tool"
-FILES:${PN} += "/home/root/mtv_dump_qt_stop_gradient"
-FILES:${PN} += "/home/root/mtv_dump_qt_stop_gradient_v422"
-FILES:${PN} += "/home/root/r_reg_via_dev_mem_II"
-FILES:${PN} += "/home/root/read_all_via_dev_mem_II"
-FILES:${PN} += "/home/root/rw_via_dev_mem_II"
-FILES:${PN} += "/home/root/rw_via_str_mem_3_const"
-FILES:${PN} += "/home/root/rw_via_str_mem_74_reg"
+FILES:${PN} += "/home/root/drawing_vertical.sh"
+FILES:${PN} += "/home/root/drawing_horizontal.sh"
+FILES:${PN} += "/home/root/mtv-fill"
 FILES:${PN} += "/home/root/mtv_dump_via_flag"

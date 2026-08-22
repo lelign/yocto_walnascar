@@ -1,10 +1,12 @@
 #! /bin/sh
 # add driver mtv-overlay
-DRIVER="mtv-overlay"
-MODULE_INFO=$(lsmod | grep "^$DRIVER ")
+# add driver mtv-overlay mtv as mtv-overlay
+DRIVER="mtv" 
+MODULE_INFO=$(lsmod | grep -i $DRIVER)
 if [ -z "$MODULE_INFO" ]; then
-    insmod $(find / -type f -name mtv-overlay.ko)
+    insmod /lib/modules/*/kernel/profitt/mtv-overlay.ko
 fi
+
 # start app
 name=pbx-mtv-5161
 binpath=/usr/bin/$name
@@ -32,7 +34,7 @@ gpio_export_all () {
         echo "input_$i 1" >> /var/volatile/inputs_all
     done
     for i in $(echo $GPIO_LIST_IN" "$GPIO_LIST_OUT); do
-        echo $i > /sys/class/gpio/export;
+        echo $i > /sys/class/gpio/export 2>/dev/null;
     done
     for i in $GPIO_LIST_IN; do
         echo in > /sys/class/gpio/gpio$i/direction;
@@ -58,10 +60,10 @@ case "$1" in
   start)
     log_begin_msg "Starting $name daemon..."
     gpio_export_all
-    m26-eeprom
+    # m26-eeprom
     mkdir -p /var/volatile/hls/
     ln -sf /var/volatile/hls/ /www/pages/
-    start-stop-daemon --start -x $binpath
+#    start-stop-daemon --start -x $binpath
     ;;
   stop)
     log_begin_msg "Stopping $name daemon..."

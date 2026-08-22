@@ -1,7 +1,10 @@
 [Unit]
 Description=pbx-mtv-508 Application Service
 # Specify when to start the service (e.g., after the multi-user stage is reached)
-After=multi-user.target 
+# After=multi-user.target 
+# fast start after mount fs
+DefaultDependencies=no
+After=local-fs.target systemd-modules-load.service
 
 [Service]
 # Type can be simple, forking, oneshot, etc.
