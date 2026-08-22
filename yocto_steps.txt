@@ -2968,5 +2968,7 @@
                         0
         После этого bitbake благополучно собрал pbx-mtv-5161
         проверяю reboot
+        cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns
+                0 <= OK after reboot
 
                 
