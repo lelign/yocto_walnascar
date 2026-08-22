@@ -1,0 +1,41 @@
+From 8557a806519bc5b5748ec4ea6a9faf5317fc58d4 Mon Sep 17 00:00:00 2001
+From: lelign <ignatlelekin@gmail.com>
+Date: Fri, 17 Jul 2026 12:32:58 +0300
+Subject: [PATCH] dts: arm: a10: fix vmsgdma_cma_region: no-map
+Upstream-Status: Inappropriate [oe specific]
+
+---
+ .../dts/intel/socfpga/socfpga_arria10_socdk.dtsi   | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+index a3e2d4ea711b..34f85ed36bef 100644
+--- a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
++++ b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+@@ -32,12 +32,20 @@ reserved-memory {
+ 		#size-cells = <1>;
+ 		ranges;
+ 
+-		vmsgdma_cma_region: vmsgdma_cma@0 {
++		/*vmsgdma_cma_region: vmsgdma_cma@0 {
+ 			compatible = "shared-dma-pool";
+ 			reusable;
+-			size = <0x01000000>; /* ИСПРАВЛЕНО: Ровно 16 МБ под Double Buffering */
+-			alignment = <0x00001000>; /* Выравнивание по границе страницы (4КБ) */
++			size = <0x01000000>; // ИСПРАВЛЕНО: Ровно 16 МБ под Double Buffering
++			alignment = <0x00001000>; // Выравнивание по границе страницы (4КБ)
++		};*/
++		/* ИСПРАВЛЕНО: Привязали узел к физическому адресу 0x3F000000 и сделали его СТАТИЧЕСКИМ */
++		vmsgdma_cma_region: vmsgdma_cma@3f000000 {
++			compatible = "shared-dma-pool";
++			no-map; /* ЖЕСТКАЯ ИЗОЛЯЦИЯ: Ядро Linux больше никогда не залезет сюда кэшем! */
++			reg = <0x3f000000 0x01000000>; /* Ровно 16 МБ, начиная с адреса 0x3F000000 */
++			alignment = <0x00001000>; /* Выравнивание 4КБ */
+ 		};
++
+ 	};
+ 
+ 
+-- 
+2.43.0
+

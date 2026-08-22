@@ -1,0 +1,27 @@
+From 12bdc7911977b430e20621f5a0339452d53bb5da Mon Sep 17 00:00:00 2001
+From: lelign <ignatlelekin@gmail.com>
+Date: Tue, 28 Jul 2026 15:57:35 +0300
+Subject: [PATCH] increased reg = <0x3f000000 0x00BDE000> 12443648 (0xBDE000)
+Upstream-Status: Inappropriate [oe specific]
+
+---
+ arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+index 38a385ca6a15..2e72fe036966 100644
+--- a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
++++ b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+@@ -43,7 +43,8 @@ vmsgdma_cma_region: vmsgdma_cma@3f000000 {
+ 			compatible = "shared-dma-pool";
+ 			no-map; /* ЖЕСТКАЯ ИЗОЛЯЦИЯ: Ядро Linux больше никогда не залезет сюда кэшем! */
+ 			//reg = <0x3f000000 0x01000000>; /* Ровно 16 МБ, начиная с адреса 0x3F000000 */
+-			reg = <0x3f000000 0x005ef000>; /* Ровно 6221824 байт, начиная с адреса 0x3F000000 */
++			//reg = <0x3f000000 0x005ef000>; /* Ровно 6221824 байт, начиная с адреса 0x3F000000 */
++			reg = <0x3f000000 0x00BDE000>; /* Размер увеличен до 12443648 байт (0xBDE000) */
+ 			alignment = <0x00001000>; /* Выравнивание 4КБ */
+ 		};
+ 
+-- 
+2.43.0
+

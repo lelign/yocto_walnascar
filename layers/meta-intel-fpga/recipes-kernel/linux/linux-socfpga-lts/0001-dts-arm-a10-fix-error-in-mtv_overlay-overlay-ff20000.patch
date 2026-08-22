@@ -1,0 +1,25 @@
+From b7c895cea864061e5eb6e8e3f181effb73318713 Mon Sep 17 00:00:00 2001
+From: lelign <ignatlelekin@gmail.com>
+Date: Fri, 10 Jul 2026 00:58:12 +0300
+Subject: [PATCH] dts: arm: a10: fix error in mtv_overlay: overlay@ff200000
+Upstream-Status: Inappropriate [oe specific]
+---
+ arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+index aa3dd976c082..a3e2d4ea711b 100644
+--- a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
++++ b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+@@ -53,7 +53,7 @@ osc1 {
+ 		};
+ 
+ 		/* ИСПРАВЛЕНО: адрес в имени узла переведен в нижний регистр + N_AR_AR10_1*/
+-		mtv_overlay: overlay@ff204a00 {
++		mtv_overlay: overlay@ff200000 {
+ 			compatible = "pfrt,overlay";
+ 			reg = <0xFF200000 0x0030>;
+ 			memory-region = <&vmsgdma_cma_region>; /* Связка с CMA */
+-- 
+2.43.0
+

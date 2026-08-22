@@ -1,0 +1,27 @@
+From 4d865920f2a1be42f386265d3f2a5d67cad93ea3 Mon Sep 17 00:00:00 2001
+From: lelign <ignatlelekin@gmail.com>
+Date: Tue, 21 Jul 2026 14:56:16 +0300
+Subject: [PATCH] change size vmsgdma_cma_region reg = <0x3f000000 0x005ef000>
+Upstream-Status: Inappropriate [oe specific]
+
+---
+ arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+index 34f85ed36bef..dcf1191ded09 100644
+--- a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
++++ b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+@@ -42,7 +42,8 @@ reserved-memory {
+ 		vmsgdma_cma_region: vmsgdma_cma@3f000000 {
+ 			compatible = "shared-dma-pool";
+ 			no-map; /* ЖЕСТКАЯ ИЗОЛЯЦИЯ: Ядро Linux больше никогда не залезет сюда кэшем! */
+-			reg = <0x3f000000 0x01000000>; /* Ровно 16 МБ, начиная с адреса 0x3F000000 */
++			//reg = <0x3f000000 0x01000000>; /* Ровно 16 МБ, начиная с адреса 0x3F000000 */
++			reg = <0x3f000000 0x005ef000>; /* Ровно 6221824 байт, начиная с адреса 0x3F000000 */
+ 			alignment = <0x00001000>; /* Выравнивание 4КБ */
+ 		};
+ 
+-- 
+2.43.0
+

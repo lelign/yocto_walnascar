@@ -1,0 +1,27 @@
+From 3f3a949069fa4dd6e2136438ca50df2e5a79df7b Mon Sep 17 00:00:00 2001
+From: lelign <ignatlelekin@gmail.com>
+Date: Thu, 23 Jul 2026 11:28:23 +0300
+Subject: [PATCH] dts: add kick reg for DMA
+Upstream-Status: Inappropriate [oe specific]
+
+---
+ arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+index dcf1191ded09..38a385ca6a15 100644
+--- a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
++++ b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+@@ -64,7 +64,8 @@ osc1 {
+ 		/* ИСПРАВЛЕНО: адрес в имени узла переведен в нижний регистр + N_AR_AR10_1*/
+ 		mtv_overlay: overlay@ff200000 {
+ 			compatible = "pfrt,overlay";
+-			reg = <0xFF200000 0x0030>;
++			reg = <0xFF200000 0x0030>,	/*REG_DMA_DATA*/
++			<0xFF200004 0x0030>;		/*REG_DMA_KICK*/
+ 			memory-region = <&vmsgdma_cma_region>; /* Связка с CMA */
+ 			status = "okay";
+ 		};
+-- 
+2.43.0
+
