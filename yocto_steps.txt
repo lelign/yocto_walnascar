@@ -3008,3 +3008,28 @@
         0001-f2s-priority-port0-0x7-Assign-highest-priority-to-Po.patch
         Попытка выставить приоритет для моста fpga2sdram (чтобы при обращении к sdram у fpga приоритет был выше, чем у cpu)
         Реально это скорее всего не работает (но и не мешает, поэотму отставлено)
+
+        fix backup (на второй диск):
+                cp -r ~/ProjectsSDK /media/iru/backup/ProjectsSDK_22_08 
+                cp -r poky /media/iru/backup/poky-socfpga/poky_22_08
+
+        проверка сборки с новым архивом приложения pbx-mtv-5161
+                cp ~/ProjectsSDK/from_508_to_5161/pbx-mtv-5161.tar.gz \
+                /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-customer/application_pbxmtv5161/files/pbx-mtv-5161.tar.gz
+
+        bitbake core_image_minimal <= OK, no errors, no WARNINGS
+
+        проверка на плате
+        не работает!!!
+        systemctl status pbx-mtv-5161
+                /etc/init.d/pbx-mtv-5161.sh: .: line 13: can't open '/etc/profile.d/qt-qpa.sh': No such file or directory
+
+        добавил файл вручную, просорсил, заработало!
+
+        проверил рецепт pbx-mtv-5161.bb <= в SRC_URI не значится, добавил его туда, 
+        # install -m 0755 ${UNPACKDIR}/qt-qpa.sh ${D}${sysconfdir}/profile.d/ < убрал # 
+        увеличил PR = "r12" > PR = "r13"
+
+        bitbake core_image_minimal <= OK, no errors, no WARNINGS
+
+        проверка на плате, работает!!!

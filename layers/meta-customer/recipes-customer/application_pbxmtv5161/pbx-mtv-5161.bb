@@ -34,6 +34,7 @@ def find_newest_tarball(d):
 NEWEST_TAR = "${@find_newest_tarball(d)}"
 
 SRC_URI = "file://${NEWEST_TAR} \
+           file://qt-qpa.sh \ 
            file://snmp-profitt.conf \
            file://event_log_class_description \
            file://pbx-mtv-5161.sh \
@@ -54,7 +55,7 @@ do_unpack[vardeps] += "${@d.getVar('NEWEST_TAR') if os.path.exists(os.path.join(
 INITSCRIPT_PARAMS = "defaults 99"
 EXTRA_OECMAKE:append = " -DBOARD_REV=1"
 
-PR = "r12"
+PR = "r13"
 
 # Для Walnascar исходники всегда ищем в UNPACKDIR
 S = "${UNPACKDIR}"
@@ -71,7 +72,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/${INITSCRIPT_NAME} ${D}${sysconfdir}/init.d
     
     install -d ${D}${sysconfdir}/profile.d/
-#    install -m 0755 ${UNPACKDIR}/qt-qpa.sh ${D}${sysconfdir}/profile.d/
+    install -m 0755 ${UNPACKDIR}/qt-qpa.sh ${D}${sysconfdir}/profile.d/
     
     install -d ${D}/var
     install -d ${D}${sysconfdir}
