@@ -3000,3 +3000,11 @@
                         file://devtool-fragment.cfg \
                         "
         сooтветственоо включаем в commit все эти патчи сам рецепт и bbappend к нему
+
+        
+        
+        u-boot-socfpga
+        патч
+        0001-f2s-priority-port0-0x7-Assign-highest-priority-to-Po.patch
+        Попытка выставить приоритет для моста fpga2sdram (чтобы при обращении к sdram у fpga приоритет был выше, чем у cpu)
+        Реально это скорее всего не работает (но и не мешает, поэотму отставлено)

@@ -1,0 +1,39 @@
+From 3d9013d94a63fc486b4c0002292584baa0bbd526 Mon Sep 17 00:00:00 2001
+From: lelign <ignatlelekin@gmail.com>
+Date: Wed, 29 Jul 2026 19:06:42 +0300
+Subject: [PATCH] f2s-priority-port0 = <0x7> Assign highest priority to Port 0
+Upstream-Status: Inappropriate [oe specific]
+
+---
+ arch/arm/dts/socfpga_arria10-handoff.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm/dts/socfpga_arria10-handoff.dtsi b/arch/arm/dts/socfpga_arria10-handoff.dtsi
+index a3afb4d9df4..db5aa8e90c9 100644
+--- a/arch/arm/dts/socfpga_arria10-handoff.dtsi
++++ b/arch/arm/dts/socfpga_arria10-handoff.dtsi
+@@ -242,6 +242,12 @@
+ 		reg-names = "mpu_m0";
+ 		bootph-all;
+ 
++		/* ===== ADD YOUR F2S PORT PRIORITIES HERE ===== */
++		/* Value ranges from 0x0 (Lowest priority) to 0x7 (Highest priority) */
++		f2s-priority-port0 = <0x7>;  /* Assign highest priority to Port 0 */
++		//f2s-priority-port1 = <0x5>;  /* Assign medium priority to Port 1 */
++		//f2s-priority-port2 = <0x0>;  /* Assign lowest priority to Port 2  */
++
+ 		firewall {
+ 			mpu0 = <0x00000000 0x0000ffff>;
+ 			l3-0 = <0x00000000 0x0000ffff>;
+@@ -250,6 +256,8 @@
+ 			fpga2sdram2-0 = <0x00000000 0x0000ffff>;
+ 			bootph-all;
+ 		};
++
++		
+ 	};
+ 
+ 	hps_fpgabridge0: fpgabridge@0 {
+-- 
+2.43.0
+
