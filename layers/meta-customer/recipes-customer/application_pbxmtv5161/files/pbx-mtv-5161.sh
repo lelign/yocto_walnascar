@@ -63,7 +63,7 @@ case "$1" in
     # m26-eeprom
     mkdir -p /var/volatile/hls/
     ln -sf /var/volatile/hls/ /www/pages/
-#    start-stop-daemon --start -x $binpath
+    start-stop-daemon --start -x $binpath
     ;;
   stop)
     log_begin_msg "Stopping $name daemon..."

@@ -55,16 +55,25 @@ do_unpack[vardeps] += "${@d.getVar('NEWEST_TAR') if os.path.exists(os.path.join(
 INITSCRIPT_PARAMS = "defaults 99"
 EXTRA_OECMAKE:append = " -DBOARD_REV=1"
 
-PR = "r13"
+PR = "r16"
 
 # Для Walnascar исходники всегда ищем в UNPACKDIR
 S = "${UNPACKDIR}"
 
 inherit cmake_qt5 initscript
 
+#do_configure:prepend() {
+#    # Создаем version.h прямо в директории исходников перед вызовом CMake
+#    echo "#define VERSION \"${PV}-${PR} (\" __DATE__ \")\"" > ${S}/version.h
+#}
+
+# Запись макроса в заголовочный файл version.h для отображения браузере в поле 
+# System > version information > Version
 do_configure:prepend() {
-    # Создаем version.h прямо в директории исходников перед вызовом CMake
-    echo "#define VERSION \"${PV}-${PR} (\" __DATE__ \")\"" > ${S}/version.h
+   # Добавляем +3 часа к текущему времени сборки
+   BUILD_TIME=$(date -d '+3 hours' +'%m-%d_%H:%M')   
+   # Записываем макрос APP_VERSION в файл version.h
+   echo "#define APP_VERSION \"${PV}-${PR} (${BUILD_TIME})\"" > ${S}/version.h
 }
 
 do_install:append() {
