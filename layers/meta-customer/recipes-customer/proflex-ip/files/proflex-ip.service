@@ -1,0 +1,12 @@
+[Unit]
+Description=Proflex IP Service
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/etc/init.d/proflex-ip.sh start
+ExecStop=/etc/init.d/proflex-ip.sh stop
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
