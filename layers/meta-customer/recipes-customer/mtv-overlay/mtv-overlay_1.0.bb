@@ -31,11 +31,10 @@ NEWEST_MTV_OVERLLAY = "${@find_newest_tarball(d)}"
 
 SRC_URI = " \
     file://mtv-overlay.c \
-    file://one-buffer-mtv-overlay.c \
     file://Makefile \
 "
 
-PR = "r13"
+PR = "r39"
 
 
 S = "${WORKDIR}/sources"
@@ -48,9 +47,9 @@ export INSTALL_MOD_DIR="kernel/profitt"
 
 
 # Force re-execution of compile and install tasks every time
-do_compile[nostamp] = "1"
-do_install[nostamp] = "1"
+# do_compile[nostamp] = "1"
+# do_install[nostamp] = "1"
 # for pbx-mtv-5161
 RPROVIDES:${PN} += "pbx-mtv-508-modules"
 # add one-buffer-mtv-overlay in the same dir as mtv-overlay
-RDEPENDS:${PN} += "kernel-module-one-buffer-mtv-overlay"
+# RDEPENDS:${PN} += "kernel-module-one-buffer-mtv-overlay"

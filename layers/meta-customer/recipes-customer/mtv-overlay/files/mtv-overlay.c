@@ -282,10 +282,12 @@ static int mtv_overlay_probe(struct platform_device *pdev)
         memset_io(board->virt, 0, board->mem_size);
 
         
-        dev_info(&pdev->dev, "v35.4 DTS PHYSICAL BASE ADDRESS: 0x%llx\n", (unsigned long long)board->dma);
-        dev_info(&pdev->dev, "v35.4 DTS MEMORY SIZE: %zu bytes\n", board->mem_size);
-        dev_info(&pdev->dev, "v35.4 Kernel Virtual Space (virt): %p\n", board->virt);
-        dev_info(&pdev->dev, "NEW FLIP IOCTL CODE: FLIP=0x%X\n", (unsigned int)OVERLAY_IOCTL_FLIP_BUFFER);
+        // dev_info(&pdev->dev, "\tv35.4 DTS PHYSICAL BASE ADDRESS: 0x%llx\n", (unsigned long long)board->dma);
+        // dev_info(&pdev->dev, "\tv35.4 DTS MEMORY SIZE: %zu bytes\n", board->mem_size);
+        // dev_info(&pdev->dev, "\tv35.4 Kernel Virtual Space (virt): %p\n", board->virt);
+        // dev_info(&pdev->dev, "\tNEW FLIP IOCTL CODE: FLIP=0x%X\n", (unsigned int)OVERLAY_IOCTL_FLIP_BUFFER);
+
+        dev_info(&pdev->dev, "\tv39 DTS PHYSICAL BASE ADDRESS: 0x%llx\n\tv39 DTS MEMORY SIZE: %zu bytes\n\tv39 Kernel Virtual Space (virt): %p\n\tNEW FLIP IOCTL CODE: FLIP=0x%X\n", (unsigned long long)board->dma, board->mem_size, board->virt, (unsigned int)OVERLAY_IOCTL_FLIP_BUFFER);
 
         // Регистрация символьного устройства
         ret = alloc_chrdev_region(&board->devt, 0, 1, DRV_NAME);
