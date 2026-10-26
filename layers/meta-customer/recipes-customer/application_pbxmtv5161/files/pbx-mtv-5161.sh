@@ -1,17 +1,17 @@
 #! /bin/sh
 # add driver mtv-overlay
 # add driver mtv-overlay mtv as mtv-overlay
-DRIVER="mtv" 
-MODULE_INFO=$(lsmod | grep -i $DRIVER)
-if [ -z "$MODULE_INFO" ]; then
-    insmod /lib/modules/*/kernel/profitt/mtv-overlay.ko
+# tsin
+echo -e "\tstart script pbx-mtv-5161.sh n1"
+if [ -z "$(find /dev -type c -name tsin1)" ]; then
+    rm -f /dev/tsin1
+    mkfifo  /dev/tsin1
+    chmod 666  /dev/tsin1
 fi
+echo "1.3.5.7.9.11.13.15" > /home/root/video_exist
 
-# start app
-name=pbx-mtv-5161
-binpath=/usr/bin/$name
-. /etc/profile.d/qt-qpa.sh
 
+name=pbx-mtv-5161.sh
 INPUTS_ALL=$(seq 1 16)
 GPIO_LIST_IN=$(seq 512 521)" "$(seq 528 535)" 544 545" # inputs on d14 d15 (16) & fan_state (2)
 GPIO_LIST_OUT="536 546 553 554" # output d15, fan_reset & leds on plate
@@ -63,17 +63,17 @@ case "$1" in
     # m26-eeprom
     mkdir -p /var/volatile/hls/
     ln -sf /var/volatile/hls/ /www/pages/
-    start-stop-daemon --start -x $binpath
+#    start-stop-daemon --start -x $binpath
     ;;
   stop)
     log_begin_msg "Stopping $name daemon..."
     gpio_unexport_all
-    start-stop-daemon --stop -x $binpath
+#    start-stop-daemon --stop -x $binpath
     ;;
   restart)
     log_begin_msg "Restarting $name daemon..."
-    start-stop-daemon --stop -x $binpath
-    start-stop-daemon --start -x $binpath
+#   start-stop-daemon --stop -x $binpath
+#   start-stop-daemon --start -x $binpath
 
     ;;
   reload-or-restart)

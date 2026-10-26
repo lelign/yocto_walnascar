@@ -1,17 +1,18 @@
 [Unit]
 Description=pbx-mtv-508 Application Service
-# Specify when to start the service (e.g., after the multi-user stage is reached)
-# After=multi-user.target 
-# fast start after mount fs
 DefaultDependencies=no
 After=local-fs.target systemd-modules-load.service
 
 [Service]
-# Type can be simple, forking, oneshot, etc.
 Type=simple
-# Command to execute (use the full path where it will be installed)
-ExecStart=/etc/init.d/pbx-mtv-5161.sh start
+ExecStartPre=/bin/sh /etc/init.d/pbx-mtv-5161.sh start
+Environment="QT_QPA_PLATFORM=offscreen"
+Environment="QT_QPA_FONTDIR=/usr/share/fonts/truetype"
+ExecStart=/usr/bin/pbx-mtv-5161
+StandardOutput=journal
+StandardError=journal
+Restart=always
+RestartSec=3
 
 [Install]
-# This ensures the service is started with the multi-user target
 WantedBy=multi-user.target

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# важно путь для этого файла /home/iru/poky-socfpga/build/tmp/hosttools/tar
+# 1. Путь к вашему стабильному tar 1.34
+STATIC_TAR="/home/iru/static-tar/bin/tar"
+if [ ! -f "$STATIC_TAR" ]; then
+    STATIC_TAR="/usr/bin/tar"
+fi
+
+# 2. Если это распаковка (tar -xf - -C /путь), убираем флаги сохранения прав (-p, --overwrite),
+# так как именно из-за них pseudo и ядро 7.0 ломают дескрипторы openat/mkdirat
+if echo "$@" | grep -q "\-xf"; then
+    # Фильтруем аргументы: удаляем "-p" (preserve permissions) и строгие маски
+    CLEANED_ARGS=$(echo "$@" | sed 's/ -p//g; s/--overwrite//g')
+    
+    # Запускаем стабильный tar с очищенными флагами
+    exec "$STATIC_TAR" $CLEANED_ARGS
+fi
+
+# 3. Для всех остальных вызовов (создание архивов -cf) просто передаем управление
+exec "$STATIC_TAR" "$@"

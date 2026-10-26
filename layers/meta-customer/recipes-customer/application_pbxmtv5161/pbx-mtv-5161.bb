@@ -1,7 +1,9 @@
 SUMMARY = "PBX MTV Application"
 LICENSE = "CLOSED"
 
-# Переводим зависимости на правильный синтаксис Walnascar (через двоеточие)
+# Переводим зависимости на чистый синтаксис Walnascar и подключаем ТОЛЬКО systemd
+inherit cmake_qt5 systemd
+
 RDEPENDS:${PN} = "ca-certificates \
     tzdata tzdata-misc tzdata-posix tzdata-right tzdata-africa \
     tzdata-americas tzdata-antarctica tzdata-arctic tzdata-asia \
@@ -14,7 +16,11 @@ DEPENDS = "qtbase qtwebsockets qtserialport libusb bitstream qtsvg zvbi nlohmann
 
 INITSCRIPT_NAME = "pbx-mtv-5161.sh"
 PACKAGE_ARCH = "${MACHINE}"
-SYSTEMD_SERVICE:${PN} = "pbx-mtv-508.service"
+
+# Настройки для системного класса systemd
+SYSTEMD_PACKAGES = "${PN}"
+SYSTEMD_SERVICE:${PN} = "pbx-mtv-5161.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 # 1. Автоматический поиск самого нового архива в папке files/
 def find_newest_tarball(d):
@@ -40,35 +46,25 @@ SRC_URI = "file://${NEWEST_TAR} \
            file://pbx-mtv-5161.sh \
            file://pbx-mtv-5161.service \
            file://${INITSCRIPT_NAME} \
+           file://OP_47_emulator \
+           file://scte_tty_gen \
 "
 # Принудительно проверяем реальный файл на диске, который нашла Python-функция
 do_unpack[file-checksums] += "${THISDIR}/files/${NEWEST_TAR}:True"
 
-# ХАК ДЛЯ WALNASCAR: Заставляем BitBake следить за mtime (временем изменения) 
-# самого нового найденного архива. Как только вы обновите его через SDK — кэш сбросится сам!
-# do_unpack[vardeps] += "${@os.path.exists(os.path.join(d.getVar('THISDIR'), 'files', d.getVar('NEWEST_TAR'))) ? d.getVar('NEWEST_TAR') : ''}"
 # Заставляем BitBake следить за изменением конкретного файла архива
 do_unpack[vardeps] += "${@d.getVar('NEWEST_TAR') if os.path.exists(os.path.join(d.getVar('THISDIR'), 'files', d.getVar('NEWEST_TAR'))) else ''}"
-
-
 
 INITSCRIPT_PARAMS = "defaults 99"
 EXTRA_OECMAKE:append = " -DBOARD_REV=1"
 
-PR = "r16"
+# Поднимаем ревизию для opkg на плате
+PR = "r21"
 
 # Для Walnascar исходники всегда ищем в UNPACKDIR
 S = "${UNPACKDIR}"
 
-inherit cmake_qt5 initscript
-
-#do_configure:prepend() {
-#    # Создаем version.h прямо в директории исходников перед вызовом CMake
-#    echo "#define VERSION \"${PV}-${PR} (\" __DATE__ \")\"" > ${S}/version.h
-#}
-
-# Запись макроса в заголовочный файл version.h для отображения браузере в поле 
-# System > version information > Version
+# Запись макроса в заголовочный файл version.h
 do_configure:prepend() {
    # Добавляем +3 часа к текущему времени сборки
    BUILD_TIME=$(date -d '+3 hours' +'%m-%d_%H:%M')   
@@ -91,16 +87,28 @@ do_install:append() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/pbx-mtv-5161.service ${D}${systemd_system_unitdir}
     
-    install -d ${D}${systemd_system_unitdir}/multi-user.target.wants
-    ln -sf ${systemd_system_unitdir}/pbx-mtv-5161.service ${D}${systemd_system_unitdir}/multi-user.target.wants/pbx-mtv-5161.service
+    install -d ${D}/home/root
+    install -m 0755 ${UNPACKDIR}/OP_47_emulator ${D}/home/root/
+    install -m 0755 ${UNPACKDIR}/scte_tty_gen ${D}/home/root/
 }
 
-# Исправлен синтаксис пост-инсталляции на современный Yocto
 pkg_postinst:${PN} () {
     rm -f $D${sysconfdir}/xdg/pbx-mtv-508*
 }
 
-# Исправлен синтаксис маппинга файлов в пакет
-FILES:${PN} += "${sysconfdir}/init.d/${INITSCRIPT_NAME}"
-FILES:${PN} += "${systemd_system_unitdir}/pbx-mtv-5161.service"
-FILES:${PN} += "${systemd_system_unitdir}/multi-user.target.wants/pbx-mtv-5161.service"
+# для remote_update
+# Это заставит BitBake при сборке автоматически дописывать exit 0 в конец системных скриптов
+pkg_prerm:append:${PN}() {
+    exit 0
+}
+
+# Явно расписываем все файлы по пакетам для Walnascar (Защита от QA Issue)
+FILES:${PN} += " \
+    ${sysconfdir}/init.d/pbx-mtv-5161.sh \
+    ${sysconfdir}/profile.d/qt-qpa.sh \
+    ${sysconfdir}/snmp-profitt.conf \
+    /var/event_log_class_description \
+    ${systemd_system_unitdir}/pbx-mtv-5161.service \
+    /home/root/OP_47_emulator \
+    /home/root/scte_tty_gen \
+"
