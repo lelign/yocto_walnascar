@@ -3033,3 +3033,290 @@
         bitbake core_image_minimal <= OK, no errors, no WARNINGS
 
         проверка на плате, работает!!!
+
+
+
+11_09 ign
+        Проблема с UART во время загрузки
+        на плате с установленной утилитой dtc
+        декомпилируем имеющийся tree
+                dtc -I fs -O dts -o /tmp/extracted_board.dts /proc/device-tree
+
+        cat /tmp/extracted_board.dts | grep aliases -A 3
+                aliases {
+                        ethernet0 = "/soc/ethernet@ff804000";
+                        serial0 = "/soc/serial@ffc02100";                               <= для serial0 назначен ffc02100
+                }; 
+
+        cat /tmp/extracted_board.dts | grep chosen -A 4
+	chosen {
+		u-boot,version = "2025.07";
+		stdout-path = "serial0:115200n8";                                       <= Linux при старте считает порт ffc02100 главным 
+		bootargs = "root=/dev/mmcblk0p2 rootwait rw console=ttyS1,115200n8";
+	};
+        
+        cat /tmp/extracted_board.dts | grep serial@ffc02000 -A 10
+		serial@ffc02000 {                                                       <= serial@ffc02000 другой!!!
+			reg-io-width = <0x04>;
+			compatible = "snps,dw-apb-uart";
+			clocks = <0x1f>;
+			resets = <0x06 0x50>;
+			status = "okay";
+			interrupts = <0x00 0x6e 0x04>;
+			reg = <0xffc02000 0x100>;                                       <= 0xffc02000
+			reg-shift = <0x02>;
+		};
+
+        В U-Boot, в железе — это физический ffc02000.
+        Но в файле .dtb  имя serial0 назначено второму порту — ffc02100.
+        Из-за этого ядро Linux при старте считает порт ffc02100 главным (stdout-path = "serial0:115200n8"), 
+        присваивает ему имя ttyS0 и пытается слать логи загрузки туда.
+        Реальный физический порт ffc02000 (в который воткнут кабель) ядро считает портом serial1 и 
+        переименовывает его в ttyS1!
+
+        решение
+                временно на sd-карте в разделе boot
+                        редактируем файл /boot/extlinux/extlinux.conf
+                                APPEND root=/dev/mmcblk0p2 rootwait rw console=ttyS1,115200n8  <= ttyS1
+
+                постоянно
+                        внести соотв. изменения в Yocto
+                        значение 
+                                serial0 = &uart1; никакими патчами не изменяется
+
+                        в файле /home/iru/poky-socfpga/not_used_dts_dtsi_linux_socfpga_lts/socfpga_arria10.dtsi
+                                uart0: serial@ffc02000 {
+                                        ...
+                                        reg = <0xffc02000 0x100>; никакими патчами не изменяется
+
+                                uart1: serial@ffc02100 {
+                                        ...
+                                        reg = <0xffc02100 0x100>; никакими патчами не изменяется
+
+
+
+                        bitbake-getvar -r u-boot-socfpga PV
+                                PV="v2025.07+git"
+
+
+                        bitbake-getvar -r u-boot-socfpga UBOOT_EXTLINUX_KERNEL_ARGS
+                                UBOOT_EXTLINUX_KERNEL_ARGS="rootwait rw"
+
+                        bitbake-getvar -r u-boot-socfpga UBOOT_EXTLINUX_CONSOLE
+                                #
+                                # $UBOOT_EXTLINUX_CONSOLE [2 operations]
+                                #   set? /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/conf/machine/arria10.conf:42
+                                #     "console=ttyS0,115200n8"
+                                #   set /home/iru/poky-socfpga/poky/meta/classes-recipe/uboot-extlinux-config.bbclass:67
+                                #     [_defaultval] "console=${console},${baudrate}"
+                                # pre-expansion value:
+                                #   "console=ttyS0,115200n8"
+                                UBOOT_EXTLINUX_CONSOLE="console=ttyS0,115200n8"
+
+                        таким образом изменения следует внести в назначение переменной 
+                                UBOOT_EXTLINUX_CONSOLE
+        
+        
+20_09 ign
+	Обнаружилась проблема при установке сетевого соединения с использованием VPN
+	Ситуация:
+		в моей офисной сети на роутере поднято vpn соединение L2TP с сервером Profitt-vpn
+		роутер получил адрес 192.168.5.ххх
+		с ноутбука я имею доступ ко всем устройствам в сети 192.168.2.ххх
+		на роутере сделан проброс портов во внутренннюю сеть (TCP2222->TCP22 для адреса 192.168.222.45 <arria10>)
+	Проблема:
+		нет доступа с IRU <192.168.2.135> к моей arria10  <ssh -p 2222 root@192.168.5.xxx>
+	Решение:
+		смотрим на состояние сетевых интерфейсов
+		root@arria10:~# ip a 
+			1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
+    			link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    			inet 127.0.0.1/8 scope host lo
+       			valid_lft forever preferred_lft forever
+    			inet6 ::1/128 scope host noprefixroute 
+       			valid_lft forever preferred_lft forever
+			2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq qlen 1000
+    			link/ether 0a:1b:2c:3d:4e:5f brd ff:ff:ff:ff:ff:ff
+    			inet 192.168.0.209/24 brd 192.168.0.255 scope global eth0
+       			valid_lft forever preferred_lft forever
+    			inet 192.168.222.45/24 brd 192.168.222.255 scope global dynamic eth0
+       			valid_lft 24025sec preferred_lft 24025sec
+    			inet6 fe80::81b:2cff:fe3d:4e5f/64 scope link 
+       			valid_lft forever preferred_lft forever
+			3: sit0@NONE: <NOARP> mtu 1480 qdisc noop qlen 1000
+    l			ink/sit 0.0.0.0 brd 0.0.0.0
+    
+    			т.о. имеем два активных соединения на одном интерфейсе
+    			
+    		смотрим на состояние подключенных gateway
+    		root@arria10:~# ip route
+			default via 192.168.0.1 dev eth0 					
+			default via 192.168.222.1 dev eth0  src 192.168.222.45  metric 1024 
+			192.168.0.0/24 dev eth0 scope link  src 192.168.0.209 
+			192.168.222.0/24 dev eth0 scope link  src 192.168.222.45  metric 1024 
+			192.168.222.1 dev eth0 scope link  src 192.168.222.45  metric 1024
+			
+			оба как default!
+			
+		удаляем gateway  192.168.0.1
+		root@arria10:~# ip route del default via 192.168.0.1
+
+		теперь доступ от IRU <ssh -p 2222 root@192.168.5.xxx> работает до следующей перезагрузки arria10
+		
+	Проблема:
+		отключение HDMI выхода на плате после нагрева (примерно через 5 минут после включения)
+	Решение:
+		убрал поролоновую прокладку между BNC разьемами, отключений HDMI выхода больше не видел.
+		
+	Проблема:
+		Иногда дергается изображение и появляются фиолетовые срывы при старте приложения или смене layout
+		
+	Решение (требуется время на проверку, за два дня дерганий или срывов не видел):
+		подключил библиотеку QMutex
+		она исключает многократный вызов функций draw_overlay/draw_overlay_fast
+		"закрывает дверь" для вызовов функции, если она уже была вызвана и еще работает, вызовы перед закрытой дверью тихо
+		ждут, когда дверь отроется
+		в mtv-system.h
+			#include <QMutex> 
+			QMutex m_mutex_draw; 		<- для draw_overlay
+			QMutex m_mutex_draw_fast; 	<- для draw_overlay_fast
+		в mtv-system.cpp 
+			<void PbxMtvSystem::draw_overlay>
+				QMutexLocker locker(&m_mutex_draw); 
+			<void PbxMtvSystem::draw_overlay_fast>
+				QMutexLocker locker(&m_mutex_draw_fast); 
+				
+		
+16_10 ign
+	добавил драйвер ts-in в сборку
+		сам драйвер указан в рецепте /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-customer/pbx-str-500-modules
+		исходник ts-in.c
+		devtool status
+			NOTE: Starting bitbake server...
+			INFO: No recipes currently in your workspace
+		
+		devtool modify linux-socfpga-lts
+		code -n /home/iru/poky-socfpga/build/workspace/sources/linux-socfpga-lts
+		edit arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+		devtool build linux-socfpga-lts  < OK
+		git status
+			 modified:   arch/arm/boot/dts/intel/socfpga/socfpga_arria10_socdk.dtsi
+		git commit -m "added tsin2@ff209840 in soc"
+		git format-patch -1 HEAD --output-directory /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux/socfpga-lts
+		devtool reset linux-socfpga-lts
+		add into /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts/0001-added-tsin2-ff209840-in-soc.patch
+		 	Upstream-Status: Inappropriate [oe specific]
+		add into /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/recipes-kernel/linux/linux-socfpga-lts_6.12.bbappend
+			file://0001-added-tsin2-ff209840-in-soc.patch \
+			
+		bitbake linux-socfpga-lts -c configure < OK
+		bitbake core-image-minimal < OK
+		
+		
+		check on board а10
+			dmesg | grep tsin
+				[    8.447946] tsin_init
+				[    8.450483] tsin_probe
+			
+			lsmod
+				Module                  Size  Used by
+				ts_in                  12288  0			< exist
+				str_mem                12288  0
+				mtv_overlay            12288  2
+			
+			ls /dev/tsin1 -l
+				crw-------    1 root     root      245,   1 May 29 19:30 /dev/tsin1 < exist
+				
+			
+		эмуляторы OP-47 и scte не могут работать с файлом /dev/tsin1, когда он в режиме crw-------
+                для использования эмуляторов OP-47 и scte
+                rmmod ts-in                     выгрузить драйвер
+                rm -f /dev/tsin1                удалить файл
+                mkfifo /dev/tsin1               создать файл типа pipe
+                chmod 666 /dev/tsin1
+
+                добавил описание драйвера 
+                /home/iru/poky-socfpga/poky/layers/meta-customer/recipes-customer/pbx-str-500-modules/files/Описание_драйвера_ts-in.c.odt
+		
+
+19_10_ign
+        in file /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/conf/machine/arria10.conf
+                # ignat changed console=ttyS0,115200n8 to console=ttyS1,115200n8 for UART possability
+                #UBOOT_EXTLINUX_CONSOLE ?= "console=ttyS0,115200n8"
+                UBOOT_EXTLINUX_CONSOLE ?= "console=ttyS1,115200n8"
+
+        check
+                bitbake-getvar -r u-boot-socfpga UBOOT_EXTLINUX_CONSOLE
+                        #
+                        # $UBOOT_EXTLINUX_CONSOLE [2 operations]
+                        #   set? /home/iru/poky-socfpga/poky/layers/meta-intel-fpga/conf/machine/arria10.conf:45
+                        #     "console=ttyS1,115200n8"
+                        #   set /home/iru/poky-socfpga/poky/meta/classes-recipe/uboot-extlinux-config.bbclass:67
+                        #     [_defaultval] "console=${console},${baudrate}"
+                        # pre-expansion value:
+                        #   "console=ttyS1,115200n8"
+                        UBOOT_EXTLINUX_CONSOLE="console=ttyS1,115200n8"  < изменилось
+
+        перенес исходники для приложения pbx-mtv-5161 как архив pbx-mtv-5161.tar.gz
+        из /home/iru/ProjectsSDK/ant_add_ign
+        в /home/iru/poky-socfpga/poky/layers/meta-customer/*/*/files/pbx-mtv-5161.tar.gz
+
+        внес изменения в /home/iru/poky-socfpga/poky/layers/meta-customer/*/*/files/pbx-mtv-5161.sh
+        для генерации video_exist и создания /dev/tsin1 как pipe, если нет драйвера ts-in
+        добавил автоматическую установку собранных бинарников OP_47_emulator и scte_tty_gen в /home/root на arria10
+
+
+22_10_ign
+        remote-update
+                установил rust на IRU
+                создал каталоги 
+                        /home/iru/ProjectsSDK/ant_add_ign/A_remote_update_rust бинарник для IRU для remote-update
+                        /home/iru/ProjectsSDK/ant_add_ign/pbx-mtv-508-20250714-4.16.1-r2-update (данные для обновления)
+                сборка бинарника
+                        pwd
+                                /home/iru/ProjectsSDK/ant_add_ign/A_remote_update_rust
+                        cargo build --release
+                обновление 508
+                        pwd
+                                /home/iru/ProjectsSDK/ant_add_ign/pbx-mtv-508-20250714-4.16.1-r2-update
+
+                        cp /home/iru/ProjectsSDK/ant_add_ign/A_remote_update_rust/target/release/remote_update \                                
+                                /home/iru/ProjectsSDK/ant_add_ign/pbx-mtv-508-20250714-4.16.1-r2-update/
+
+                        ./remote_update 192.168.5.124:2209 ./data               < success
+
+                чтобы Yocto собирал ipk файлы, добавил в /home/iru/poky-socfpga/poky/local.conf
+                        PACKAGE_CLASSES ?= "package_ipk"
+
+                bitbake pbx-mtv-5161 падает с ошибкой по поводу tar, не нравится он ему
+                системный tar 
+                /usr/bin/tar --version
+                        tar (GNU tar) 1.35
+                при его вызове используется wrapper
+                file /home/iru/poky-socfpga/build/tmp/hosttools/tar
+                        /home/iru/poky-socfpga/build/tmp/hosttools/tar: POSIX shell script, Unicode text, UTF-8 text executable
+                сохранил его как /home/iru/poky-socfpga/poky/tar_old (резерв под git)
+                внес изменения в /home/iru/poky-socfpga/build/tmp/hosttools/tar
+                сохранил его как /home/iru/poky-socfpga/poky/tar_new (резерв под git)
+                установил
+                        $HOME/static-tar/bin/tar
+                последовательность установки в iru@iru-ubuntu:~/old_tar
+                $HOME/static-tar/bin/tar --version
+                        tar (GNU tar) 1.34
+
+                добавил в /home/iru/poky-socfpga/poky/local.conf
+                        # подмена tar старым, принудительно заставляем Yocto использовать стабильный tar 1.34 для ВСЕХ рецептов
+                        HOSTTOOLS_DEPS[tar] = "/home/iru/static-tar/bin/tar"
+                        # Разрешаем сборщику использовать этот tar во всех критических задачах упаковки
+                        HOSTTOOLS_NONFATAL += "tar"
+
+                все благополучно собралось
+                du /home/iru/poky-socfpga/walnascar_deploy/ipk -sh
+                        120M    /home/iru/poky-socfpga/walnascar_deploy/ipk/arria10
+                        940M    /home/iru/poky-socfpga/walnascar_deploy/ipk/cortexa9t2hf-neon
+                        3.8M    /home/iru/poky-socfpga/walnascar_deploy/ipk/all
+                        1.1G    /home/iru/poky-socfpga/walnascar_deploy/ipk   
+
+                
+
+                

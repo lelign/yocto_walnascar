@@ -173,3 +173,8 @@ layers/meta-customer/recipes-customer/hello-world-module/
 layers/meta-customer/recipes-customer/mtv-overlay/files/*
 !layers/meta-customer/recipes-customer/mtv-overlay/files/Makefile
 !layers/meta-customer/recipes-customer/mtv-overlay/files/mtv-overlay.c
+layers/meta-customer/recipes-customer/application_pbxmtv5161/files/pbx-mtv-5161-v1910-20-51.tar.gz
+layers/meta-customer/recipes-customer/application_pbxmtv5161/files/old_pbx-mtv-5161.tar.gz
+layers/meta-customer/recipes-customer/application_pbxmtv5161/files/scte_tty_gen
+layers/meta-customer/recipes-customer/application_pbxmtv5161/files/OP_47_emulator
+layers/meta-customer/recipes-customer/pbx-str-500-modules/files/Описание_драйвера_ts-in.c.odt
