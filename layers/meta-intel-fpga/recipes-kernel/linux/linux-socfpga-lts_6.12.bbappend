@@ -14,6 +14,8 @@ SRC_URI += "file://0001-third-try-join-netconfig-i2c.patch \
 
 # Добавляем наш конфигурационный файл в список исходников рецепта
 SRC_URI += "file://defconfig"
+# ts-in driver
+#SRC_URI += "file://0001-added-tsin2-ff209840-in-soc.patch"
 
 # Опционально: если ваше ядро использует мета-данные Yocto (yocto-kernel-architecture),
 # эта строка гарантирует, что defconfig принудительно заменит стандартную конфигурацию.
